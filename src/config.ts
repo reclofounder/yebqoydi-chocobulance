@@ -12,8 +12,8 @@ export const PHONE_DISPLAY = '105';
 
 export const PHONE_TEL = `tel:${PHONE}`;
 
-/** Price in UZS as displayed (digit groups separated by a plain space). */
-export const PRICE = '99 000';
+/** Price in UZS as displayed. Digit groups are joined by a no-break space (U+00A0) so it never wraps. */
+export const PRICE = '99\u00a0000';
 
 /** teaser = pre-launch, live = accepting calls, ended = campaign over. */
 export type Mode = 'teaser' | 'live' | 'ended';

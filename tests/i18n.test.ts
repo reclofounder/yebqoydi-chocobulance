@@ -20,7 +20,7 @@ test('no literal hotline or price in copy, only templates', () => {
   for (const d of [uz, ru]) {
     for (const [k, v] of Object.entries(d)) {
       expect(v, k).not.toMatch(/(?<!\d)105(?!\d)/);
-      expect(v, k).not.toContain('99 000');
+      expect(v, k).not.toMatch(/99\s000/); // \s also matches the no-break space
     }
   }
 });
@@ -29,7 +29,7 @@ test('t fills templates', () => {
   expect(t('hero.title2', 'uz')).toBe('105 ga qoʻngʻiroq qiling.');
   expect(t('hero.title2', 'ru')).toBe('Звоните 105.');
   expect(t('hero.numeral', 'uz')).toBe('105');
-  expect(t('door.price', 'uz')).toBe('99 000 soʻm');
+  expect(t('door.price', 'uz')).toBe('99\u00a0000 soʻm');
   expect(t('cta.or', 'uz')).toBe('yoki 105');
 });
 

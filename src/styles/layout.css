@@ -288,6 +288,7 @@ h3 {
 
 /* "Soon" / "Ended" pill: the engine swaps the link for a span carrying only class and data-cta. */
 .cta--disabled,
+.cta--disabled:hover,
 .cta--disabled:active {
   background: var(--grey-out);
   color: var(--choco-soft);
@@ -543,6 +544,7 @@ h3 {
   font-size: var(--fs-h2);
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .price-card__note {
