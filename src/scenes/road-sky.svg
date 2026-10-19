@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" class="scene__art layer-sky" aria-hidden="true" focusable="false">
   <!-- Road scene, back layer: the sky, 800x450, filling the stage (it does not travel). Its two
-       stops read --road-sky-top / --road-sky-bottom, which scenes.css sets on the road section to
-       the dawn tokens; the timeline moves them toward the day tokens as the van drives. Phones
+       stops read the road-sky-top / road-sky-bottom custom properties, which scenes.css sets on
+       the road section to the dawn tokens; the timeline moves them toward the day tokens as the van drives. Phones
        see x 220-580. Tokens only. -->
   <defs>
     <linearGradient id="road-sky-fill" x1="0" y1="0" x2="0" y2="1">

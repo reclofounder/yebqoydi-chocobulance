@@ -200,6 +200,15 @@ describe('scene art sources', () => {
     },
   );
 
+  it.each(ART)(
+    '%s is well-formed XML (it is parsed as an SVG document, not only as HTML)',
+    (name) => {
+      const doc = new DOMParser().parseFromString(sources[name], 'image/svg+xml');
+      expect(doc.querySelector('parsererror')).toBeNull();
+      expect(doc.documentElement.localName).toBe('svg');
+    },
+  );
+
   it('keeps each drawing under 20 KB and all of them under 100 KB (they ship inside the JS)', () => {
     const sizes = ART.map((name) => Buffer.byteLength(sources[name]));
     for (const [i, size] of sizes.entries()) expect(size, ART[i]).toBeLessThan(20_000);
@@ -225,6 +234,13 @@ describe('scenes.css', () => {
     );
     // The hero is a wide street strip at every size, so its van stays in the first screen.
     expect(body('#hero .scene__stage')).toMatch(/aspect-ratio:\s*16\s*\/\s*9/);
+  });
+
+  it('sizes the price tag to its unbroken price, so the price never spills out on a narrow phone', () => {
+    // jsdom has no layout: guard the rule pair that keeps "99 000 soʻm" inside the red tag.
+    expect(body('.price-badge__price')).toMatch(/white-space:\s*nowrap/);
+    expect(body('.price-badge')).toMatch(/width:\s*min-content/);
+    expect(body('.price-badge')).not.toMatch(/max-width:\s*\d+%/);
   });
 
   it('turns the door on its own box, from the hinge side', () => {

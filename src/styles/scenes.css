@@ -306,7 +306,9 @@
 /* ---------- Door: the price badge ---------- */
 
 /* A red tag on the wall above the kid, tilted like a sticker (the rotate property composes with
-   the transform the timeline animates). White on red is 4.6:1; the note sits on cream. */
+   the transform the timeline animates). White on red is 4.6:1; the note sits on cream.
+   As wide as its unbroken price (min-content), so the price always fits inside the tag and the
+   note wraps under it, in both languages, down to 320 px. */
 .price-badge {
   position: absolute;
   top: 6%;
@@ -314,7 +316,7 @@
   display: grid;
   justify-items: center;
   gap: 6px;
-  max-width: 48%;
+  width: min-content;
   padding: 12px var(--s2);
   border-radius: var(--r-m);
   background: var(--red);
