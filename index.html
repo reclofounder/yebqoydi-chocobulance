@@ -8,19 +8,203 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
-    <header id="header"></header>
-    <main>
-      <section id="hero"></section>
-      <section id="scene-kitchen"></section>
-      <section id="scene-call"></section>
-      <section id="scene-road"></section>
-      <section id="scene-door"></section>
-      <section id="how"></section>
-      <section id="coverage"></section>
-      <section id="faq"></section>
+    <header id="header" class="header" data-scrolled="false">
+      <div class="header__inner">
+        <a class="brand" href="#hero" data-i18n="header.brand">Chocobulance</a>
+        <div class="lang" role="group" data-i18n-attr="aria-label:a11y.lang">
+          <button
+            type="button"
+            class="lang__btn"
+            data-lang="uz"
+            data-i18n="header.lang.uz"
+          ></button>
+          <button
+            type="button"
+            class="lang__btn"
+            data-lang="ru"
+            data-i18n="header.lang.ru"
+          ></button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Pinned scenes: .scene__copy holds the words, .scene__stage[data-stage] is filled with art later. -->
+      <section id="hero" class="scene" data-scene="hero" aria-labelledby="hero-title">
+        <div class="scene__copy">
+          <p class="eyebrow" data-i18n="hero.eyebrow"></p>
+          <h1 id="hero-title" class="hero__title">
+            <span class="hero__line" data-i18n="hero.title"></span>
+            <span class="hero__line hero__line--accent" data-i18n="hero.title2"></span>
+          </h1>
+          <p class="body" data-i18n="hero.body"></p>
+          <div class="hero__actions">
+            <a class="cta" href="tel:105" data-cta data-i18n="hero.cta"></a>
+            <a class="cta cta--ghost" href="#how" data-i18n="hero.cta2"></a>
+          </div>
+          <p class="note" data-i18n="hero.note" data-state-note></p>
+          <p class="phone-hint" data-phone-hint hidden></p>
+        </div>
+        <div class="scene__stage" data-stage></div>
+        <!-- Part of the art zone: drawn over the stage cell, not inside the copy column. -->
+        <div class="hero__numeral" data-i18n="hero.numeral" aria-hidden="true"></div>
+        <p class="hero__scroll" data-i18n="hero.scroll" aria-hidden="true"></p>
+      </section>
+
+      <section
+        id="scene-kitchen"
+        class="scene"
+        data-scene="kitchen"
+        aria-labelledby="kitchen-title"
+      >
+        <div class="scene__copy">
+          <p class="eyebrow" data-i18n="kitchen.eyebrow"></p>
+          <h2 id="kitchen-title" data-i18n="kitchen.title"></h2>
+          <p class="body" data-i18n="kitchen.body"></p>
+          <div class="card">
+            <h3 class="card__title" data-i18n="kitchen.list.title"></h3>
+            <ul class="card__list" role="list">
+              <li data-i18n="kitchen.list.1"></li>
+              <li data-i18n="kitchen.list.2"></li>
+              <li data-i18n="kitchen.list.3"></li>
+              <li data-i18n="kitchen.list.4"></li>
+            </ul>
+          </div>
+        </div>
+        <div class="scene__stage" data-stage></div>
+      </section>
+
+      <section id="scene-call" class="scene" data-scene="call" aria-labelledby="call-title">
+        <div class="scene__copy">
+          <p class="eyebrow" data-i18n="call.eyebrow"></p>
+          <h2 id="call-title" data-i18n="call.title"></h2>
+          <p class="body" data-i18n="call.body"></p>
+        </div>
+        <div class="scene__stage" data-stage></div>
+      </section>
+
+      <section id="scene-road" class="scene" data-scene="road" aria-labelledby="road-title">
+        <div class="scene__copy">
+          <p class="eyebrow" data-i18n="road.eyebrow"></p>
+          <h2 id="road-title" data-i18n="road.title"></h2>
+          <p class="body" data-i18n="road.body"></p>
+        </div>
+        <div class="scene__stage" data-stage></div>
+      </section>
+
+      <section id="scene-door" class="scene" data-scene="door" aria-labelledby="door-title">
+        <div class="scene__copy">
+          <p class="eyebrow" data-i18n="door.eyebrow"></p>
+          <h2 id="door-title" data-i18n="door.title"></h2>
+          <p class="body" data-i18n="door.body"></p>
+        </div>
+        <div class="scene__stage" data-stage></div>
+      </section>
+
+      <!-- Static sections -->
+      <section id="how" class="section" aria-labelledby="how-title">
+        <div class="container">
+          <h2 id="how-title" class="section__title" data-i18n="how.title"></h2>
+          <ol class="steps" role="list">
+            <li>
+              <article class="step">
+                <span class="step__num" aria-hidden="true">1</span>
+                <h3 class="step__title" data-i18n="how.1.title"></h3>
+                <p class="step__body" data-i18n="how.1.body"></p>
+              </article>
+            </li>
+            <li>
+              <article class="step">
+                <span class="step__num" aria-hidden="true">2</span>
+                <h3 class="step__title" data-i18n="how.2.title"></h3>
+                <p class="step__body" data-i18n="how.2.body"></p>
+              </article>
+            </li>
+            <li>
+              <article class="step">
+                <span class="step__num" aria-hidden="true">3</span>
+                <h3 class="step__title" data-i18n="how.3.title"></h3>
+                <p class="step__body" data-i18n="how.3.body"></p>
+              </article>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="coverage" class="section" aria-labelledby="coverage-title">
+        <div class="container">
+          <div class="section__head">
+            <h2 id="coverage-title" class="section__title" data-i18n="coverage.title"></h2>
+            <p class="section__lead" data-i18n="coverage.body"></p>
+          </div>
+          <div class="coverage__grid">
+            <!-- coverage.svg is injected into [data-stage] by src/scenes/mount.ts; the labels are real text over it. -->
+            <div class="coverage__map">
+              <div class="coverage__stage" data-stage></div>
+              <p class="coverage__label coverage__label--in" data-i18n="coverage.inside"></p>
+              <p class="coverage__label coverage__label--out" data-i18n="coverage.outside"></p>
+            </div>
+            <div class="coverage__info">
+              <div class="price-card">
+                <p class="price-card__price" data-i18n="coverage.price"></p>
+                <p class="price-card__note" data-i18n="coverage.price.note"></p>
+              </div>
+              <dl class="hours">
+                <dt data-i18n="coverage.hours.label"></dt>
+                <dd data-i18n="coverage.hours.value"></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="section" aria-labelledby="faq-title">
+        <div class="container">
+          <h2 id="faq-title" class="section__title" data-i18n="faq.title"></h2>
+          <div class="faq__list">
+            <details class="faq__item">
+              <summary data-i18n="faq.1.q"></summary>
+              <p data-i18n="faq.1.a"></p>
+            </details>
+            <details class="faq__item">
+              <summary data-i18n="faq.2.q"></summary>
+              <p data-i18n="faq.2.a"></p>
+            </details>
+            <details class="faq__item">
+              <summary data-i18n="faq.3.q"></summary>
+              <p data-i18n="faq.3.a"></p>
+            </details>
+            <details class="faq__item">
+              <summary data-i18n="faq.4.q"></summary>
+              <p data-i18n="faq.4.a"></p>
+            </details>
+            <details class="faq__item">
+              <summary data-i18n="faq.5.q"></summary>
+              <p data-i18n="faq.5.a"></p>
+            </details>
+          </div>
+        </div>
+      </section>
     </main>
-    <footer id="footer"></footer>
-    <div id="sticky-cta"></div>
+
+    <footer id="footer" class="footer">
+      <div class="container footer__inner">
+        <p class="footer__line" data-i18n="footer.line"></p>
+        <!-- TODO: add href to each social link once the handles exist (spec section 9). No href = inert text. -->
+        <ul class="footer__social" role="list">
+          <li><a data-i18n="footer.social.instagram"></a></li>
+          <li><a data-i18n="footer.social.telegram"></a></li>
+        </ul>
+        <p class="footer__note" data-i18n="footer.note"></p>
+        <p class="footer__copy" data-i18n="footer.copy"></p>
+      </div>
+    </footer>
+
+    <div id="sticky-cta" class="sticky-cta" data-visible="false">
+      <a class="cta" href="tel:105" data-cta data-i18n="sticky.cta"></a>
+      <span class="phone-hint" data-phone-hint hidden></span>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

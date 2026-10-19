@@ -1,9 +1,15 @@
+import '@fontsource/nunito/800.css';
+import '@fontsource/nunito/900.css';
 import './styles/tokens.css';
 import './styles/base.css';
+import './styles/layout.css';
+import './styles/scenes.css';
 import { applyI18n, getLang, isLang, setLang } from './i18n';
+import { mountScenes } from './scenes/mount';
 import { applyMode, applyPhoneHint } from './state';
 
 applyI18n(document, getLang());
+mountScenes(document);
 applyMode(document);
 applyPhoneHint(document);
 

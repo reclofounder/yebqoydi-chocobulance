@@ -1,0 +1,166 @@
+/*
+ * Pinned-scene shells only. Stage geometry and the shared type live in layout.css; the illustrated
+ * art and its motion are added by later tasks, so nothing here draws scenery.
+ */
+
+/* ---------- Backgrounds: a flat shell color per scene, painted over later ---------- */
+
+[data-scene='hero'],
+[data-scene='road'] {
+  background: linear-gradient(180deg, var(--sky-dawn-top), var(--sky-dawn-bottom));
+}
+
+[data-scene='kitchen'] {
+  background: var(--sky-dawn-bottom);
+}
+
+[data-scene='call'] {
+  background: var(--cream);
+}
+
+[data-scene='door'] {
+  background: var(--sky-day-bottom);
+}
+
+/* ---------- Hero ---------- */
+
+/* The numeral is a grid item of its own, drawn over the stage cell: it belongs to the art zone.
+   Phones: top-left of the stage. Desktop: top of the right column, above the parked van. */
+.hero__numeral {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
+  justify-self: start;
+  z-index: 1;
+  padding: var(--s1) max(var(--gutter), env(safe-area-inset-right, 0px)) 0
+    max(var(--gutter), env(safe-area-inset-left, 0px));
+  color: var(--red);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: min(var(--fs-numeral), 14svh);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.hero__line {
+  display: block;
+}
+
+/* The question is the headline; the call to action under it is one step smaller. */
+.hero__line--accent {
+  margin-top: 0.15em;
+  color: var(--red-deep);
+  font-size: var(--fs-h2);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s2);
+  width: 100%;
+  margin-top: var(--s1);
+}
+
+/* Phones: full-width buttons, so the primary action is the easiest thing to hit. */
+.hero__actions > .cta {
+  flex: 1 1 100%;
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: max(var(--s2), env(safe-area-inset-bottom, 0px));
+  left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  color: var(--choco-soft);
+  font-size: var(--fs-small);
+}
+
+.hero__scroll::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+@media (min-width: 600px) {
+  .hero__actions > .cta {
+    flex: 0 0 auto;
+  }
+}
+
+@media (min-width: 900px) {
+  .hero__numeral {
+    grid-column: 3 / -1;
+    grid-row: 1;
+    justify-self: center;
+    padding: calc(var(--header-total) + var(--s8)) 0 0;
+    font-size: min(var(--fs-numeral), 24svh);
+  }
+
+  .hero__scroll {
+    left: max(var(--gutter), calc((100% - var(--container)) / 2));
+  }
+}
+
+/* Phones: the stage is never shorter than the numeral that sits on it (nor the 10rem floor). */
+@media (max-width: 899.98px) {
+  #hero .scene__stage {
+    min-height: max(10rem, calc(min(var(--fs-numeral), 14svh) + var(--s4)));
+  }
+}
+
+/* On short screens the copy fills the view and the hint would collide with the numeral. */
+@media (max-height: 760px) {
+  .hero__scroll {
+    display: none;
+  }
+}
+
+/* ---------- Kitchen: the "most common emergencies" card ---------- */
+
+.card {
+  display: grid;
+  gap: var(--s1);
+  width: 100%;
+  max-width: 28rem;
+  margin-top: var(--s1);
+  padding: var(--s3);
+  border-radius: var(--r-m);
+  background: var(--white);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--choco) 12%, transparent);
+}
+
+.card__title {
+  color: var(--red-deep);
+  font-size: var(--fs-small);
+  line-height: 1.3;
+}
+
+.card__list {
+  display: grid;
+  gap: var(--s1);
+}
+
+.card__list li {
+  position: relative;
+  padding-left: var(--s3);
+  line-height: 1.35;
+}
+
+.card__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+}
