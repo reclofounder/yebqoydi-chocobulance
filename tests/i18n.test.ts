@@ -39,6 +39,26 @@ test('t falls back to uz and warns', () => {
   expect(warn).toHaveBeenCalledWith('[i18n] missing', '__missing__', 'ru');
 });
 
+test('a key missing in ru falls back to the uz string, warns, and still renders', () => {
+  const dict = ru as Record<string, string>;
+  const removed = dict['hero.body'];
+  delete dict['hero.body'];
+  try {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const uzText = t('hero.body', 'uz');
+    expect(uzText).not.toBe('hero.body');
+
+    expect(t('hero.body', 'ru')).toBe(uzText);
+    expect(warn).toHaveBeenCalledWith('[i18n] missing', 'hero.body', 'ru');
+
+    document.body.innerHTML = '<p data-i18n="hero.body">x</p>';
+    applyI18n(document, 'ru');
+    expect(document.querySelector('p')!.textContent).toBe(uzText);
+  } finally {
+    dict['hero.body'] = removed;
+  }
+});
+
 test('getLang precedence: query, then localStorage, then uz', () => {
   expect(getLang()).toBe('uz');
 
@@ -87,6 +107,14 @@ test('applyI18n sets document title and meta content, not textContent of meta', 
   const meta = document.querySelector('meta[name="description"]')!;
   expect(meta.getAttribute('content')).toBe(t('meta.description', 'uz'));
   expect(meta.textContent).toBe('');
+});
+
+test('an svg <title data-i18n> gets its own text and leaves document.title alone', () => {
+  document.head.innerHTML = '<title>keep me</title>';
+  document.body.innerHTML = '<svg><title data-i18n="a11y.van">x</title></svg>';
+  applyI18n(document, 'uz');
+  expect(document.querySelector('svg title')!.textContent).toBe('Chocobulance mashinasi');
+  expect(document.title).toBe('keep me');
 });
 
 test('applyI18n works with no hreflang links and updates them when present', () => {

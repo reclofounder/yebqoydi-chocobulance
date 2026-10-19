@@ -1,4 +1,4 @@
-// Boot wiring: copy, campaign mode and phone hint on load; language buttons afterwards.
+// Boot wiring: copy and campaign mode on load; language buttons afterwards.
 vi.doMock('../src/config', () => ({
   HOOK: '105',
   PHONE: '+998901234567',
@@ -25,7 +25,7 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   expect(text('[data-state-note]')).toBe(
     'Liniya tez orada ochiladi. Hozircha Chococreamʼni yashirib qoʻying.',
   );
-  expect(text('[data-phone-hint]')).toBe('yoki +998901234567');
+  expect(document.querySelector('[data-phone-hint]')!.hasAttribute('hidden')).toBe(true);
 
   document.querySelector<HTMLElement>('[data-lang="ru"] span')!.click();
 
@@ -35,7 +35,6 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   expect(text('[data-state-note]')).toBe(
     'Линия откроется совсем скоро. А пока спрячьте Chococream.',
   );
-  expect(text('[data-phone-hint]')).toBe('или +998901234567');
 
   document.querySelector<HTMLElement>('[data-lang="uz"]')!.click();
   expect(text('[data-cta]')).toBe('Tez orada');

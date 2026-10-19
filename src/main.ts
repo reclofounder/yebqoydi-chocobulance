@@ -12,8 +12,6 @@ document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const lang = event.target.closest<HTMLElement>('[data-lang]')?.dataset.lang;
   if (!isLang(lang)) return;
+  // applyMode/applyPhoneHint tag their copy with data-i18n, so setLang already re-translates it.
   setLang(lang);
-  // State copy (CTA label, note, phone hint) must follow the new language.
-  applyMode(document);
-  applyPhoneHint(document);
 });

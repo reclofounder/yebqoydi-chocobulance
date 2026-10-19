@@ -53,7 +53,8 @@ function applyText(el: HTMLElement, text: string): void {
       break;
     case 'title':
       el.textContent = text;
-      document.title = text;
+      // An SVG <title> is just an accessible name; only the HTML one is the page title.
+      if (el instanceof HTMLTitleElement) document.title = text;
       break;
     default:
       el.textContent = text;

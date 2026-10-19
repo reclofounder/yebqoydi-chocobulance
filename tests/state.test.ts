@@ -119,6 +119,14 @@ describe('ended mode', () => {
   });
 });
 
+describe('phone hint outside live mode', () => {
+  test.each(['teaser', 'ended'])('stays hidden in %s mode even with a distinct number', (MODE) => {
+    render({ MODE, PHONE: '+998901234567', PHONE_DISPLAY: '+998901234567' });
+
+    expect(hint().hasAttribute('hidden')).toBe(true);
+  });
+});
+
 describe('live mode', () => {
   test('CTA stays a link to the dial number and the hint shows the number', () => {
     render({ MODE: 'live', PHONE: '+998901234567', PHONE_DISPLAY: '+998901234567', HOOK: '105' });

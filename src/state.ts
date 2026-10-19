@@ -41,9 +41,12 @@ export function applyMode(root: ParentNode): void {
   }
 }
 
-/** Shows the "or {phone}" hint only when the dial number differs from the campaign hook. */
+/**
+ * Shows the "or {phone}" hint only while the line is live and the dial number differs from the
+ * campaign hook (a number next to an inert "coming soon" or "ended" pill would make no sense).
+ */
 export function applyPhoneHint(root: ParentNode): void {
-  const show = PHONE !== HOOK;
+  const show = MODE === 'live' && PHONE !== HOOK;
   for (const el of root.querySelectorAll<HTMLElement>('[data-phone-hint]')) {
     el.toggleAttribute('hidden', !show);
     if (show) setCopy(el, 'cta.or');
