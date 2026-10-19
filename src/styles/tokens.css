@@ -1,0 +1,41 @@
+/* Design tokens. Colors per spec section 5.2; spacing is an 8-pt grid (section 5.4). */
+:root {
+  /* Brand */
+  --red: #e2231a;
+  --red-deep: #b5120b;
+  --cream: #fff6ec;
+  --choco: #3e1f0e;
+  --choco-soft: #6b4328;
+  --hazel: #c98a4b;
+  --white: #ffffff;
+
+  /* Scene skies, chrome and "outside the city" */
+  --sky-dawn-top: #ffb86b;
+  --sky-dawn-bottom: #ffe2b8;
+  --sky-day-top: #8fd3ff;
+  --sky-day-bottom: #e6f6ff;
+  --night: #1e1b2e;
+  --grey-out: #d9d4cc;
+
+  /* Type */
+  --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, 'Segoe UI', Roboto, sans-serif;
+
+  /* Spacing: 8-pt steps */
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --s5: 40px;
+  --s6: 48px;
+  --s7: 56px;
+  --s8: 64px;
+  --s9: 72px;
+  --s10: 80px;
+
+  /* Radii */
+  --r-s: 8px;
+  --r-m: 16px;
+  --r-l: 28px;
+}

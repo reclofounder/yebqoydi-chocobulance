@@ -1,0 +1,40 @@
+{
+  "name": "chocobulance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chocobulance - Chococream 105 PR activation landing page",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "format": "prettier --write index.html vite.config.ts src tests",
+    "start": "serve -s dist -l ${PORT:-3000}"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reclofounder/yebqoydi-chocobulance.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reclofounder/yebqoydi-chocobulance/issues"
+  },
+  "homepage": "https://github.com/reclofounder/yebqoydi-chocobulance#readme",
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^4.1.12"
+  },
+  "dependencies": {
+    "@fontsource/nunito": "^5.3.0",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.27",
+    "serve": "^14.2.6"
+  }
+}
