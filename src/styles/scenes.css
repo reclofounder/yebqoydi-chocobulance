@@ -57,11 +57,13 @@
 }
 
 /* The road layers that travel are twice the stage's width (as are their viewBoxes): the timeline
-   can slide each one left by up to half its own width before an edge would show. */
+   can slide each one left by up to half its own width before an edge would show. base.css caps
+   every svg at max-width: 100%, which would hold them to one stage width. */
 .scene__stage > .layer-far,
 .scene__stage > .layer-mid,
 .scene__stage > .layer-near {
   width: 200%;
+  max-width: none;
 }
 
 /* Kitchen, call, road and door are paper cards: rounded, and clipped, so the road layers and the
@@ -305,8 +307,9 @@
 
 /* ---------- Door: the price badge ---------- */
 
-/* A red tag on the wall above the kid, tilted like a sticker (the rotate property composes with
-   the transform the timeline animates). White on red is 4.6:1; the note sits on cream.
+/* A red tag on the wall above the kid, tilted like a sticker (the rotate property; GSAP folds it
+   into the transform it animates, so the tilt survives the drop). White on red is 4.6:1; the
+   note sits on cream.
    As wide as its unbroken price (min-content), so the price always fits inside the tag and the
    note wraps under it, in both languages, down to 320 px. */
 .price-badge {
@@ -350,15 +353,50 @@
 /* ---------- Animated parts (the scroll timeline drives them) ---------- */
 
 /* The door swings on its hinge edge and the hearts pop from their centres, each about its own
-   box. Drive them with CSS transforms (element.style.transform), as with the van's wheels: GSAP
-   writes SVG transforms as attributes with a view-box origin, which fill-box would offset. */
+   box. The timeline drives them through custom properties (--door-open, --pop), as with the van's
+   wheels: GSAP writes SVG transforms as attributes with a view-box origin, which fill-box would
+   offset. Unset, they rest in their drawn state: door closed, hearts full size. */
 #door-leaf {
   transform-box: fill-box;
   transform-origin: left center;
+  transform: perspective(900px) rotateY(var(--door-open, 0deg));
 }
 
 #heart-l,
 #heart-r {
   transform-box: fill-box;
   transform-origin: center;
+  transform: scale(var(--pop, 1));
+}
+
+/* Moving layers get compositor layers of their own while the story runs, not in the still frames. */
+:root:not(.reduced) #scene-road .layer-far,
+:root:not(.reduced) #scene-road .layer-mid,
+:root:not(.reduced) #scene-road .layer-near,
+:root:not(.reduced) #scene-road .van {
+  will-change: transform;
+}
+
+/* ---------- Reduced motion: the story as still frames (scroll/reduced.ts adds .reduced) ---------- */
+
+/* Every part is drawn in its final state except the door, drawn closed: hold it open, or the
+   medic and the full tub stay behind it. */
+.reduced #door-leaf {
+  --door-open: -100deg;
+}
+
+/* The van mid-drive, wheels still: its centre at 70 % of the card, both bumpers in view. */
+.reduced #scene-road .van {
+  left: calc(70% - 44% / 2);
+}
+
+@media (min-width: 900px) {
+  .reduced #scene-road .van {
+    left: calc(70% - 34% / 2);
+  }
+}
+
+/* The hint promises a story that plays as you scroll; the still page has none to promise. */
+.reduced .hero__scroll {
+  display: none;
 }

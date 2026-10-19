@@ -7,6 +7,7 @@ import './styles/scenes.css';
 import './styles/van.css';
 import { applyI18n, getLang, isLang, setLang } from './i18n';
 import { mountScenes } from './scenes/mount';
+import { initScroll, refreshScroll } from './scroll/motion';
 import { applyMode, applyPhoneHint } from './state';
 
 // Art first, so the language pass also labels what it mounts (the van's aria-label).
@@ -23,3 +24,9 @@ document.addEventListener('click', (event) => {
   // applyMode/applyPhoneHint tag their copy with data-i18n, so setLang already re-translates it.
   setLang(lang);
 });
+
+// A new language changes the copy's length, so the scenes' heights and pin positions move.
+document.addEventListener('langchange', refreshScroll);
+
+// The scroll story last: ScrollTrigger measures the scenes, and the fonts set their heights.
+void (document.fonts?.ready ?? Promise.resolve()).then(initScroll);

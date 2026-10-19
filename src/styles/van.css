@@ -11,12 +11,14 @@
 }
 
 /* Each wheel turns about its own centre: the tyre circle is the group's box, whatever the art.
-   Part ids carry a per-van suffix (#van-wheel-front-hero), hence the prefix match. Turn wheels
-   with a CSS transform (style.transform = rotate(…)): GSAP's SVG rotation bakes its own origin
-   into the transform attribute assuming the default view-box, and would orbit off the axle. */
+   Part ids carry a per-van suffix (#van-wheel-front-hero), hence the prefix match. They turn
+   through a CSS transform fed by --wheel-rot (the road timeline sets it on the van's root):
+   GSAP's SVG rotation bakes its own origin into the transform attribute assuming the default
+   view-box, and would orbit off the axle. */
 .van [id^='van-wheel-'] {
   transform-box: fill-box;
   transform-origin: center;
+  transform: rotate(var(--wheel-rot, 0deg));
 }
 
 /* ---------- Hero: parked at the right, on the bottom of the stage ---------- */
@@ -58,5 +60,42 @@
 @media (min-width: 900px) {
   #scene-road .van {
     width: 34%;
+  }
+}
+
+/* ---------- Idle motion: the only things that move without scrolling ---------- */
+
+/* The siren light pulses while the story runs (scroll/timeline.ts adds .siren--on): a slow
+   2 s breath while parked in the hero, a 1.2 s blink on the road. Opacity only. */
+.siren--on {
+  animation: siren-pulse 1s ease-in-out infinite alternate;
+}
+
+#scene-road .siren--on {
+  animation-duration: 0.6s;
+}
+
+@keyframes siren-pulse {
+  to {
+    opacity: 0.35;
+  }
+}
+
+/* The parked van idles: it lifts 2 px and settles back, never sinking into the road. The
+   individual translate property leaves transform free, and runs on the compositor. */
+[data-van='hero'] {
+  animation: van-idle 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes van-idle {
+  to {
+    translate: 0 -2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .siren--on,
+  [data-van='hero'] {
+    animation: none;
   }
 }
