@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 240" preserveAspectRatio="xMaxYMax meet">
+  <!-- Chocobulance van, 480x240, facing right. PLACEHOLDER art made to be swapped:
+       keep the six part ids (van-shadow, van-body, van-siren, siren-light, van-wheel-rear,
+       van-wheel-front), draw each wheel group around its tyre (the tyre circle is the group's box,
+       so its centre is the pivot), and update VAN in van.ts if the wheels move or resize.
+       xMaxYMax: in a box shorter than 2:1 the van stays parked bottom-right (see van.css).
+       Painted with the design tokens only: inline SVG sees the page's custom properties. -->
+  <defs>
+    <!-- Body silhouette: high roof, rounded cab, raked windscreen, short nose. -->
+    <path
+      id="van-shape"
+      d="M38 204 Q24 204 24 190 V64 Q24 40 48 40 H318 C344 40 358 50 372 66 L414 118
+         C420 126 428 130 440 132 C452 134 458 142 458 154 V190 Q458 204 444 204 Z"
+    />
+    <clipPath id="van-clip"><use href="#van-shape" /></clipPath>
+  </defs>
+
+  <g id="van-shadow">
+    <ellipse cx="240" cy="223" rx="226" ry="11" style="fill: var(--choco); fill-opacity: 0.08" />
+    <ellipse cx="240" cy="223" rx="192" ry="6" style="fill: var(--choco); fill-opacity: 0.16" />
+  </g>
+
+  <g id="van-body">
+    <!-- Bumpers sit behind the body, so only their ends show. -->
+    <g style="fill: var(--grey-out)">
+      <rect x="16" y="182" width="30" height="24" rx="8" />
+      <rect x="434" y="182" width="32" height="24" rx="8" />
+    </g>
+
+    <use
+      href="#van-shape"
+      transform="translate(3 4)"
+      style="fill: var(--choco); fill-opacity: 0.12"
+    />
+    <use href="#van-shape" style="fill: var(--white)" />
+
+    <!-- Livery, cut to the silhouette: red roof block, side stripe, lower cladding, wheel arches -->
+    <g clip-path="url(#van-clip)">
+      <rect y="160" width="480" height="26" style="fill: var(--choco); fill-opacity: 0.05" />
+      <g style="fill: var(--choco); fill-opacity: 0.12">
+        <rect y="56" width="480" height="3" />
+        <rect y="160" width="480" height="3" />
+      </g>
+      <rect width="480" height="56" style="fill: var(--red)" />
+      <rect y="144" width="480" height="16" style="fill: var(--red)" />
+      <rect y="186" width="480" height="20" style="fill: var(--grey-out)" />
+      <g style="fill: var(--grey-out)">
+        <circle cx="118" cy="196" r="33" />
+        <circle cx="362" cy="196" r="33" />
+      </g>
+      <g style="fill: var(--choco); fill-opacity: 0.7">
+        <circle cx="118" cy="196" r="29" />
+        <circle cx="362" cy="196" r="29" />
+      </g>
+    </g>
+
+    <!-- Cab: side window, door seam and handle, mirror -->
+    <path
+      d="M322 72 H360 Q366 72 370 77 L399 112 Q403 118 396 118 H322 Q316 118 316 112 V78 Q316 72 322 72 Z"
+      style="fill: var(--sky-day-bottom); stroke: var(--choco); stroke-width: 3; stroke-linejoin: round"
+    />
+    <path
+      d="M306 60 V184"
+      style="fill: none; stroke: var(--choco); stroke-opacity: 0.25; stroke-width: 2"
+    />
+    <rect x="318" y="126" width="18" height="6" rx="3" style="fill: var(--choco-soft)" />
+    <path
+      d="M396 112 L404 110"
+      style="fill: none; stroke: var(--choco-soft); stroke-width: 3; stroke-linecap: round"
+    />
+    <rect x="402" y="94" width="11" height="20" rx="5" style="fill: var(--choco-soft)" />
+
+    <!-- Headlight and tail light -->
+    <path
+      d="M444 135 Q453 137 456 145 V150 H445 Q440 150 440 145 V140 Q440 135 444 135 Z"
+      style="fill: var(--cream); stroke: var(--choco-soft); stroke-width: 2; stroke-linejoin: round"
+    />
+    <rect x="446" y="164" width="11" height="8" rx="3" style="fill: var(--hazel)" />
+    <rect x="24" y="116" width="7" height="22" rx="2" style="fill: var(--red-deep)" />
+
+    <!-- Emblem: a red cross with a chocolate drop and a hazelnut -->
+    <g>
+      <g style="fill: var(--red)">
+        <rect x="155" y="60" width="18" height="48" rx="6" />
+        <rect x="140" y="75" width="48" height="18" rx="6" />
+      </g>
+      <path
+        d="M164 66 C168 74 175 81 175 90 A11 11 0 0 1 153 90 C153 81 160 74 164 66 Z"
+        style="fill: var(--choco)"
+      />
+      <ellipse cx="159.5" cy="89" rx="2.5" ry="4.5" style="fill: var(--white); fill-opacity: 0.55" />
+      <g style="stroke: var(--choco-soft); stroke-width: 1.5; stroke-linejoin: round">
+        <path d="M177 95 L180 89.5 L183 95 Z" style="fill: var(--choco-soft)" />
+        <circle cx="180" cy="102" r="8" style="fill: var(--hazel)" />
+        <path d="M172.58 105 A8 8 0 0 0 187.42 105 Z" style="fill: var(--cream)" />
+      </g>
+      <ellipse cx="177" cy="99" rx="2" ry="2.5" style="fill: var(--white); fill-opacity: 0.5" />
+    </g>
+
+    <!-- Lettering (becomes a path in the final art) -->
+    <text
+      x="164"
+      y="136"
+      text-anchor="middle"
+      textLength="202"
+      aria-hidden="true"
+      style="font-family: var(--font-display); font-weight: 900; font-size: 30px; fill: var(--red)"
+    >Chocobulance</text>
+
+    <!-- Siren on the roof; the light is its own shape so it can pulse -->
+    <g id="van-siren">
+      <rect x="280" y="32" width="44" height="10" rx="4" style="fill: var(--grey-out)" />
+      <rect id="siren-light" x="288" y="18" width="28" height="18" rx="8" style="fill: var(--red)" />
+      <rect x="293" y="22" width="8" height="4" rx="2" style="fill: var(--white); fill-opacity: 0.7" />
+    </g>
+  </g>
+
+  <!-- Wheels: tyre r=26, rim, five white spokes so the spin reads, hub r=10 -->
+  <g id="van-wheel-rear">
+    <circle cx="118" cy="196" r="26" style="fill: var(--choco)" />
+    <circle cx="118" cy="196" r="18" style="fill: var(--choco-soft)" />
+    <g style="stroke: var(--white); stroke-width: 2; stroke-linecap: round">
+      <path d="M118 196 V179" />
+      <path d="M118 196 L134.17 190.75" />
+      <path d="M118 196 L128 209.75" />
+      <path d="M118 196 L108 209.75" />
+      <path d="M118 196 L101.83 190.75" />
+    </g>
+    <circle cx="118" cy="196" r="10" style="fill: var(--grey-out)" />
+    <circle cx="118" cy="196" r="3.5" style="fill: var(--choco-soft)" />
+  </g>
+  <g id="van-wheel-front">
+    <circle cx="362" cy="196" r="26" style="fill: var(--choco)" />
+    <circle cx="362" cy="196" r="18" style="fill: var(--choco-soft)" />
+    <g style="stroke: var(--white); stroke-width: 2; stroke-linecap: round">
+      <path d="M362 196 V179" />
+      <path d="M362 196 L378.17 190.75" />
+      <path d="M362 196 L372 209.75" />
+      <path d="M362 196 L352 209.75" />
+      <path d="M362 196 L345.83 190.75" />
+    </g>
+    <circle cx="362" cy="196" r="10" style="fill: var(--grey-out)" />
+    <circle cx="362" cy="196" r="3.5" style="fill: var(--choco-soft)" />
+  </g>
+</svg>

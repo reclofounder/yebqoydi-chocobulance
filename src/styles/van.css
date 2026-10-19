@@ -1,0 +1,43 @@
+/*
+ * The van (src/van/van.svg, mounted by mountVan). Sized by its width; the drawing keeps its 2:1
+ * viewBox. Placement per scene lives here too, never as inline transforms: the scroll timeline
+ * animates transform on the road van.
+ */
+
+.van {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Each wheel turns about its own centre: the tyre circle is the group's box, whatever the art.
+   Part ids carry a per-van suffix (#van-wheel-front-hero), hence the prefix match. Turn wheels
+   with a CSS transform (style.transform = rotate(…)): GSAP's SVG rotation bakes its own origin
+   into the transform attribute assuming the default view-box, and would orbit off the axle. */
+.van [id^='van-wheel-'] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ---------- Hero: parked at the right, on the bottom of the stage ---------- */
+
+/* The numeral holds the other corner: top-left of the stage on phones, top-centre on desktop.
+   Phones get a narrower van so its roof clears the numeral and its bumper the scroll hint
+   (except while the stage sits at its 10rem floor, too short for both). When the stage is shorter
+   than the van (landscape phones), the height cap wins and the drawing stays bottom-right inside
+   its box (preserveAspectRatio in van.svg). */
+#hero .van {
+  position: absolute;
+  right: max(var(--gutter), env(safe-area-inset-right, 0px));
+  bottom: var(--s1);
+  max-width: 58%;
+  max-height: calc(100% - var(--s1));
+}
+
+@media (min-width: 900px) {
+  #hero .van {
+    bottom: var(--s2);
+    max-width: min(68%, 44rem);
+    max-height: calc(100% - var(--s2));
+  }
+}

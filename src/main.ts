@@ -4,12 +4,14 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/layout.css';
 import './styles/scenes.css';
+import './styles/van.css';
 import { applyI18n, getLang, isLang, setLang } from './i18n';
 import { mountScenes } from './scenes/mount';
 import { applyMode, applyPhoneHint } from './state';
 
-applyI18n(document, getLang());
+// Art first, so the language pass also labels what it mounts (the van's aria-label).
 mountScenes(document);
+applyI18n(document, getLang());
 applyMode(document);
 applyPhoneHint(document);
 
