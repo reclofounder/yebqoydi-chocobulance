@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMax slice" class="scene__art" aria-hidden="true" focusable="false">
+  <!-- The door, 800x500. Phones (4:5 stage) see x 200-600, desktop (16:9) y 50-500. The front
+       door (#door-leaf, hinge on its left edge, drawn closed) opens on the choco-medic in the
+       stairwell, who hands the full tub (#tub-full) to the kid; the kid's eyes become hearts
+       (#heart-l, #heart-r, drawn popped) and Dad gives a thumbs-up from the next room
+       (#dad-thumb, drawn visible). Animated groups carry no transform attribute of their own.
+       The price badge is HTML (#price-badge, .scene__overlay). Tokens only. -->
+  <defs>
+    <pattern id="door-stripes" width="36" height="10" patternUnits="userSpaceOnUse">
+      <rect width="14" height="10" style="fill: var(--sky-dawn-bottom); fill-opacity: 0.6" />
+    </pattern>
+  </defs>
+
+  <!-- Hall: striped wallpaper, floor, skirting -->
+  <rect width="800" height="500" style="fill: var(--cream)" />
+  <rect width="800" height="436" style="fill: url(#door-stripes)" />
+  <rect y="440" width="800" height="60" style="fill: var(--hazel); fill-opacity: 0.45" />
+  <path d="M0 466H800M0 486H800" style="stroke: var(--choco); stroke-opacity: 0.08; stroke-width: 2" />
+  <rect y="434" width="800" height="8" style="fill: var(--white)" />
+
+  <!-- Coat hooks, a coat, two pairs of shoes (desktop wing) -->
+  <rect x="56" y="138" width="120" height="10" rx="5" style="fill: var(--choco-soft)" />
+  <path d="M78 146Q66 150 62 168L54 296Q54 304 62 304H120Q128 304 128 296L120 168Q116 150 104 146Z" style="fill: var(--choco-soft)" />
+  <path d="M80 146L91 176L102 146M91 176V302" style="fill: none; stroke: var(--choco); stroke-opacity: 0.35; stroke-width: 3; stroke-linejoin: round" />
+  <g style="fill: var(--hazel)">
+    <circle cx="96" cy="200" r="3" />
+    <circle cx="96" cy="230" r="3" />
+    <circle cx="96" cy="260" r="3" />
+  </g>
+  <path d="M144 146Q150 136 158 146" style="fill: none; stroke: var(--red-deep); stroke-width: 4" />
+  <rect x="134" y="148" width="34" height="44" rx="10" style="fill: var(--red)" />
+  <rect x="140" y="170" width="22" height="14" rx="5" style="fill: var(--red-deep)" />
+  <g style="fill: var(--choco-soft)">
+    <rect x="70" y="426" width="30" height="12" rx="6" />
+    <rect x="104" y="426" width="30" height="12" rx="6" />
+  </g>
+  <g style="fill: var(--red-deep)">
+    <rect x="146" y="428" width="20" height="10" rx="5" />
+    <rect x="170" y="428" width="20" height="10" rx="5" />
+  </g>
+
+  <!-- Front door frame, and the bright stairwell behind it -->
+  <rect x="222" y="104" width="176" height="336" rx="6" style="fill: var(--white)" />
+  <rect x="238" y="120" width="144" height="320" style="fill: var(--sky-day-top)" />
+  <rect x="300" y="146" width="62" height="70" rx="6" style="fill: var(--sky-day-bottom)" />
+  <path d="M331 146V216M300 181H362" style="stroke: var(--white); stroke-width: 4" />
+  <path d="M238 360L382 250" style="fill: none; stroke: var(--choco-soft); stroke-opacity: 0.35; stroke-width: 6" />
+  <rect x="238" y="420" width="144" height="20" style="fill: var(--grey-out)" />
+
+  <!-- The choco-medic: white coat with brown trim, red bag, cap with a cross -->
+  <g style="fill: var(--choco-soft)">
+    <rect x="290" y="378" width="14" height="54" rx="5" />
+    <rect x="312" y="378" width="14" height="54" rx="5" />
+  </g>
+  <g style="fill: var(--choco)">
+    <rect x="284" y="428" width="22" height="12" rx="6" />
+    <rect x="310" y="428" width="22" height="12" rx="6" />
+  </g>
+  <path d="M276 392V282Q276 252 300 250H318Q342 252 342 282V392Z" style="fill: var(--white)" />
+  <path d="M296 250L309 274L322 250M309 274V392M276 388H342" style="fill: none; stroke: var(--choco-soft); stroke-width: 4; stroke-linejoin: round" />
+  <path d="M336 256L284 344" style="fill: none; stroke: var(--red-deep); stroke-width: 6; stroke-linecap: round" />
+  <rect x="254" y="330" width="44" height="46" rx="9" style="fill: var(--red)" />
+  <rect x="254" y="330" width="44" height="10" rx="5" style="fill: var(--red-deep)" />
+  <g style="fill: var(--white)">
+    <rect x="273" y="346" width="6" height="22" rx="2" />
+    <rect x="265" y="354" width="22" height="6" rx="2" />
+  </g>
+  <rect x="302" y="234" width="14" height="20" rx="6" style="fill: var(--hazel)" />
+  <circle cx="309" cy="218" r="26" style="fill: var(--hazel)" />
+  <path d="M284 214Q284 188 309 188Q334 188 334 214Z" style="fill: var(--white)" />
+  <path d="M284 212H334" style="stroke: var(--choco-soft); stroke-width: 3" />
+  <g style="fill: var(--red)">
+    <rect x="306" y="193" width="6" height="16" rx="2" />
+    <rect x="301" y="198" width="16" height="6" rx="2" />
+  </g>
+  <g style="fill: var(--choco)">
+    <circle cx="314" cy="222" r="3.2" />
+    <circle cx="328" cy="222" r="3.2" />
+  </g>
+  <circle cx="324" cy="232" r="5" style="fill: var(--red); fill-opacity: 0.25" />
+  <path d="M312 233Q320 240 328 233" style="fill: none; stroke: var(--choco); stroke-width: 2.5; stroke-linecap: round" />
+  <path d="M332 270Q348 282 344 304M334 290Q346 310 342 326" style="fill: none; stroke: var(--white); stroke-width: 13; stroke-linecap: round" />
+  <path d="M338 300H350M336 322H348" style="stroke: var(--choco-soft); stroke-width: 4" />
+
+  <!-- The full tub, lid on -->
+  <g id="tub-full">
+    <g transform="translate(354 336) scale(0.6)">
+      <ellipse cy="1" rx="44" ry="5" style="fill: var(--choco); fill-opacity: 0.14" />
+      <path d="M-40 -56L-35 -6Q-34 0 -28 0H28Q34 0 35 -6L40 -56Z" style="fill: var(--red)" />
+      <path d="M24 -56H40L35 -6Q34 0 28 0H20Z" style="fill: var(--red-deep); fill-opacity: 0.35" />
+      <rect x="-33" y="-46" width="6" height="34" rx="3" style="fill: var(--white); fill-opacity: 0.35" />
+      <ellipse cy="-26" rx="20" ry="13" style="fill: var(--cream)" />
+      <path d="M-4 -36C-1 -32 3 -29 3 -25A6 6 0 0 1 -9 -25C-9 -29 -6 -32 -4 -36Z" style="fill: var(--choco)" />
+      <circle cx="7" cy="-22" r="5" style="fill: var(--hazel)" />
+      <rect x="-44" y="-70" width="88" height="16" rx="8" style="fill: var(--red-deep)" />
+      <rect x="-44" y="-72" width="88" height="12" rx="6" style="fill: var(--red)" />
+      <rect x="-34" y="-69" width="30" height="4" rx="2" style="fill: var(--white); fill-opacity: 0.45" />
+    </g>
+    <g style="fill: var(--hazel)">
+      <ellipse cx="338" cy="314" rx="8" ry="7" />
+      <ellipse cx="340" cy="332" rx="8" ry="7" />
+    </g>
+  </g>
+
+  <!-- The door: a chocolate bar of a door, hinged on its left edge -->
+  <g id="door-leaf">
+    <rect x="238" y="120" width="144" height="320" rx="3" style="fill: var(--choco-soft)" />
+    <g style="fill: var(--choco); fill-opacity: 0.35">
+      <rect x="250" y="134" width="56" height="64" rx="7" />
+      <rect x="314" y="134" width="56" height="64" rx="7" />
+      <rect x="250" y="206" width="56" height="64" rx="7" />
+      <rect x="314" y="206" width="56" height="64" rx="7" />
+      <rect x="250" y="278" width="56" height="64" rx="7" />
+      <rect x="314" y="278" width="56" height="64" rx="7" />
+      <rect x="250" y="350" width="56" height="64" rx="7" />
+      <rect x="314" y="350" width="56" height="64" rx="7" />
+    </g>
+    <g style="fill: var(--hazel); fill-opacity: 0.3">
+      <rect x="258" y="142" width="40" height="48" rx="5" />
+      <rect x="322" y="142" width="40" height="48" rx="5" />
+      <rect x="258" y="214" width="40" height="48" rx="5" />
+      <rect x="322" y="214" width="40" height="48" rx="5" />
+      <rect x="258" y="286" width="40" height="48" rx="5" />
+      <rect x="322" y="286" width="40" height="48" rx="5" />
+      <rect x="258" y="358" width="40" height="48" rx="5" />
+      <rect x="322" y="358" width="40" height="48" rx="5" />
+    </g>
+    <g style="fill: var(--grey-out)">
+      <rect x="238" y="158" width="5" height="22" rx="2" />
+      <rect x="238" y="382" width="5" height="22" rx="2" />
+      <circle cx="368" cy="276" r="7" />
+      <rect x="342" y="272" width="28" height="8" rx="4" />
+      <circle cx="310" cy="170" r="4" />
+    </g>
+  </g>
+  <rect x="236" y="442" width="148" height="10" rx="5" style="fill: var(--red-deep)" />
+
+  <!-- The kid, facing the door: arms out, mouth open, heart eyes -->
+  <g style="fill: var(--choco-soft)">
+    <rect x="428" y="396" width="14" height="36" rx="5" />
+    <rect x="450" y="396" width="14" height="36" rx="5" />
+  </g>
+  <g style="fill: var(--white)">
+    <rect x="424" y="428" width="20" height="12" rx="6" />
+    <rect x="448" y="428" width="20" height="12" rx="6" />
+  </g>
+  <path d="M418 404Q414 352 434 340H462Q482 352 478 404Z" style="fill: var(--sky-day-top)" />
+  <path d="M440 352Q408 352 392 322M452 362Q418 376 392 342" style="fill: none; stroke: var(--sky-day-top); stroke-width: 12; stroke-linecap: round" />
+  <g style="fill: var(--hazel)">
+    <circle cx="388" cy="318" r="7.5" />
+    <circle cx="388" cy="340" r="7.5" />
+    <rect x="441" y="324" width="14" height="18" rx="6" />
+    <circle cx="474" cy="306" r="6" />
+    <circle cx="448" cy="304" r="28" />
+  </g>
+  <path d="M420 300Q418 270 448 272Q478 274 478 304Q470 288 460 286Q446 290 420 300Z" style="fill: var(--choco)" />
+  <g style="fill: var(--choco)">
+    <circle cx="434" cy="304" r="3.4" />
+    <circle cx="452" cy="304" r="3.4" />
+  </g>
+  <path d="M434 318Q442 332 452 318Z" style="fill: var(--choco)" />
+  <circle cx="462" cy="316" r="5" style="fill: var(--red); fill-opacity: 0.3" />
+  <g id="heart-l">
+    <path d="M434 312C431 309 425 305 425 300A4.5 4.5 0 0 1 434 298A4.5 4.5 0 0 1 443 300C443 305 437 309 434 312Z" style="fill: var(--red)" />
+    <circle cx="429.5" cy="300" r="1.6" style="fill: var(--white)" />
+  </g>
+  <g id="heart-r">
+    <path d="M453 312C450 309 444 305 444 300A4.5 4.5 0 0 1 453 298A4.5 4.5 0 0 1 462 300C462 305 456 309 453 312Z" style="fill: var(--red)" />
+    <circle cx="448.5" cy="300" r="1.6" style="fill: var(--white)" />
+  </g>
+
+  <!-- Dad, approving from the next room (still with chocolate on his moustache) -->
+  <g id="dad-thumb">
+    <path d="M598 292Q570 282 546 286L544 300Q570 300 598 308Z" style="fill: var(--sky-day-top)" />
+    <g style="fill: var(--hazel)">
+      <rect x="520" y="276" width="30" height="26" rx="10" />
+      <rect x="522" y="256" width="13" height="28" rx="6.5" transform="rotate(-8 528 270)" />
+      <circle cx="566" cy="236" r="28" />
+    </g>
+    <path d="M522 285H536M522 293H536" style="stroke: var(--choco); stroke-opacity: 0.25; stroke-width: 2; stroke-linecap: round" />
+    <path d="M538 232Q536 204 566 204Q596 204 596 230Q584 218 566 220Q550 220 538 232Z" style="fill: var(--choco)" />
+    <path d="M548 234Q554 228 560 234M570 234Q576 228 582 234" style="fill: none; stroke: var(--choco); stroke-width: 3; stroke-linecap: round" />
+    <path d="M546 250Q556 242 566 248Q576 242 586 250Q576 256 566 252Q556 256 546 250Z" style="fill: var(--choco)" />
+    <path d="M552 258Q566 270 580 258Z" style="fill: var(--choco)" />
+    <circle cx="544" cy="244" r="3" style="fill: var(--choco)" />
+    <circle cx="584" cy="244" r="5" style="fill: var(--red); fill-opacity: 0.25" />
+  </g>
+
+  <!-- The next room's doorway, drawn over Dad's shoulder -->
+  <rect x="606" y="120" width="116" height="320" style="fill: var(--cream)" />
+  <rect x="606" y="120" width="116" height="320" style="fill: var(--hazel); fill-opacity: 0.35" />
+  <g style="fill: var(--white)">
+    <rect x="590" y="112" width="18" height="328" rx="4" />
+    <rect x="720" y="112" width="18" height="328" rx="4" />
+    <rect x="582" y="104" width="164" height="16" rx="6" />
+  </g>
+  <rect x="750" y="170" width="40" height="52" rx="4" style="fill: var(--white)" />
+  <rect x="756" y="176" width="28" height="40" rx="2" style="fill: var(--sky-day-top)" />
+  <path d="M770 206C767 203 762 200 762 196A3.5 3.5 0 0 1 770 194A3.5 3.5 0 0 1 778 196C778 200 773 203 770 206Z" style="fill: var(--red)" />
+</svg>

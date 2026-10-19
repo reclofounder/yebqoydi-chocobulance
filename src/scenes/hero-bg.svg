@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMax meet" class="scene__art" aria-hidden="true" focusable="false">
+  <!-- Hero backdrop, 800x450 (the hero stage is 16:9 everywhere). The sky is the section's own
+       gradient, so the art is transparent above the skyline. Composed around what sits on it:
+       the van (mounted after this) parks bottom-right, wheels on the road (y 368-450, deep enough to carry the "scroll" hint), and on
+       phones the "105" numeral covers the top-left (about x < 430, y < 210). So the hotel and the
+       sun stand left of the van, the TV tower and a tall block rise above its roof. The sidewalk
+       and road run on past x = 0 (scenes.css lets this drawing overflow its box): on desktop the
+       street continues under the copy column. Painted with the design tokens only. -->
+  <defs>
+    <pattern id="hero-lattice" width="10" height="13" patternUnits="userSpaceOnUse">
+      <path d="M2.5 13V6.5a2.5 2.5 0 0 1 5 0V13" style="fill: none; stroke: var(--cream); stroke-width: 1.6" />
+    </pattern>
+    <pattern id="hero-windows" width="16" height="18" patternUnits="userSpaceOnUse">
+      <rect x="4" y="5" width="8" height="8" rx="2" style="fill: var(--cream)" />
+    </pattern>
+  </defs>
+
+  <!-- Low dawn sun -->
+  <circle cx="34" cy="296" r="82" style="fill: var(--cream); fill-opacity: 0.35" />
+  <circle cx="34" cy="296" r="52" style="fill: var(--cream); fill-opacity: 0.9" />
+
+  <!-- Far skyline in one soft tone: flats, Hotel Uzbekistan's lattice slab, the TV tower -->
+  <g style="opacity: 0.55">
+    <g style="fill: var(--hazel)">
+      <rect x="-40" y="292" width="124" height="80" rx="4" />
+      <path d="M96 372V236Q160 222 224 236V372Z" />
+      <rect x="470" y="150" width="92" height="222" rx="4" />
+      <rect x="690" y="184" width="130" height="188" rx="4" />
+      <path d="M606 372L634 290H646L674 372H660L640 308L620 372Z" />
+      <path d="M634 290L637 120H643L646 290Z" />
+      <ellipse cx="640" cy="132" rx="20" ry="8.5" />
+      <ellipse cx="640" cy="149" rx="13" ry="5" />
+      <rect x="638.5" y="18" width="3" height="104" rx="1.5" />
+      <rect x="635" y="76" width="10" height="4" rx="2" />
+      <rect x="636" y="50" width="8" height="3" rx="1.5" />
+    </g>
+    <rect x="104" y="246" width="112" height="126" style="fill: url(#hero-lattice)" />
+    <g style="fill: url(#hero-windows)">
+      <rect x="-36" y="298" width="116" height="74" />
+      <rect x="474" y="156" width="84" height="216" />
+      <rect x="694" y="190" width="104" height="182" />
+    </g>
+  </g>
+  <!-- A few windows already lit -->
+  <g style="fill: var(--cream)">
+    <rect x="20" y="321" width="8" height="8" rx="2" />
+    <rect x="52" y="303" width="8" height="8" rx="2" />
+    <rect x="494" y="179" width="8" height="8" rx="2" />
+    <rect x="526" y="215" width="8" height="8" rx="2" />
+    <rect x="730" y="195" width="8" height="8" rx="2" />
+  </g>
+
+  <!-- A plane tree in autumn gold and a lamp post along the sidewalk -->
+  <g style="fill: var(--choco-soft)">
+    <rect x="252" y="302" width="8" height="60" rx="3" />
+    <rect x="292" y="246" width="5" height="116" rx="2.5" />
+    <rect x="308" y="234" width="22" height="8" rx="4" />
+  </g>
+  <path d="M294.5 250Q294 236 308 236H316" style="fill: none; stroke: var(--choco-soft); stroke-width: 5; stroke-linecap: round" />
+  <circle cx="319" cy="246" r="5" style="fill: var(--cream)" />
+  <g style="fill: var(--hazel)">
+    <circle cx="242" cy="296" r="22" />
+    <circle cx="266" cy="288" r="25" />
+    <circle cx="254" cy="270" r="20" />
+  </g>
+  <g style="fill: var(--sky-dawn-top)">
+    <circle cx="258" cy="266" r="9" />
+    <circle cx="244" cy="287" r="7" />
+  </g>
+
+  <!-- Sidewalk, curb and road, running on to the left (no lane marks: the "scroll" hint is
+       written on this road) -->
+  <rect x="-2400" y="350" width="3200" height="16" style="fill: var(--grey-out)" />
+  <rect x="-2400" y="364" width="3200" height="4" style="fill: var(--white)" />
+  <rect x="-2400" y="368" width="3200" height="82" style="fill: var(--choco-soft)" />
+</svg>

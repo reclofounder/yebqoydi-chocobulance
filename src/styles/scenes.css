@@ -1,13 +1,21 @@
 /*
- * Pinned-scene shells only. Stage geometry and the shared type live in layout.css; the illustrated
- * art and its motion are added by later tasks, so nothing here draws scenery.
+ * Pinned scenes: backgrounds, the stage box the art is drawn for, how the art and the copy laid
+ * over it are stacked, and the hero and kitchen extras. The grid cells and the shared type live in
+ * layout.css; the drawings are src/scenes/*.svg (mounted by src/scenes/mount.ts).
  */
 
-/* ---------- Backgrounds: a flat shell color per scene, painted over later ---------- */
+/* ---------- Backgrounds behind the copy ---------- */
 
-[data-scene='hero'],
-[data-scene='road'] {
+[data-scene='hero'] {
   background: linear-gradient(180deg, var(--sky-dawn-top), var(--sky-dawn-bottom));
+}
+
+/* The road's sky stops are variables: road-sky.svg paints with them too, and the scroll timeline
+   moves them from the dawn tokens toward the day tokens as the van drives. */
+[data-scene='road'] {
+  --road-sky-top: var(--sky-dawn-top);
+  --road-sky-bottom: var(--sky-dawn-bottom);
+  background: linear-gradient(180deg, var(--road-sky-top), var(--road-sky-bottom));
 }
 
 [data-scene='kitchen'] {
@@ -22,7 +30,93 @@
   background: var(--sky-day-bottom);
 }
 
+/* ---------- Stages: one stable shape per layout, the art stacked inside ---------- */
+
+/* Each drawing is composed for these shapes (its story sits inside the 4:5 crop, the 16:9 view
+   adds the wings), so the box never stretches: 4:5 under the copy on phones, 16:9 beside it from
+   900 px. The overlay (copy that belongs to the art: the bubble, the price badge) takes the very
+   same cell and box, so its percentages line up with the drawing under it. */
+.scene__stage,
+.scene__overlay {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  aspect-ratio: 4 / 5;
+}
+
+.scene__overlay {
+  position: relative;
+  z-index: 1;
+}
+
+.scene__stage > .scene__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* The road layers that travel are twice the stage's width (as are their viewBoxes): the timeline
+   can slide each one left by up to half its own width before an edge would show. */
+.scene__stage > .layer-far,
+.scene__stage > .layer-mid,
+.scene__stage > .layer-near {
+  width: 200%;
+}
+
+/* Kitchen, call, road and door are paper cards: rounded, and clipped, so the road layers and the
+   van come and go at the card's edge. Phones: a sheet rising from the bottom of the scene. */
+[data-scene]:not([data-scene='hero']) > .scene__stage {
+  overflow: hidden;
+  overflow: clip;
+  border-radius: var(--r-l) var(--r-l) 0 0;
+  box-shadow: 0 -6px 20px color-mix(in srgb, var(--choco) 10%, transparent);
+}
+
+/* Tablets in portrait: a 4:5 stage would be ~960 px tall at 768 px and push every scene past the
+   screen; 4:3 still shows the whole story crop (x 67-733 of the 800-wide drawings). */
+@media (min-width: 600px) and (max-width: 899.98px) {
+  .scene__stage,
+  .scene__overlay {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (min-width: 900px) {
+  .scene__stage,
+  .scene__overlay {
+    grid-column: 3 / -1;
+    grid-row: 1;
+    align-self: center;
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Bleeds off the right edge, so only the left corners are rounded. */
+  [data-scene]:not([data-scene='hero']) > .scene__stage {
+    border-radius: var(--r-l) 0 0 var(--r-l);
+    box-shadow: 0 18px 40px -18px color-mix(in srgb, var(--choco) 35%, transparent);
+  }
+}
+
 /* ---------- Hero ---------- */
+
+/* The hero is open sky, not a card: a wide street strip at the bottom of the scene. 16:9 on phones
+   too, so the parked van stays in the first screen (with a 4:5 stage its roof would sit ~140 px
+   below the fold at 390x844) and its roof clears the numeral down to 375x667. The street runs on past the
+   stage's left edge (the section clips it), under the copy column on desktop. */
+#hero .scene__stage {
+  aspect-ratio: 16 / 9;
+}
+
+#hero .scene__art {
+  overflow: visible;
+}
+
+@media (min-width: 900px) {
+  #hero .scene__stage {
+    align-self: end;
+  }
+}
 
 /* The numeral is a grid item of its own, drawn over the stage cell: it belongs to the art zone.
    Phones: top-left of the stage. Desktop: top of the right column, above the parked van. */
@@ -68,6 +162,8 @@
   flex: 1 1 100%;
 }
 
+/* Written on the hero's road (hero-bg.svg keeps the road deeper than this line): cream on the
+   road is 7.9:1. Plain text, so it stays clear of the parked van's rear bumper on phones. */
 .hero__scroll {
   position: absolute;
   bottom: max(var(--s2), env(safe-area-inset-bottom, 0px));
@@ -76,7 +172,7 @@
   display: flex;
   align-items: center;
   gap: var(--s1);
-  color: var(--choco-soft);
+  color: var(--cream);
   font-size: var(--fs-small);
 }
 
@@ -87,6 +183,13 @@
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
   transform: translateY(-2px) rotate(45deg);
+}
+
+/* The narrowest phones: the chevron would touch the parked van's rear bumper. */
+@media (max-width: 379.98px) {
+  .hero__scroll::after {
+    display: none;
+  }
 }
 
 @media (min-width: 600px) {
@@ -106,13 +209,6 @@
 
   .hero__scroll {
     left: max(var(--gutter), calc((100% - var(--container)) / 2));
-  }
-}
-
-/* Phones: the stage is never shorter than the numeral that sits on it (nor the 10rem floor). */
-@media (max-width: 899.98px) {
-  #hero .scene__stage {
-    min-height: max(10rem, calc(min(var(--fs-numeral), 14svh) + var(--s4)));
   }
 }
 
@@ -163,4 +259,104 @@
   height: 10px;
   border-radius: 50%;
   background: var(--red);
+}
+
+/* ---------- Call: the dispatcher's speech bubble ---------- */
+
+/* Anchored by its bottom-right corner over the dispatcher (call.svg), growing up and left with
+   the text; the tail points down at her head. Rests at its final look: the timeline pops it. */
+.bubble {
+  --tail: 62%;
+  position: absolute;
+  right: 4%;
+  bottom: 57%;
+  max-width: 46%;
+  padding: var(--s1) var(--s2);
+  border-radius: var(--r-m);
+  background: var(--white);
+  color: var(--choco);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(0.9375rem, 0.875rem + 0.278vw, 1.125rem); /* 15-18 */
+  line-height: 1.25;
+  text-wrap: balance;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--choco) 14%, transparent);
+  transform-origin: var(--tail) 100%;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 1px);
+  left: var(--tail);
+  width: 18px;
+  height: 14px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 30% 100%);
+}
+
+@media (min-width: 900px) {
+  .bubble {
+    --tail: 16%;
+    bottom: 63%;
+    max-width: 34%;
+  }
+}
+
+/* ---------- Door: the price badge ---------- */
+
+/* A red tag on the wall above the kid, tilted like a sticker (the rotate property composes with
+   the transform the timeline animates). White on red is 4.6:1; the note sits on cream. */
+.price-badge {
+  position: absolute;
+  top: 6%;
+  right: 5%;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  max-width: 48%;
+  padding: 12px var(--s2);
+  border-radius: var(--r-m);
+  background: var(--red);
+  color: var(--white);
+  text-align: center;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--red-deep) 30%, transparent);
+  rotate: -4deg;
+  transform-origin: 50% 0;
+}
+
+.price-badge__price {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: calc(var(--fs-h3) * 1.2);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.price-badge__note {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--red-deep);
+  font-size: var(--fs-small);
+  font-weight: 700;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+/* ---------- Animated parts (the scroll timeline drives them) ---------- */
+
+/* The door swings on its hinge edge and the hearts pop from their centres, each about its own
+   box. Drive them with CSS transforms (element.style.transform), as with the van's wheels: GSAP
+   writes SVG transforms as attributes with a view-box origin, which fill-box would offset. */
+#door-leaf {
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+
+#heart-l,
+#heart-r {
+  transform-box: fill-box;
+  transform-origin: center;
 }

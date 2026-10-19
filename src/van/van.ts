@@ -78,6 +78,8 @@ export function mountVan(target: Element, opts: { id?: string } = {}): SVGSVGEle
   suffixIds(svg, key);
   svg.classList.add('van');
   svg.setAttribute('data-van', key);
+  // Parked bottom-right when its box is not 2:1 (hero on short screens), whatever the art says.
+  svg.setAttribute('preserveAspectRatio', 'xMaxYMax meet');
   // An image with a translated name; applyI18n keeps the label in step with the language toggle.
   svg.removeAttribute('aria-hidden');
   svg.setAttribute('role', 'img');

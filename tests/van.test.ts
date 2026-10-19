@@ -174,6 +174,16 @@ describe('mountVan with swapped art', () => {
     expect(body.querySelectorAll('use')[1].getAttribute('href')).toBe('#not-in-this-art');
     expect(svg.querySelector('style')!.textContent).toBe('.cls-1 { fill: url(#paint-x); }');
   });
+
+  it('parks any art bottom-right in a box of another shape (the art itself does not say how)', async () => {
+    vi.resetModules();
+    vi.doMock('../src/van/van.svg?raw', () => ({ default: ART }));
+    const { mountVan: mount } = await import('../src/van/van');
+
+    const svg = mount(document.body, { id: 'x' });
+
+    expect(svg.getAttribute('preserveAspectRatio')).toBe('xMaxYMax meet');
+  });
 });
 
 describe('van.css', () => {

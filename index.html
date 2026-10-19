@@ -81,6 +81,10 @@
           <p class="body" data-i18n="call.body"></p>
         </div>
         <div class="scene__stage" data-stage></div>
+        <!-- Copy that belongs to the art, laid over the stage: real text, so it translates and wraps. -->
+        <div class="scene__overlay" aria-hidden="false">
+          <p id="bubble" class="bubble" data-i18n="call.bubble"></p>
+        </div>
       </section>
 
       <section id="scene-road" class="scene" data-scene="road" aria-labelledby="road-title">
@@ -99,6 +103,12 @@
           <p class="body" data-i18n="door.body"></p>
         </div>
         <div class="scene__stage" data-stage></div>
+        <div class="scene__overlay" aria-hidden="false">
+          <div id="price-badge" class="price-badge">
+            <p class="price-badge__price" data-i18n="door.price"></p>
+            <p class="price-badge__note" data-i18n="door.price.note"></p>
+          </div>
+        </div>
       </section>
 
       <!-- Static sections -->

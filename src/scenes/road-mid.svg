@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 450" preserveAspectRatio="xMinYMax slice" class="scene__art layer-mid" aria-hidden="true" focusable="false">
+  <!-- Road scene, middle layer, 1600x450 at twice the stage's width: Chorsu bazaar's big blue
+       dome, low houses and golden plane trees. Phones only see x 0-720 (Chorsu is there).
+       Bottoms run under the near layer's sidewalk (y 338). Tokens only. -->
+  <defs>
+    <pattern id="road-mid-windows" width="22" height="26" patternUnits="userSpaceOnUse">
+      <rect x="6" y="6" width="10" height="12" rx="3" style="fill: var(--choco); fill-opacity: 0.18" />
+    </pattern>
+  </defs>
+
+  <!-- Low houses -->
+  <g style="fill: var(--cream)">
+    <rect x="740" y="250" width="150" height="110" rx="6" />
+    <rect x="1060" y="230" width="140" height="130" rx="6" />
+    <rect x="1340" y="262" width="120" height="98" rx="6" />
+  </g>
+  <g style="fill: var(--red-deep)">
+    <rect x="732" y="240" width="166" height="14" rx="7" />
+    <rect x="1052" y="220" width="156" height="14" rx="7" />
+    <rect x="1332" y="252" width="136" height="14" rx="7" />
+  </g>
+  <g style="fill: url(#road-mid-windows)">
+    <rect x="750" y="260" width="132" height="78" />
+    <rect x="1070" y="240" width="132" height="104" />
+    <rect x="1350" y="272" width="110" height="66" />
+  </g>
+
+  <!-- Chorsu bazaar: drum, the big dome with its ribs, two small domes -->
+  <g style="fill: var(--sky-day-top)">
+    <path d="M262 300A34 34 0 0 1 330 300Z" />
+    <path d="M510 300A34 34 0 0 1 578 300Z" />
+    <path d="M314 272A106 104 0 0 1 526 272Z" />
+  </g>
+  <g style="fill: var(--cream)">
+    <rect x="258" y="298" width="76" height="62" rx="4" />
+    <rect x="506" y="298" width="76" height="62" rx="4" />
+    <rect x="310" y="268" width="220" height="92" rx="4" />
+  </g>
+  <rect x="306" y="266" width="228" height="12" rx="6" style="fill: var(--hazel)" />
+  <path d="M420 168V266M370 182Q352 220 348 266M470 182Q488 220 492 266M336 214Q330 240 330 266M504 214Q510 240 510 266" style="fill: none; stroke: var(--white); stroke-opacity: 0.7; stroke-width: 4; stroke-linecap: round" />
+  <path d="M414 170Q420 150 426 170Z" style="fill: var(--hazel)" />
+  <circle cx="420" cy="148" r="5" style="fill: var(--hazel)" />
+  <g style="fill: var(--sky-day-top); fill-opacity: 0.6">
+    <path d="M332 360V312A14 14 0 0 1 360 312V360Z" />
+    <path d="M384 360V304A14 14 0 0 1 412 304V360Z" />
+    <path d="M428 360V304A14 14 0 0 1 456 304V360Z" />
+    <path d="M480 360V312A14 14 0 0 1 508 312V360Z" />
+    <path d="M282 360V322A14 14 0 0 1 310 322V360Z" />
+    <path d="M530 360V322A14 14 0 0 1 558 322V360Z" />
+  </g>
+
+  <!-- Plane trees in autumn gold -->
+  <g style="fill: var(--choco-soft)">
+    <rect x="66" y="250" width="10" height="110" rx="4" />
+    <rect x="964" y="252" width="10" height="108" rx="4" />
+    <rect x="1262" y="244" width="10" height="116" rx="4" />
+    <rect x="1540" y="250" width="10" height="110" rx="4" />
+  </g>
+  <g style="fill: var(--hazel)">
+    <circle cx="52" cy="244" r="36" /><circle cx="92" cy="232" r="40" /><circle cx="70" cy="204" r="34" />
+    <circle cx="950" cy="246" r="34" /><circle cx="988" cy="234" r="38" /><circle cx="968" cy="206" r="32" />
+    <circle cx="1248" cy="238" r="36" /><circle cx="1288" cy="226" r="40" /><circle cx="1266" cy="198" r="34" />
+    <circle cx="1526" cy="244" r="36" /><circle cx="1566" cy="232" r="40" /><circle cx="1544" cy="204" r="34" />
+  </g>
+  <g style="fill: var(--sky-dawn-top)">
+    <circle cx="76" cy="198" r="14" /><circle cx="50" cy="234" r="10" /><circle cx="100" cy="228" r="8" />
+    <circle cx="974" cy="200" r="13" /><circle cx="948" cy="238" r="9" />
+    <circle cx="1272" cy="192" r="14" /><circle cx="1246" cy="228" r="10" /><circle cx="1296" cy="222" r="8" />
+    <circle cx="1550" cy="198" r="14" /><circle cx="1524" cy="234" r="10" />
+  </g>
+</svg>
