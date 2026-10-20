@@ -300,6 +300,40 @@ h3 {
   display: none;
 }
 
+/* Desktop's call action once the hero has scrolled away (phones have the sticky bar): a compact
+   pill in the header, between the brand and the language toggle, shown with the frosted bar. */
+.cta--compact {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .cta--compact {
+    display: inline-flex;
+    min-height: 44px;
+    margin-left: auto;
+    padding: 0 var(--s2);
+    border-radius: 999px;
+    font-size: 1rem;
+    transition:
+      opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+      translate 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+      visibility 0s,
+      transform 0.12s ease-out,
+      background-color 0.12s ease-out;
+  }
+
+  .header[data-scrolled='false'] .cta--compact {
+    opacity: 0;
+    translate: 0 -4px;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+      translate 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+      visibility 0s 0.2s;
+  }
+}
+
 :root {
   --icon-phone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C9.61 21 3 14.39 3 6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E");
 }
@@ -350,7 +384,7 @@ h3 {
     visibility 0s 0.3s;
 }
 
-/* On desktop the hero call-to-action is always in reach, so the bar stays away. */
+/* On desktop the header carries a compact call pill instead (.cta--compact). */
 @media (min-width: 900px) {
   .sticky-cta {
     display: none;
@@ -472,6 +506,19 @@ h3 {
   .steps {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--s4);
+  }
+}
+
+/* Step one says "dial 105": the call is right under the steps, full width on phones. */
+.how__cta {
+  display: flex;
+  width: 100%;
+  margin-top: var(--s6);
+}
+
+@media (min-width: 600px) {
+  .how__cta {
+    width: fit-content;
   }
 }
 
@@ -724,6 +771,8 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
   .header,
   .cta,
+  .cta--compact,
+  .header[data-scrolled='false'] .cta--compact,
   .sticky-cta,
   .sticky-cta[data-visible='false'],
   .faq__item summary::after {

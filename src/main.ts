@@ -25,8 +25,12 @@ document.addEventListener('click', (event) => {
   setLang(lang);
 });
 
-// A new language changes the copy's length, so the scenes' heights and pin positions move.
-document.addEventListener('langchange', refreshScroll);
+// A new language changes the copy's length, so the scenes' heights and pin positions move:
+// re-measure now (which also starts loading the new script's font subset), and again once it is in.
+document.addEventListener('langchange', () => {
+  refreshScroll();
+  void document.fonts?.ready.then(refreshScroll);
+});
 
 // The scroll story last: ScrollTrigger measures the scenes, and the fonts set their heights.
 void (document.fonts?.ready ?? Promise.resolve()).then(initScroll);

@@ -15,11 +15,18 @@
 [data-scene='road'] {
   --road-sky-top: var(--sky-dawn-top);
   --road-sky-bottom: var(--sky-dawn-bottom);
-  background: linear-gradient(180deg, var(--road-sky-top), var(--road-sky-bottom));
+  background: linear-gradient(
+    180deg,
+    var(--cream),
+    var(--road-sky-top) 30%,
+    var(--road-sky-bottom)
+  );
 }
 
+/* Each scene's background ends in the next one's first colour (hero dawn > kitchen > cream call >
+   road > door > cream sections), so every hand-off between pins is one continuous sheet. */
 [data-scene='kitchen'] {
-  background: var(--sky-dawn-bottom);
+  background: linear-gradient(180deg, var(--sky-dawn-bottom) 55%, var(--cream));
 }
 
 [data-scene='call'] {
@@ -27,7 +34,7 @@
 }
 
 [data-scene='door'] {
-  background: var(--sky-day-bottom);
+  background: linear-gradient(180deg, var(--sky-day-bottom) 55%, var(--cream));
 }
 
 /* ---------- Stages: one stable shape per layout, the art stacked inside ---------- */
@@ -91,6 +98,17 @@
     grid-row: 1;
     align-self: center;
     aspect-ratio: 16 / 9;
+  }
+
+  /* The story's art is the content: 7/12 of the container (733 x 412 at 1280 px), the copy 5/12.
+     The stage stays 16:9, so the drawings' crop and the bubble and price-tag anchors hold. The
+     hero keeps its halves: its headline is sized for a 560 px column. */
+  [data-scene]:not([data-scene='hero']) {
+    grid-template-columns:
+      minmax(max(var(--gutter), env(safe-area-inset-left, 0px)), 1fr)
+      minmax(0, calc(var(--container) * 5 / 12))
+      minmax(0, calc(var(--container) * 7 / 12))
+      minmax(var(--gutter), 1fr);
   }
 
   /* Bleeds off the right edge, so only the left corners are rounded. */
@@ -263,6 +281,27 @@
   background: var(--red);
 }
 
+/* Phones: the kitchen fits one screen with its title, so the line ("Dad ate it") and the joke (Dad
+   slinking off) are on screen together. The card says what the paragraph says, and funnier. */
+@media (max-width: 899.98px) {
+  #scene-kitchen .body {
+    display: none;
+  }
+
+  #scene-kitchen .card {
+    padding: var(--s2);
+    gap: 4px;
+  }
+
+  #scene-kitchen .card__list {
+    gap: 4px;
+  }
+
+  #scene-kitchen .card__list li {
+    font-size: 1rem;
+  }
+}
+
 /* ---------- Call: the dispatcher's speech bubble ---------- */
 
 /* Anchored by its bottom-right corner over the dispatcher (call.svg), growing up and left with
@@ -353,7 +392,7 @@
 /* ---------- Animated parts (the scroll timeline drives them) ---------- */
 
 /* The door swings on its hinge edge and the hearts pop from their centres, each about its own
-   box. The timeline drives them through custom properties (--door-open, --pop), as with the van's
+   box. The timeline drives them through custom properties (--door-open, --pop, --pop-o), as with the van's
    wheels: GSAP writes SVG transforms as attributes with a view-box origin, which fill-box would
    offset. Unset, they rest in their drawn state: door closed, hearts full size. */
 #door-leaf {
@@ -367,6 +406,7 @@
   transform-box: fill-box;
   transform-origin: center;
   transform: scale(var(--pop, 1));
+  opacity: var(--pop-o, 1);
 }
 
 /* Moving layers get compositor layers of their own while the story runs, not in the still frames. */
@@ -392,7 +432,7 @@
 
 @media (min-width: 900px) {
   .reduced #scene-road .van {
-    left: calc(70% - 34% / 2);
+    left: calc(70% - 38% / 2);
   }
 }
 

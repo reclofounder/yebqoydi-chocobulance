@@ -54,9 +54,15 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   expect(text('[data-state-note]')).toBe(
     'Линия откроется совсем скоро. А пока спрячьте Chococream.',
   );
+  // Re-measured at once, and again once the new script's font subset (Cyrillic) is in.
   expect(story.refresh).toHaveBeenCalledTimes(1);
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(story.refresh).toHaveBeenCalledTimes(2);
 
   document.querySelector<HTMLElement>('[data-lang="uz"]')!.click();
   expect(text('[data-cta]')).toBe('Tez orada');
-  expect(story.refresh).toHaveBeenCalledTimes(2);
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(story.refresh).toHaveBeenCalledTimes(4);
 });

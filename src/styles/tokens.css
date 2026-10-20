@@ -13,6 +13,9 @@
   --sky-dawn-top: #ffb86b;
   --sky-dawn-bottom: #ffe2b8;
   --sky-day-top: #8fd3ff;
+  /* Road sky top on its way from dawn to day (scroll/timeline.ts): pale but never grey. */
+  --sky-sunrise-top: #ffd9a8;
+  --sky-morning-top: #cfeaff;
   --sky-day-bottom: #e6f6ff;
   --night: #1e1b2e;
   --grey-out: #d9d4cc;

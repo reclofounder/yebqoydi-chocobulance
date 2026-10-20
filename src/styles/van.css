@@ -48,8 +48,8 @@
 
 /* Mounted last into the road stage, above all four layers. The scroll timeline drives it across
    (transform only); this is where it starts from: left edge, wheels on the near lane of
-   road-near.svg. A third of the 16:9 stage wide; wider on the tall 4:5 phone stage, where the
-   drawing is scaled to the height and a third would leave a small van on a wide road. */
+   road-near.svg. 38 % of the 16:9 stage wide; 44 % on the tall 4:5 phone stage, where the drawing
+   is scaled to the height and a narrower van would look lost on a wide road. */
 #scene-road .van {
   position: absolute;
   left: 0;
@@ -59,19 +59,20 @@
 
 @media (min-width: 900px) {
   #scene-road .van {
-    width: 34%;
+    width: 38%;
   }
 }
 
 /* ---------- Idle motion: the only things that move without scrolling ---------- */
 
 /* The siren light pulses while the story runs (scroll/timeline.ts adds .siren--on): a slow
-   2 s breath while parked in the hero, a 1.2 s blink on the road. Opacity only. */
+   2 s breath while parked, a 1.2 s blink once on alert (the road van, and the hero van as soon as
+   the visitor scrolls). Opacity only. */
 .siren--on {
   animation: siren-pulse 1s ease-in-out infinite alternate;
 }
 
-#scene-road .siren--on {
+.siren--alert {
   animation-duration: 0.6s;
 }
 

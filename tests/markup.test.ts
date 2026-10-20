@@ -56,7 +56,7 @@ describe('index.html markup', () => {
   it('keeps every call-to-action a plain-text anchor the engine can swap for a pill', () => {
     // applyMode() replaces a CTA by a span that keeps only class and data-cta.
     const ctas = [...doc.querySelectorAll<HTMLElement>('[data-cta]')];
-    expect(ctas).toHaveLength(2);
+    expect(ctas).toHaveLength(4);
     for (const cta of ctas) {
       expect(cta.localName).toBe('a');
       expect(cta.childElementCount).toBe(0);
@@ -65,6 +65,17 @@ describe('index.html markup', () => {
       expect(cta.getAttribute('href')).toBe('tel:105');
     }
     expect(doc.querySelector('#sticky-cta a.cta[data-cta][data-i18n="sticky.cta"]')).not.toBeNull();
+  });
+
+  it('keeps a call action in reach after the hero: a header pill, and one under the steps', () => {
+    // Desktop has no sticky bar: the header carries a compact call pill, between brand and language.
+    const inner = [...doc.querySelector('#header .header__inner')!.children];
+    expect(inner.map((el) => el.className)).toEqual(['brand', 'cta cta--compact', 'lang']);
+    expect(inner[1].matches('a[data-cta][data-i18n="sticky.cta"]')).toBe(true);
+    // "Dial 105" in step one, with something to tap right under the steps (every width).
+    const how = doc.querySelector('#how .container')!;
+    expect(how.lastElementChild!.matches('a.cta[data-cta][data-i18n="hero.cta"]')).toBe(true);
+    expect(how.lastElementChild!.previousElementSibling!.matches('ol.steps')).toBe(true);
   });
 
   it('starts the sticky bar hidden, with phone hints hidden until the engine reveals them', () => {

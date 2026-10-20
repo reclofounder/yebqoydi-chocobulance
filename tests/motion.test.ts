@@ -8,7 +8,7 @@ import { mountScenes } from '../src/scenes/mount';
 import { VAN, wheelRotation } from '../src/van/van';
 import { initScroll, prefersReducedMotion } from '../src/scroll/motion';
 import { initReduced } from '../src/scroll/reduced';
-import { pinShift, wheelTurn } from '../src/scroll/timeline';
+import { beat, pinShift, wheelTurn } from '../src/scroll/timeline';
 
 const fake = vi.hoisted(() => {
   /** The media queries that currently match. */
@@ -18,6 +18,13 @@ const fake = vi.hoisted(() => {
   type Cleanup = (() => void) | void;
   /** Each gsap.matchMedia().add(), re-runnable after `media` changes (as GSAP does on a change). */
   const contexts: Array<{ rerun: () => void }> = [];
+
+  /** A stand-in for a paused GSAP tween: the gags are played and reversed in time. */
+  const tween = () => {
+    const t: Record<string, unknown> = {};
+    for (const method of ['play', 'reverse', 'timeScale']) t[method] = vi.fn(() => t);
+    return t;
+  };
 
   /** A chainable stand-in for a GSAP timeline; `scrollTrigger.end` is the pin's last scroll px. */
   const timeline = () => {
@@ -33,7 +40,7 @@ const fake = vi.hoisted(() => {
     timeline: vi.fn(timeline),
     set: vi.fn(),
     to: vi.fn(),
-    fromTo: vi.fn(),
+    fromTo: vi.fn(tween),
     ticker: { add: vi.fn(), remove: vi.fn(), lagSmoothing: vi.fn() },
     // GSAP's contract: run `fn` while any condition matches, with every condition's state; on a
     // media change, undo the previous run (its returned cleanup) and run again.
@@ -87,14 +94,17 @@ const html = read('index.html');
 const root = document.documentElement;
 const byId = (id: string) => document.getElementById(id)!;
 const isReduced = () => root.classList.contains('reduced');
-const sirenOn = (id: string) => byId(`siren-light-${id}`).classList.contains('siren--on');
+const siren = (id: string, state: 'on' | 'alert') =>
+  byId(`siren-light-${id}`).classList.contains(`siren--${state}`);
+const sirenOn = (id: string) => siren(id, 'on');
 
 type Pin = {
   trigger: HTMLElement;
   pin: boolean;
-  scrub: number;
+  scrub: number | boolean;
   end: string;
   anticipatePin: number;
+  onUpdate: (self: { progress: number }) => void;
 };
 /** The scroll-trigger settings of every pinned timeline, in creation order. */
 const pins = (): Pin[] =>
@@ -102,8 +112,35 @@ const pins = (): Pin[] =>
     .map((args) => (args as unknown as [{ scrollTrigger?: Pin }?])[0]?.scrollTrigger)
     .filter((st): st is Pin => Boolean(st?.pin));
 
-type Trigger = { start: unknown; onToggle: (self: { isActive: boolean }) => void };
+/** What a ScrollTrigger callback is handed: where the page is, and where the trigger starts. */
+type Self = { scroll: () => number; start: number; progress: number; isActive: boolean };
+/** At the page bottom a trigger ending at 'max' has progress 1 and is no longer "active". */
+const at = (scroll: number, start: number): Self => ({
+  scroll: () => scroll,
+  start,
+  progress: scroll > start ? 1 : 0,
+  isActive: false,
+});
+type Trigger = {
+  trigger?: Element;
+  pinnedContainer?: Element;
+  start: unknown;
+  onUpdate: (self: Self) => void;
+  onRefresh: (self: Self) => void;
+};
 const triggers = () => fake.ScrollTrigger.create.mock.calls.map((args) => args[0] as Trigger);
+
+type FakeTween = Record<'play' | 'reverse' | 'timeScale', ReturnType<typeof vi.fn>>;
+/** The paused tween of the gag whose target is (or starts with) the element with this id. */
+function gag(id: string): FakeTween {
+  const i = fake.gsap.fromTo.mock.calls.findIndex((args) => {
+    const target = (args as unknown[])[0];
+    return (Array.isArray(target) ? target[0] : (target as Element | null))?.id === id;
+  });
+  expect(i, `no gag tween for #${id}`).toBeGreaterThanOrEqual(0);
+  return fake.gsap.fromTo.mock.results[i].value as FakeTween;
+}
+const played = (...ids: string[]) => ids.map((id) => gag(id).play.mock.calls.length);
 
 function setScrollY(y: number): void {
   Object.defineProperty(window, 'scrollY', { value: y, configurable: true });
@@ -169,8 +206,9 @@ describe('initScroll with motion', () => {
     initScroll();
 
     expect(pins().map((st) => st.trigger.id)).toEqual(SCENES);
-    expect(pins().map((st) => st.end)).toEqual(['+=150%', '+=200%', '+=150%', '+=300%', '+=150%']);
-    expect(pins().map((st) => st.scrub)).toEqual([0.8, 0.8, 0.8, 0.8, 0.8]);
+    expect(pins().map((st) => st.end)).toEqual(['+=60%', '+=120%', '+=150%', '+=300%', '+=150%']);
+    // Native scrolling: a light catch-up smooths the scrubbed motion.
+    expect(pins().map((st) => st.scrub)).toEqual([0.4, 0.4, 0.4, 0.4, 0.4]);
     expect(isReduced()).toBe(false);
   });
 
@@ -181,8 +219,8 @@ describe('initScroll with motion', () => {
 
     expect(pins().map((st) => st.trigger.id)).toEqual(SCENES);
     expect(pins().map((st) => st.end)).toEqual([
-      '+=112.5%',
-      '+=150%',
+      '+=45%',
+      '+=90%',
       '+=112.5%',
       '+=225%',
       '+=112.5%',
@@ -201,43 +239,127 @@ describe('initScroll with motion', () => {
     expect(line[2]).toMatchObject({ strokeDashoffset: 0, autoRound: false });
   });
 
-  it('pulses both sirens while the story runs', () => {
+  it('pulses both sirens while the story runs: a slow breath parked, a blink once it moves', () => {
     fake.media.add(NARROW);
 
     initScroll();
 
     expect(sirenOn('hero')).toBe(true);
+    expect(siren('hero', 'alert')).toBe(false);
     expect(sirenOn('road')).toBe(true);
+    expect(siren('road', 'alert')).toBe(true);
+
+    // The hero's one beat: the first few px of its pin switch its siren to the road blink.
+    const hero = pins()[0];
+    hero.onUpdate({ progress: 0.06 });
+    expect(siren('hero', 'alert')).toBe(true);
+    hero.onUpdate({ progress: 0 });
+    expect(siren('hero', 'alert')).toBe(false);
   });
 
-  it('frosts the header past 40 px and shows the sticky bar once the hero lets go', () => {
+  it('plays the call gags in time at 6, 16, 26 and 54 % of its pin, and takes them back faster', () => {
+    fake.media.add(NARROW);
+    initScroll();
+    const call = pins()[2];
+
+    call.onUpdate({ progress: 0.05 });
+    expect(played('digit-1', 'digit-0', 'digit-5', 'bubble')).toEqual([0, 0, 0, 0]);
+    call.onUpdate({ progress: 0.07 });
+    expect(played('digit-1', 'digit-0', 'digit-5', 'bubble')).toEqual([1, 0, 0, 0]);
+    call.onUpdate({ progress: 0.27 });
+    expect(played('digit-1', 'digit-0', 'digit-5', 'bubble')).toEqual([1, 1, 1, 0]);
+    call.onUpdate({ progress: 0.55 });
+    call.onUpdate({ progress: 0.9 });
+    expect(played('digit-1', 'digit-0', 'digit-5', 'bubble')).toEqual([1, 1, 1, 1]);
+
+    call.onUpdate({ progress: 0.5 });
+    expect(gag('bubble').reverse).toHaveBeenCalledTimes(1);
+    expect(gag('bubble').timeScale).toHaveBeenLastCalledWith(1.6);
+    expect(gag('digit-5').reverse).not.toHaveBeenCalled();
+  });
+
+  it('plays the door gags at 36, 46 and 56 % of its pin', () => {
+    fake.media.add(WIDE);
+    initScroll();
+    const door = pins()[4];
+
+    door.onUpdate({ progress: 0.35 });
+    expect(played('heart-l', 'dad-thumb', 'price-badge')).toEqual([0, 0, 0]);
+    door.onUpdate({ progress: 0.37 });
+    expect(played('heart-l', 'dad-thumb', 'price-badge')).toEqual([1, 0, 0]);
+    door.onUpdate({ progress: 0.47 });
+    expect(played('heart-l', 'dad-thumb', 'price-badge')).toEqual([1, 1, 0]);
+    door.onUpdate({ progress: 0.57 });
+    expect(played('heart-l', 'dad-thumb', 'price-badge')).toEqual([1, 1, 1]);
+  });
+
+  it('never grows a gag from nothing: pops start at half size or more', () => {
+    fake.media.add(WIDE);
+    initScroll();
+
+    const from = (id: string) => {
+      const call = fake.gsap.fromTo.mock.calls.find((args) => {
+        const target = (args as unknown[])[0];
+        return (Array.isArray(target) ? target[0] : (target as Element))?.id === id;
+      })!;
+      return (call as unknown[])[1] as Record<string, number>;
+    };
+    expect(from('bubble')).toEqual({ scale: 0.6, opacity: 0 });
+    expect(from('heart-l')).toEqual({ '--pop': 0.5, '--pop-o': 0 });
+    expect(from('digit-1')).toMatchObject({ opacity: 0, scale: 0.88 });
+    expect(from('price-badge')).toEqual({ y: 16, opacity: 0 });
+  });
+
+  it('keeps the header frosted and the call bar up to the very bottom of the page', () => {
     fake.media.add(NARROW);
     initScroll();
     const header = byId('header');
     const sticky = byId('sticky-cta');
-
     const frost = triggers().find((t) => t.start === 40)!;
-    frost.onToggle({ isActive: true });
-    expect(header.dataset.scrolled).toBe('true');
-    frost.onToggle({ isActive: false });
-    expect(header.dataset.scrolled).toBe('false');
+    const bar = triggers().find((t) => t.trigger === document.querySelector('#hero [data-cta]'))!;
 
-    // The bar's trigger starts where the hero's pin ends, whatever that is after a refresh.
-    const hero = fake.gsap.timeline.mock.results[0].value as { scrollTrigger: { end: number } };
-    hero.scrollTrigger.end = 1234;
-    const bar = triggers().find((t) => typeof t.start === 'function')!;
-    expect((bar.start as () => number)()).toBe(1234);
-    bar.onToggle({ isActive: true });
-    expect(sticky.dataset.visible).toBe('true');
-    bar.onToggle({ isActive: false });
-    expect(sticky.dataset.visible).toBe('false');
+    // At the very bottom a trigger ending at 'max' has progress 1 and is no longer "active", and a
+    // jump from there back to the top changes no active state either: the flags follow every state
+    // change (onUpdate), keyed to the scroll position, not to isActive.
+    frost.onUpdate(at(13000, 40));
+    bar.onUpdate(at(13000, 900));
+    expect([header.dataset.scrolled, sticky.dataset.visible]).toEqual(['true', 'true']);
+
+    frost.onUpdate(at(10, 40));
+    bar.onUpdate(at(10, 900));
+    expect([header.dataset.scrolled, sticky.dataset.visible]).toEqual(['false', 'false']);
   });
 
-  it('smooths mouse and trackpad scrolling with Lenis, on the GSAP ticker', () => {
+  it('sets the header and the call bar on load, wherever the page opens', () => {
+    fake.media.add(NARROW);
+    initScroll();
+    const frost = triggers().find((t) => t.start === 40)!;
+    const bar = triggers().find((t) => t.trigger === document.querySelector('#hero [data-cta]'))!;
+
+    frost.onRefresh(at(9000, 40));
+    bar.onRefresh(at(9000, 900));
+
+    expect(byId('header').dataset.scrolled).toBe('true');
+    expect(byId('sticky-cta').dataset.visible).toBe('true');
+  });
+
+  it('shows the call bar once the hero call button has gone under the header, not before', () => {
+    fake.media.add(NARROW);
+    initScroll();
+
+    const bar = triggers().find((t) => t.trigger === document.querySelector('#hero [data-cta]'))!;
+
+    expect(bar.pinnedContainer).toBe(byId('hero'));
+    expect((bar.start as () => string)()).toMatch(/^bottom top\+=\d+$/);
+  });
+
+  it('smooths mouse and trackpad scrolling with Lenis, on the GSAP ticker, and only once', () => {
     fake.media.add(WIDE).add(FINE);
 
     initScroll();
 
+    // Lenis already eases the wheel: the scenes follow the smoothed scroll directly.
+    expect(pins().map((st) => st.scrub)).toEqual([true, true, true, true, true]);
     expect(fake.Lenis).toHaveBeenCalledTimes(1);
     expect(fake.lenis.on).toHaveBeenCalledWith('scroll', fake.ScrollTrigger.update);
     expect(fake.gsap.ticker.add).toHaveBeenCalledTimes(1);
@@ -365,6 +487,30 @@ describe('wheelTurn', () => {
   });
 });
 
+describe('beat', () => {
+  it('plays once when the pin passes its point, and reverses 1.6x faster below it', () => {
+    const tween = { play: vi.fn(), reverse: vi.fn(), timeScale: vi.fn() };
+    tween.play.mockReturnValue(tween);
+    tween.reverse.mockReturnValue(tween);
+    tween.timeScale.mockReturnValue(tween);
+    const run = beat(tween as unknown as Parameters<typeof beat>[0], 0.5);
+
+    run(0.2);
+    run(0.4);
+    expect(tween.play).not.toHaveBeenCalled();
+
+    run(0.5);
+    run(0.8);
+    expect(tween.play).toHaveBeenCalledTimes(1);
+    expect(tween.timeScale).toHaveBeenLastCalledWith(1);
+
+    run(0.3);
+    run(0.1);
+    expect(tween.reverse).toHaveBeenCalledTimes(1);
+    expect(tween.timeScale).toHaveBeenLastCalledWith(1.6);
+  });
+});
+
 describe('the CSS the motion leans on', () => {
   const strip = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
   const vanCss = strip(read('src/styles/van.css'));
@@ -387,6 +533,7 @@ describe('the CSS the motion leans on', () => {
 
   it('pulses the siren and idles the parked van, and stops both under reduced motion', () => {
     expect(body(vanCss, '.siren--on')).toMatch(/animation:/);
+    expect(body(vanCss, '.siren--alert')).toMatch(/animation-duration:\s*0\.6s/);
     expect(vanCss).toMatch(/\[data-van='hero'\][^{]*\{[^}]*animation:/);
     expect(vanCss).toContain('@media (prefers-reduced-motion: reduce)');
     const reduced = reducedMedia(vanCss);
@@ -401,9 +548,11 @@ describe('the CSS the motion leans on', () => {
     expect(body(scenesCss, '.reduced #door-leaf')).toMatch(/--door-open:\s*-100deg/);
   });
 
-  it('pops the hearts on a custom property', () => {
-    expect(body(scenesCss, '#heart-l')).toMatch(/transform:\s*scale\(var\(--pop,\s*1\)\)/);
-    expect(body(scenesCss, '#heart-r')).toMatch(/transform:\s*scale\(var\(--pop,\s*1\)\)/);
+  it('pops the hearts on custom properties, resting full size and opaque', () => {
+    for (const heart of ['#heart-l', '#heart-r']) {
+      expect(body(scenesCss, heart)).toMatch(/transform:\s*scale\(var\(--pop,\s*1\)\)/);
+      expect(body(scenesCss, heart)).toMatch(/opacity:\s*var\(--pop-o,\s*1\)/);
+    }
   });
 
   it('parks the road van in view and hides the scroll hint in the still frame', () => {
@@ -418,6 +567,40 @@ describe('the CSS the motion leans on', () => {
       expect(rule).toMatch(/width:\s*200%/);
       expect(rule).toMatch(/max-width:\s*none/);
     }
+  });
+
+  it('fits the kitchen on phones, so its title stays in view while Dad slides away', () => {
+    const phones = scenesCss.slice(scenesCss.indexOf('#scene-kitchen .body'));
+    expect(scenesCss).toMatch(
+      /@media \(max-width: 899\.98px\)\s*\{\s*#scene-kitchen \.body\s*\{\s*display:\s*none/,
+    );
+    expect(phones).toMatch(/#scene-kitchen \.card\s*\{[^}]*padding:\s*var\(--s2\)/);
+  });
+
+  it('chains the scene backgrounds, so each hand-off is one continuous sheet', () => {
+    expect(body(scenesCss, "[data-scene='kitchen']")).toMatch(
+      /linear-gradient\(180deg,\s*var\(--sky-dawn-bottom\)[^,]*,\s*var\(--cream\)\)/,
+    );
+    expect(body(scenesCss, "[data-scene='road']")).toMatch(
+      /linear-gradient\(\s*180deg,\s*var\(--cream\),\s*var\(--road-sky-top\)/,
+    );
+    expect(body(scenesCss, "[data-scene='door']")).toMatch(
+      /linear-gradient\(180deg,\s*var\(--sky-day-bottom\)[^,]*,\s*var\(--cream\)\)/,
+    );
+  });
+
+  it('gives the story art 7/12 of the desktop container (the copy 5/12)', () => {
+    expect(scenesCss).toMatch(
+      /\[data-scene\]:not\(\[data-scene='hero'\]\)\s*\{\s*grid-template-columns:[^}]*5 \/ 12[^}]*7 \/ 12/,
+    );
+  });
+
+  it('shows the header call pill only once the header has frosted', () => {
+    const layoutCss = strip(read('src/styles/layout.css'));
+    expect(layoutCss).toMatch(
+      /\.header\[data-scrolled='false'\] \.cta--compact\s*\{[^}]*visibility:\s*hidden/,
+    );
+    expect(body(layoutCss, '.cta--compact')).toMatch(/display:\s*none/);
   });
 
   it('promotes only the moving road layers and the road van', () => {
