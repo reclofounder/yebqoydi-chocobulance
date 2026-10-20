@@ -19,7 +19,25 @@ describe('index.html markup', () => {
   it('ships hidden until main.ts has built the page, so no empty shell is painted and shifted', () => {
     expect(doc.documentElement.hasAttribute('data-booting')).toBe(true);
     const base = readFileSync(resolve(process.cwd(), 'src/styles/base.css'), 'utf8');
-    expect(base).toMatch(/html\[data-booting\] body\s*\{\s*visibility:\s*hidden/);
+    expect(base).toMatch(/html\[data-booting\] body\s*\{[^}]*visibility:\s*hidden/);
+  });
+
+  it('reveals the page without the script: a noscript rule, and a CSS timer if boot never finishes', () => {
+    // No JavaScript at all: the noscript rule shows the shell as it is. It needs !important: the
+    // bundled stylesheet is linked after it and would win the tie on specificity.
+    const fallback = doc.head.querySelector('noscript');
+    expect(fallback, 'a <noscript> in <head>').not.toBeNull();
+    expect(fallback!.textContent).toMatch(
+      /html\[data-booting\]\s+body\s*\{\s*visibility:\s*visible\s*!important/,
+    );
+
+    // The bundle fails to load or to run (blocked, too old, a throw in a static import): the same
+    // reveal comes from a 0-length animation that starts after 2.5 s and holds. main.ts removing
+    // data-booting still reveals at once, because the rule stops matching.
+    const base = readFileSync(resolve(process.cwd(), 'src/styles/base.css'), 'utf8');
+    const rule = /html\[data-booting\] body\s*\{([^}]*)\}/.exec(base)![1];
+    expect(rule).toMatch(/animation:\s*boot-reveal\s+0s\s+2\.5s\s+forwards/);
+    expect(base).toMatch(/@keyframes boot-reveal\s*\{\s*to\s*\{\s*visibility:\s*visible/);
   });
 
   it('preloads the Latin Nunito weights for everyone and the Cyrillic ones only for Russian', () => {

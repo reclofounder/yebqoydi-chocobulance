@@ -130,7 +130,8 @@ describe('the styles for touch and keyboard', () => {
   it('keeps controls from selecting their label on a long press', () => {
     expect(rule(base, 'button')).toMatch(/user-select:\s*none/);
     expect(rule(layout, '.cta')).toMatch(/user-select:\s*none/);
-    expect(rule(layout, '.faq__item summary')).toMatch(/user-select:\s*none/);
+    // The questions are content: visitors copy them.
+    expect(rule(layout, '.faq__item summary')).not.toMatch(/user-select/);
   });
 
   it('uses the small viewport unit and never 100vh', () => {

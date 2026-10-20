@@ -463,36 +463,67 @@ describe('initScroll with motion', () => {
 
 describe('the call under the steps', () => {
   /** An IntersectionObserver that records what it watches and lets a test report what it sees. */
-  const watchers: Array<{ target: Element; see: (onScreen: boolean) => void }> = [];
+  type Watcher = {
+    target: Element;
+    options: IntersectionObserverInit;
+    disconnected: boolean;
+    /** Reports how much of the call is inside the (margin-shrunk) viewport: 0 to 1. */
+    see: (ratio: number) => void;
+  };
+  const watchers: Watcher[] = [];
+  const live = () => watchers.filter((w) => !w.disconnected);
 
   beforeEach(() => {
     watchers.length = 0;
     vi.stubGlobal(
       'IntersectionObserver',
       class {
-        constructor(private callback: IntersectionObserverCallback) {}
+        private mine: Watcher[] = [];
+        constructor(
+          private callback: IntersectionObserverCallback,
+          private options: IntersectionObserverInit,
+        ) {}
         observe(target: Element) {
-          watchers.push({
+          const watcher: Watcher = {
             target,
-            see: (onScreen) =>
+            options: this.options,
+            disconnected: false,
+            see: (ratio) =>
               this.callback(
-                [{ isIntersecting: onScreen, target } as IntersectionObserverEntry],
+                [
+                  {
+                    // Any overlap counts as intersecting, whatever the threshold: only the
+                    // ratio says how much of the call is clear of the header and the bar.
+                    isIntersecting: ratio > 0,
+                    intersectionRatio: ratio,
+                    target,
+                  } as IntersectionObserverEntry,
+                ],
                 this as unknown as IntersectionObserver,
               ),
-          });
+          };
+          this.mine.push(watcher);
+          watchers.push(watcher);
         }
-        disconnect() {}
+        disconnect() {
+          for (const watcher of this.mine) watcher.disconnected = true;
+        }
       },
     );
   });
 
   const flags = () => [byId('header').dataset.inlineCta, byId('sticky-cta').dataset.inlineCta];
+  /** The header and the call bar have no layout in jsdom: give them the heights they have on a phone. */
+  const size = (header: number, bar: number) => {
+    Object.defineProperty(byId('header'), 'offsetHeight', { value: header, configurable: true });
+    Object.defineProperty(byId('sticky-cta'), 'offsetHeight', { value: bar, configurable: true });
+  };
 
   it.each([
     ['with the pinned story', [NARROW]],
     ['as still frames', [NARROW, REDUCE]],
   ])(
-    'steps the phone bar and the header pill aside while it is on screen, %s',
+    'steps the phone bar and the header pill aside once it is wholly on screen, %s',
     (_name, queries) => {
       for (const query of queries) fake.media.add(query);
 
@@ -501,13 +532,69 @@ describe('the call under the steps', () => {
       expect(watchers.map((w) => w.target)).toEqual([document.querySelector('#how [data-cta]')]);
       expect(watchers[0].target.matches('.how__cta')).toBe(true);
 
-      watchers[0].see(true);
+      watchers[0].see(1);
       expect(flags()).toEqual(['true', 'true']);
 
-      watchers[0].see(false);
+      watchers[0].see(0);
       expect(flags()).toEqual(['false', 'false']);
     },
   );
+
+  it('keeps the bar up while the call is only partly clear: one px in view is not a call to tap', () => {
+    fake.media.add(NARROW);
+    initScroll();
+
+    watchers[0].see(1);
+    expect(flags()).toEqual(['true', 'true']);
+
+    // Sliding under the header or the bar: the bar and the pill come back at once.
+    watchers[0].see(0.98);
+    expect(flags()).toEqual(['false', 'false']);
+    watchers[0].see(0.02);
+    expect(flags()).toEqual(['false', 'false']);
+
+    watchers[0].see(1);
+    expect(flags()).toEqual(['true', 'true']);
+  });
+
+  it('asks for the whole call, clear of the header at the top and of the bar at the bottom', () => {
+    size(64, 72);
+    fake.media.add(NARROW);
+
+    initScroll();
+
+    expect(watchers[0].options.threshold).toBe(1);
+    expect(watchers[0].options.rootMargin).toBe('-64px 0px -72px 0px');
+  });
+
+  it('re-measures when the bar goes (a tablet turned past 900 px) and drops the old observer', () => {
+    size(64, 72);
+    fake.media.add(NARROW);
+    initScroll();
+    expect(live()).toHaveLength(1);
+
+    // Same sizes on a resize (the URL bar moving): nothing is rebuilt.
+    window.dispatchEvent(new Event('resize'));
+    expect(watchers).toHaveLength(1);
+
+    size(64, 0); // desktop: no bar
+    window.dispatchEvent(new Event('resize'));
+
+    expect(watchers).toHaveLength(2);
+    expect(live()).toHaveLength(1);
+    expect(watchers[1].options.rootMargin).toBe('-64px 0px 0px 0px');
+  });
+
+  it('keeps one watch however often the story starts', () => {
+    size(64, 72);
+    fake.media.add(NARROW);
+    initScroll();
+    initScroll();
+
+    expect(live()).toHaveLength(1);
+    window.dispatchEvent(new Event('resize'));
+    expect(watchers).toHaveLength(2);
+  });
 
   it('finds the call even after the state engine swapped its link for an inert pill', () => {
     const how = document.querySelector('#how [data-cta]')!;

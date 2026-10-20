@@ -669,8 +669,6 @@ main {
   line-height: 1.25;
   cursor: pointer;
   list-style: none;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .faq__item summary:focus-visible {

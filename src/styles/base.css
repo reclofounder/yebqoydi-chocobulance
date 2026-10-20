@@ -6,9 +6,20 @@
 
 /* The copy and the art are injected by main.ts, which removes data-booting when the page is whole.
    Until then the shell stays hidden: painted empty, its buttons would jump when the copy arrives
-   (layout shift, and a flash of empty pills). The page background still paints. */
+   (layout shift, and a flash of empty pills). The page background still paints.
+   Two ways out when main.ts never gets there (the bundle blocked, too old to parse, or throwing in
+   an import): <noscript> in index.html shows it without scripting, and this animation, a zero-length
+   one that starts after 2.5 s and holds, shows it on its own. When main.ts does finish, the rule
+   stops matching and the page appears at once. */
 html[data-booting] body {
   visibility: hidden;
+  animation: boot-reveal 0s 2.5s forwards;
+}
+
+@keyframes boot-reveal {
+  to {
+    visibility: visible;
+  }
 }
 
 html {

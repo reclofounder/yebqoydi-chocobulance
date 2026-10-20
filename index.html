@@ -36,6 +36,15 @@
       crossorigin
       href="/node_modules/@fontsource/nunito/files/nunito-cyrillic-900-normal.woff2"
     />
+    <!-- No script, no copy to wait for: show the shell as it is (see data-booting in base.css).
+         !important because the bundled stylesheet comes after this one and would win a tie. -->
+    <noscript
+      ><style>
+        html[data-booting] body {
+          visibility: visible !important;
+        }
+      </style></noscript
+    >
     <script>
       // The language as getLang() (src/i18n.ts) will decide it: ?lang=, then the stored choice.
       // Without this the Cyrillic subset arrives after the first paint and the headline reflows.
