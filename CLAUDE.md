@@ -10,8 +10,8 @@
 - **Brand:** Chococream (official spelling; user sometimes types "Chocoream") — Uzbek chocolate-hazelnut spread, 20th anniversary.
 - **Purpose:** a landing page for a **new PR activation**. "Chocobulance" is the project/campaign
   codename (folder name and GitHub repo name).
-- **Status (2026-10-19):** brief received, key decisions made (section 6a), design references
-  being gathered. No page code exists yet.
+- **Status (2026-10-20):** v1 built on `main` (see §7 "What was built" and §8), reviewed, not pushed,
+  not deployed. Open items in §6b and the README.
 
 ## 2. Rules set by the user
 
@@ -108,7 +108,7 @@ Notes:
 | Topic | Decision |
 | --- | --- |
 | Mechanic | **Hotline only.** No Uklon integration on the site. |
-| Phone number | Real number is not ready. **Use `105` as a placeholder everywhere.** ⚠️ **REMINDER: ask the user for the final working number before launch**, then replace every `105` (tel: links, copy, OG tags). |
+| Phone number | Real number is not ready. **`105` stays as the campaign hook** (`HOOK`) in copy, art and headlines; the dial target is `PHONE` / `PHONE_DISPLAY` in `src/config.ts` (placeholder `105`). ⚠️ **REMINDER: ask the user for the final working number before launch**, then set `PHONE` and `PHONE_DISPLAY` only — the `tel:` links, the "yoki {phone}" hints and the dispatcher line follow automatically. |
 | Site purpose | **Information only, for end users:** what Chocobulance is and how to call. No order form, no payment online. |
 | Coverage | **Tashkent city only.** Say clearly that addresses outside the city may not be served. |
 | Price | **99 000 UZS**, paid by the customer **when the service is completed** (on delivery). |
@@ -126,6 +126,7 @@ Notes:
 - Social links (Instagram / Telegram) for the UGC loop.
 - Domain name.
 - Final phone number (see reminder above).
+- **Before deploy (from the final review):** add `public/serve.json` with `{"directoryListing": false}` (plain `serve` lists `/assets/`); set `VITE_SITE_URL` on Railway and rebuild so og/hreflang are absolute; smoke list in README; check Telegram/X link previews; optional: a designed share card instead of the hero screenshot.
 
 ## 7. Brief and content (received 2026-10-19)
 
@@ -283,3 +284,11 @@ on screen.
   the user decides both. Open items: real phone number (`PHONE`, `PHONE_DISPLAY`), service hours,
   social links (inert), domain (then absolute `og:image` / `og:url` / `hreflang`), final van art,
   launch date, Uzbek ʻ glyph taste (wide in Nunito: keep, ASCII `'`, or a narrower font).
+- **2026-10-20 (final review + fix wave)** — Whole-branch review (Opus) found 3 Important: anchor
+  links landed mid-story, hero note invisible over the road at laptop heights, no legible real
+  number on desktop once `PHONE ≠ HOOK`. One fix wave resolved all three plus 8 minors (Node floor,
+  `serve` without `-s`, `%VITE_SITE_URL%` for absolute share tags, hidden inert social pills,
+  `?lang` replaceState, breakpoint gap, deploy smoke list, dispatcher-line hint). Re-review clean.
+  State: `main` at 15 commits, 190 tests green, typecheck + build clean. **Not pushed, not deployed**
+  — user's call. Review reports: `docs/superpowers/reviews/`; task reports + build ledger:
+  `docs/superpowers/reports/`. Preview: `npm run build && npm start`.
