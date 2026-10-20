@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import uz from '../src/i18n/uz.json';
 import ru from '../src/i18n/ru.json';
+import { t } from '../src/i18n';
 
 const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
 const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -186,5 +187,53 @@ describe('index.html markup', () => {
       expect(uz, `uz.json is missing "${key}"`).toHaveProperty([key]);
       expect(ru, `ru.json is missing "${key}"`).toHaveProperty([key]);
     }
+  });
+
+  describe('search and social tags', () => {
+    const content = (selector: string) => doc.head.querySelector(selector)?.getAttribute('content');
+
+    it('links the favicon and the share image, a real 1200x630 PNG', () => {
+      expect(doc.head.querySelector('link[rel="icon"]')!.getAttribute('href')).toBe('/favicon.svg');
+      expect(content('meta[property="og:image"]')).toMatch(/\/og\.png$/);
+      expect(content('meta[property="og:image:width"]')).toBe('1200');
+      expect(content('meta[property="og:image:height"]')).toBe('630');
+      expect(content('meta[name="twitter:image"]')).toBe(content('meta[property="og:image"]'));
+
+      const png = readFileSync(resolve(process.cwd(), 'public/og.png'));
+      expect(png.subarray(1, 4).toString('latin1')).toBe('PNG');
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+    });
+
+    it('declares an Open Graph website card and a large Twitter card', () => {
+      expect(content('meta[property="og:type"]')).toBe('website');
+      expect(content('meta[name="twitter:card"]')).toBe('summary_large_image');
+    });
+
+    it('keeps the title and description in step with the language, and ships them in Uzbek for crawlers', () => {
+      // Crawlers that do not run scripts (link previews) read the static values: they are the
+      // Uzbek copy with the hook and price filled in, and the engine swaps them for the visitor.
+      const pairs = [
+        ['meta[property="og:title"]', 'meta.title'],
+        ['meta[name="twitter:title"]', 'meta.title'],
+        ['meta[property="og:description"]', 'meta.description'],
+        ['meta[name="twitter:description"]', 'meta.description'],
+        ['meta[name="description"]', 'meta.description'],
+      ];
+      for (const [selector, key] of pairs) {
+        const tag = doc.head.querySelector<HTMLElement>(selector)!;
+        expect(tag.dataset.i18n, `${selector} is translated`).toBe(key);
+        expect(tag.getAttribute('content'), `${selector} static value`).toBe(t(key, 'uz'));
+      }
+      expect(doc.title).toBe(t('meta.title', 'uz'));
+      expect(doc.head.querySelector('title')!.dataset.i18n).toBe('meta.title');
+    });
+
+    it('points search engines at each language, and at the Uzbek page by default', () => {
+      const alt = (code: string) =>
+        doc.head.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${code}"]`);
+      expect(alt('uz')!.getAttribute('href')).toBe('/?lang=uz');
+      expect(alt('ru')!.getAttribute('href')).toBe('/?lang=ru');
+      expect(alt('x-default')!.getAttribute('href')).toBe('/');
+    });
   });
 });

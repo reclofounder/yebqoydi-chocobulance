@@ -26,11 +26,17 @@
 
 | Piece | State |
 | --- | --- |
-| Git | Repo initialized, branch `main`, **no commits yet**. |
+| Git | Branch `main`, 13 commits (the build, tasks 1–8). **Not pushed.** |
 | GitHub | `origin` → `https://github.com/reclofounder/yebqoydi-chocobulance.git` (private). |
-| Railway | CLI installed via Homebrew, logged in as `reclofounder@gmail.com`, workspace **"Haysam AI School"**. **No Railway project yet** — create a NEW one for this site. Do **not** touch the existing project "Haysam Landing Page Live". |
+| Railway | CLI installed via Homebrew, logged in as `reclofounder@gmail.com`, workspace **"Haysam AI School"**. **No Railway project yet** — create a NEW one for this site. Do **not** touch the existing project "Haysam Landing Page Live". **Nothing has been deployed.** |
 | Deploy target | Railway (user's choice). Vercel plugin hooks appear in sessions; ignore them unless the user asks. |
-| Stack | Not decided — depends on brief. Default proposal: lightweight static site (plain HTML/CSS/JS, or Astro if content needs structure), mobile-first. |
+| Stack (decided) | Vite 8 + TypeScript (strict) + GSAP 3.15 (ScrollTrigger) + Lenis + `@fontsource/nunito`. Static output in `dist/`, served by `serve` (`npm start`, listens on `$PORT`, default 3000). Node 22 (`.nvmrc`), `engines.node` >=20.19. Tests: Vitest + jsdom. |
+| Railway config | `railway.json`: Railpack builder, build `npm run build`, start `npm start`. `PORT` comes from Railway. Optional variable `RAILPACK_NODE_VERSION=22`. Railway's docs mark config-as-code deprecated (legacy files honoured until 2026-12-01); if the file stops applying, set the same two commands in the service settings. |
+| Preview config | `.claude/launch.json` (committed): `chocobulance-preview` (`vite preview`, 4173), `chocobulance-dev` (5173), `chocobulance-preview-4174`. Run `npm run build` first for the preview ones. |
+
+Deploy steps (run by the user's decision, see README "Deploy on Railway"): new Railway project in
+"Haysam AI School" → `railway init` / connect the repo → `railway up` → generate a domain → make
+`og:image`, `twitter:image` and the `hreflang` links absolute and add `og:url`.
 
 Conventions: commit after each milestone; push to `origin main` only when the user OKs it.
 
@@ -196,6 +202,35 @@ order action unmissable (call / order button), show how it works (steps), price,
 hours, and feed the UGC loop (social links, maybe a gallery). Mobile-first: traffic comes from
 billboards, blogger stories and the Uklon app on phones.
 
+### What was built (v1, 2026-10-20)
+
+A bilingual (UZ default, RU) scroll-driven landing page, built from the spec and plan in
+`docs/superpowers/specs/2026-10-20-chocobulance-landing-design.md` and
+`docs/superpowers/plans/2026-10-20-chocobulance-landing.md`. Five pinned story scenes (hero with the
+van and the "105" numeral, kitchen with Dad, the call, the road drive with parallax and rolling
+wheels, the door) then How it works, coverage with price and hours, FAQ, footer. Hotline only,
+Tashkent only, 99 000 UZS on delivery. Reduced motion gets still frames. How to operate it:
+`README.md` (change the number, campaign mode, copy, van swap, scenes and motion, Railway).
+
+File map:
+- `index.html` shell and head tags (title, description, Open Graph, Twitter, hreflang);
+  `public/` favicon and `og.png` (1200x630 hero render).
+- `src/config.ts` single source for `HOOK` (105, the campaign line), `PHONE` / `PHONE_DISPLAY`
+  (dial target, placeholder 105), `PRICE`, `MODE` (teaser / live / ended), `LAUNCH_DATE`.
+- `src/i18n.ts` + `src/i18n/uz.json`, `ru.json` copy engine; `src/state.ts` mode and phone hint;
+  `src/main.ts` boot.
+- `src/scenes/*.svg` + `mount.ts` the art; `src/van/van.svg` + `van.ts` the swappable van.
+- `src/scroll/` `timeline.ts` (GSAP story), `reduced.ts`, `motion.ts`, `smooth.ts` (Lenis).
+- `src/styles/` tokens, base, layout, scenes, van. `tests/` 11 files, 168 tests, all passing.
+- Quality: Lighthouse mobile (Slow 4G, 4x CPU) performance 100 (uz) / 99 (ru), CLS 0, about
+  113–131 kB transferred.
+
+Calls made while building: 105 is the hook shown in copy, the dial target is separate and a small
+"yoki {phone}" hint shows only when they differ in live mode; apostrophes follow the ʻ / ʼ
+convention (README); the call bar (phones) and header pill (desktop) take over from the hero
+button as its top edge reaches the header, and step aside while the call under the steps is fully
+on screen.
+
 ## 8. Session log
 
 - **2026-10-15** — User created private GitHub repo and connected `origin`. Installed Railway CLI
@@ -235,3 +270,16 @@ billboards, blogger stories and the Uklon app on phones.
   raised two gaps, resolved as my calls: 105 = campaign hook, dial target a separate constant
   shown in small text when different; `MODE` teaser/live/ended flag. Started building with
   subagents per the user's instruction (Sonnet routine, Opus art/motion), reviewing each task.
+- **2026-10-20 (build, in progress)** — Tasks 1–4 done on `main` (scaffold, i18n UZ/RU, markup +
+  layout, van component). Progress ledger: `.superpowers/sdd/2026-10-20-chocobulance-landing/progress.md`
+  (git-ignored; if missing, `git log` is the record). Next: Task 5 scenes (Opus), Task 6 motion (Opus),
+  Task 7 mobile/a11y (Sonnet), Task 8 deploy/docs (Sonnet). Preview: `npm run build && npm start`.
+- **2026-10-20 (build complete)** — Tasks 1–8 done on `main`, 13 commits, 168 tests green,
+  typecheck and build clean, Lighthouse 100 (uz) / 99 (ru). Task 8 added the deploy config
+  (`.nvmrc`, `engines`, `typecheck` script, `railway.json` on Railpack), README, OG image and
+  Open Graph / hreflang tags, this file's update, the committed `.claude/launch.json`, and the hero
+  hand-off fix (the call bar / header pill now appear as the hero button's top reaches the
+  header, so there is no stretch of scroll with no call button). **Not deployed and not pushed**;
+  the user decides both. Open items: real phone number (`PHONE`, `PHONE_DISPLAY`), service hours,
+  social links (inert), domain (then absolute `og:image` / `og:url` / `hreflang`), final van art,
+  launch date, Uzbek ʻ glyph taste (wide in Nunito: keep, ASCII `'`, or a narrower font).

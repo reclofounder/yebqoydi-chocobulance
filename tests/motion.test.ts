@@ -399,14 +399,17 @@ describe('initScroll with motion', () => {
     expect(byId('sticky-cta').dataset.visible).toBe('true');
   });
 
-  it('shows the call bar once the hero call button has gone under the header, not before', () => {
+  it('shows the call bar as the hero call button reaches the header, so a call is always in reach', () => {
     fake.media.add(NARROW);
     initScroll();
 
     const bar = triggers().find((t) => t.trigger === document.querySelector('#hero [data-cta]'))!;
 
     expect(bar.pinnedContainer).toBe(byId('hero'));
-    expect((bar.start as () => string)()).toMatch(/^bottom top\+=\d+$/);
+    // Its top edge, not its bottom: from the moment the button starts to slide under the header
+    // the bar (phones) and the pill (desktop) are up. Waiting for the bottom edge left the button
+    // 56 px of scroll under the header with nothing else to tap.
+    expect((bar.start as () => string)()).toMatch(/^top top\+=\d+$/);
   });
 
   it('smooths mouse and trackpad scrolling with Lenis, on the GSAP ticker, and only once', () => {
@@ -619,15 +622,15 @@ describe('the call under the steps', () => {
 });
 
 describe('initReduced', () => {
-  it('frosts the header past 40 px and shows the sticky bar once the hero call button is gone', () => {
+  it('frosts the header past 40 px and shows the sticky bar once the hero call button reaches the header', () => {
     const stop = initReduced();
     const header = byId('header');
     const sticky = byId('sticky-cta');
-    let ctaBottom = 480;
+    let ctaTop = 480;
     vi.spyOn(
       document.querySelector('#hero [data-cta]')!,
       'getBoundingClientRect',
-    ).mockImplementation(() => ({ bottom: ctaBottom }) as DOMRect);
+    ).mockImplementation(() => ({ top: ctaTop }) as DOMRect);
 
     setScrollY(40);
     expect(header.dataset.scrolled).toBe('false');
@@ -639,22 +642,23 @@ describe('initReduced', () => {
     // Frosted, hero call still in view: neither the bar nor the header pill.
     expect(header.dataset.ctaVisible).toBe('false');
 
-    ctaBottom = -1;
+    ctaTop = -1;
     setScrollY(600);
     expect(sticky.dataset.visible).toBe('true');
     expect(header.dataset.ctaVisible).toBe('true');
 
-    ctaBottom = 12;
+    ctaTop = 12;
     setScrollY(500);
     expect(sticky.dataset.visible).toBe('false');
     expect(header.dataset.ctaVisible).toBe('false');
 
-    // The call is gone once it sits under the header, as in the pinned story, not only off screen.
+    // The hand-off is as in the pinned story: from the button's top edge meeting the header's
+    // lower edge, not once it is wholly under it.
     Object.defineProperty(header, 'offsetHeight', { value: 64, configurable: true });
-    ctaBottom = 64;
+    ctaTop = 64;
     setScrollY(520);
     expect([sticky.dataset.visible, header.dataset.ctaVisible]).toEqual(['true', 'true']);
-    ctaBottom = 65;
+    ctaTop = 65;
     setScrollY(510);
     expect([sticky.dataset.visible, header.dataset.ctaVisible]).toEqual(['false', 'false']);
 

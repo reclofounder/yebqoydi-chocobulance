@@ -9,11 +9,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write index.html vite.config.ts src tests",
     "start": "serve -s dist -l ${PORT:-3000}"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19"
   },
   "repository": {
     "type": "git",

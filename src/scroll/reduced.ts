@@ -14,8 +14,8 @@ export const HEADER_OFFSET = 40;
 /**
  * The chrome's state flags, as `data-*` attributes the styles key on:
  * - header `scrolled`: the frosted bar;
- * - header `ctaVisible` and sticky bar `visible`: the hero's own call has scrolled away, so the
- *   desktop header pill and the phone bar take over;
+ * - header `ctaVisible` and sticky bar `visible`: the hero's own call has reached the header, so
+ *   the desktop header pill and the phone bar take over;
  * - header and sticky bar `inlineCta`: the call under the steps is on screen, so both step aside.
  */
 export type Flag = 'scrolled' | 'visible' | 'ctaVisible' | 'inlineCta';
@@ -34,16 +34,17 @@ export function initReduced(): () => void {
   const root = document.documentElement;
   const header = document.getElementById('header');
   const sticky = document.getElementById('sticky-cta');
-  // Nothing is pinned here, so the bar takes over once the hero's own call button has gone under
-  // the header, as in the pinned story (the hero itself, should the button be missing).
+  // Nothing is pinned here, so the bar takes over as the hero's own call button reaches the
+  // header (its top edge meets the header's lower edge), as in the pinned story (the hero itself,
+  // should the button be missing).
   const heroCall = document.querySelector('#hero [data-cta]') ?? document.getElementById('hero');
 
   const update = () => {
-    const callGone =
-      heroCall !== null && heroCall.getBoundingClientRect().bottom <= (header?.offsetHeight ?? 0);
+    const atHeader =
+      heroCall !== null && heroCall.getBoundingClientRect().top <= (header?.offsetHeight ?? 0);
     setFlag(header, 'scrolled', window.scrollY > HEADER_OFFSET);
-    setFlag(header, 'ctaVisible', callGone);
-    setFlag(sticky, 'visible', callGone);
+    setFlag(header, 'ctaVisible', atHeader);
+    setFlag(sticky, 'visible', atHeader);
   };
 
   root.classList.add('reduced');

@@ -129,6 +129,19 @@ test('applyI18n works with no hreflang links and updates them when present', () 
   expect(hrefs).toEqual(['?lang=uz', '?lang=ru']);
 });
 
+test('applyI18n leaves the x-default alternate as it is', () => {
+  document.head.innerHTML =
+    '<link rel="alternate" hreflang="uz" href="/?lang=uz">' +
+    '<link rel="alternate" hreflang="x-default" href="/">';
+
+  expect(() => applyI18n(document, 'ru')).not.toThrow();
+
+  const href = (code: string) =>
+    document.querySelector(`link[hreflang="${code}"]`)!.getAttribute('href');
+  expect(href('x-default')).toBe('/');
+  expect(new URL(href('uz')!).search).toBe('?lang=uz');
+});
+
 test('setLang persists, re-applies and dispatches langchange', () => {
   document.body.innerHTML = '<h1 data-i18n="hero.title">x</h1>';
   const heard: string[] = [];

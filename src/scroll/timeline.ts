@@ -479,7 +479,9 @@ function pinDoor(pace: Pace): void {
 
 /**
  * The header frosts past 40 px; the sticky call bar (phones) and the header's call pill (desktop)
- * show once the hero's call button has gone under the header, one trigger for both. All follow the
+ * show as the hero's call button reaches the header, one trigger for both. It starts at the
+ * button's top edge, not its bottom: from the bottom edge there were ~56 px of scroll with the
+ * button sliding under the header and no other call on screen. All follow the
  * scroll position on every state change (onUpdate), not `isActive`: a trigger ending at 'max' is
  * no longer active at the very bottom of the page, and a jump from there back to the top (Home,
  * the brand link) changes no active state at all. All are also set on every refresh, wherever the
@@ -503,7 +505,7 @@ function headerAndSticky(): void {
   ScrollTrigger.create({
     trigger: heroCall,
     pinnedContainer: hero,
-    start: () => `bottom top+=${headerHeight()}`,
+    start: () => `top top+=${headerHeight()}`,
     end: 'max',
     onUpdate: call,
     onRefresh: call,
