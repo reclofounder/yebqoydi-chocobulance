@@ -257,6 +257,37 @@ describe('initScroll with motion', () => {
     expect(siren('hero', 'alert')).toBe(false);
   });
 
+  it('retimes the siren by playback rate, so the light keeps its phase when the blink starts', () => {
+    fake.media.add(NARROW);
+    const rates = (id: string) => {
+      const animation = { updatePlaybackRate: vi.fn() };
+      Object.defineProperty(byId(id), 'getAnimations', { value: () => [animation] });
+      return animation.updatePlaybackRate;
+    };
+    const hero = rates('siren-light-hero');
+    const road = rates('siren-light-road');
+
+    initScroll();
+
+    // The road van is on alert from the start: 1 s -> 0.6 s a half-cycle is 1 / 0.6 times faster.
+    expect(road).toHaveBeenLastCalledWith(1 / 0.6);
+    expect(hero).not.toHaveBeenCalled();
+
+    const beat = pins()[0];
+    beat.onUpdate({ progress: 0.06 });
+    expect(hero).toHaveBeenCalledTimes(1);
+    expect(hero).toHaveBeenLastCalledWith(1 / 0.6);
+
+    // Only a change retimes it: scroll frames inside the same state touch nothing.
+    beat.onUpdate({ progress: 0.5 });
+    beat.onUpdate({ progress: 0.9 });
+    expect(hero).toHaveBeenCalledTimes(1);
+
+    beat.onUpdate({ progress: 0 });
+    expect(hero).toHaveBeenCalledTimes(2);
+    expect(hero).toHaveBeenLastCalledWith(1);
+  });
+
   it('plays the call gags in time at 6, 16, 26 and 54 % of its pin, and takes them back faster', () => {
     fake.media.add(NARROW);
     initScroll();
@@ -306,7 +337,8 @@ describe('initScroll with motion', () => {
     };
     expect(from('bubble')).toEqual({ scale: 0.6, opacity: 0 });
     expect(from('heart-l')).toEqual({ '--pop': 0.5, '--pop-o': 0 });
-    expect(from('digit-1')).toMatchObject({ opacity: 0, scale: 0.88 });
+    // The key's pivot is set on both ends, or GSAP's smooth-origin leaves it 1-1.5 px off at rest.
+    expect(from('digit-1')).toMatchObject({ opacity: 0, scale: 0.88, transformOrigin: '50% 50%' });
     expect(from('price-badge')).toEqual({ y: 16, opacity: 0 });
   });
 
@@ -328,6 +360,30 @@ describe('initScroll with motion', () => {
     frost.onUpdate(at(10, 40));
     bar.onUpdate(at(10, 900));
     expect([header.dataset.scrolled, sticky.dataset.visible]).toEqual(['false', 'false']);
+  });
+
+  it('shows the header call pill with the call bar, once the hero call has gone, not with the frost', () => {
+    fake.media.add(WIDE);
+    initScroll();
+    const header = byId('header');
+    const frost = triggers().find((t) => t.start === 40)!;
+    const bar = triggers().find((t) => t.trigger === document.querySelector('#hero [data-cta]'))!;
+
+    // Frosted (past 40 px) but the hero call is still in view: the pill stays away, so there is
+    // never a second red button beside the hero's.
+    frost.onUpdate(at(300, 40));
+    bar.onUpdate(at(300, 900));
+    expect([header.dataset.scrolled, header.dataset.ctaVisible]).toEqual(['true', 'false']);
+
+    // The hero call has gone under the header: the pill takes over (and the bar, on phones).
+    bar.onUpdate(at(1200, 900));
+    expect([header.dataset.scrolled, header.dataset.ctaVisible]).toEqual(['true', 'true']);
+
+    // Back above it, and wherever the page opens (refresh).
+    bar.onUpdate(at(10, 900));
+    expect(header.dataset.ctaVisible).toBe('false');
+    bar.onRefresh(at(9000, 900));
+    expect(header.dataset.ctaVisible).toBe('true');
   });
 
   it('sets the header and the call bar on load, wherever the page opens', () => {
@@ -405,6 +461,76 @@ describe('initScroll with motion', () => {
   });
 });
 
+describe('the call under the steps', () => {
+  /** An IntersectionObserver that records what it watches and lets a test report what it sees. */
+  const watchers: Array<{ target: Element; see: (onScreen: boolean) => void }> = [];
+
+  beforeEach(() => {
+    watchers.length = 0;
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(private callback: IntersectionObserverCallback) {}
+        observe(target: Element) {
+          watchers.push({
+            target,
+            see: (onScreen) =>
+              this.callback(
+                [{ isIntersecting: onScreen, target } as IntersectionObserverEntry],
+                this as unknown as IntersectionObserver,
+              ),
+          });
+        }
+        disconnect() {}
+      },
+    );
+  });
+
+  const flags = () => [byId('header').dataset.inlineCta, byId('sticky-cta').dataset.inlineCta];
+
+  it.each([
+    ['with the pinned story', [NARROW]],
+    ['as still frames', [NARROW, REDUCE]],
+  ])(
+    'steps the phone bar and the header pill aside while it is on screen, %s',
+    (_name, queries) => {
+      for (const query of queries) fake.media.add(query);
+
+      initScroll();
+
+      expect(watchers.map((w) => w.target)).toEqual([document.querySelector('#how [data-cta]')]);
+      expect(watchers[0].target.matches('.how__cta')).toBe(true);
+
+      watchers[0].see(true);
+      expect(flags()).toEqual(['true', 'true']);
+
+      watchers[0].see(false);
+      expect(flags()).toEqual(['false', 'false']);
+    },
+  );
+
+  it('finds the call even after the state engine swapped its link for an inert pill', () => {
+    const how = document.querySelector('#how [data-cta]')!;
+    const pill = document.createElement('span');
+    pill.className = how.className;
+    pill.setAttribute('data-cta', '');
+    how.replaceWith(pill);
+    fake.media.add(NARROW);
+
+    initScroll();
+
+    expect(watchers.map((w) => w.target)).toEqual([pill]);
+  });
+
+  it('leaves the bar alone where the browser cannot observe', () => {
+    vi.stubGlobal('IntersectionObserver', undefined);
+    fake.media.add(NARROW);
+
+    expect(() => initScroll()).not.toThrow();
+    expect(flags()).toEqual([undefined, undefined]);
+  });
+});
+
 describe('initReduced', () => {
   it('frosts the header past 40 px and shows the sticky bar once the hero call button is gone', () => {
     const stop = initReduced();
@@ -423,13 +549,27 @@ describe('initReduced', () => {
     setScrollY(41);
     expect(header.dataset.scrolled).toBe('true');
 
+    // Frosted, hero call still in view: neither the bar nor the header pill.
+    expect(header.dataset.ctaVisible).toBe('false');
+
     ctaBottom = -1;
     setScrollY(600);
     expect(sticky.dataset.visible).toBe('true');
+    expect(header.dataset.ctaVisible).toBe('true');
 
     ctaBottom = 12;
     setScrollY(500);
     expect(sticky.dataset.visible).toBe('false');
+    expect(header.dataset.ctaVisible).toBe('false');
+
+    // The call is gone once it sits under the header, as in the pinned story, not only off screen.
+    Object.defineProperty(header, 'offsetHeight', { value: 64, configurable: true });
+    ctaBottom = 64;
+    setScrollY(520);
+    expect([sticky.dataset.visible, header.dataset.ctaVisible]).toEqual(['true', 'true']);
+    ctaBottom = 65;
+    setScrollY(510);
+    expect([sticky.dataset.visible, header.dataset.ctaVisible]).toEqual(['false', 'false']);
 
     stop();
   });
@@ -468,6 +608,55 @@ describe('pinShift: where a scene pins, in px above the top of the screen', () =
     // The kitchen at 390x844 (its card makes it 980 px), and a call scene on a 375x667 phone.
     expect(pinShift({ ...phone, height: 980 })).toBe(208);
     expect(pinShift({ ...phone, viewport: 667, height: 782 })).toBe(187);
+  });
+
+  describe("with the copy's bands: the header's edge never cuts through a line", () => {
+    // The call scene at 375x667 (782 px tall), as measured in Chrome: eyebrow chip and its text,
+    // two title lines, three body lines. Without bands its shift is 187, which puts the header's
+    // lower edge (187 + 64 = 251) through the middle of the last body line.
+    const call = { ...phone, viewport: 667, height: 782 };
+    const bands = [
+      { top: 80, bottom: 109 }, // eyebrow chip
+      { top: 84, bottom: 105 }, // its text
+      { top: 124.2, bottom: 159.8 }, // title
+      { top: 159.8, bottom: 195.3 },
+      { top: 211.3, bottom: 236.9 }, // body
+      { top: 236.9, bottom: 262.5 },
+      { top: 262.5, bottom: 288 },
+    ];
+
+    it('moves to the nearer edge of the line it would cut', () => {
+      expect(pinShift(call)).toBe(187);
+      // The line's bottom (262.5) is 11.5 px below the edge: hide the line under the header.
+      expect(pinShift({ ...call, bands })).toBe(262.5 - 64);
+      // Its top (236.9) is 6.1 px above an edge at 243: show the line instead.
+      expect(pinShift({ ...call, viewport: 667 + 8, bands })).toBeCloseTo(236.9 - 64, 5);
+    });
+
+    it('leaves a shift alone when its edge falls between two lines, or there are no bands', () => {
+      const between = { ...call, viewport: 782 + 72 - (236.9 - 64) }; // edge exactly at 236.9
+      expect(pinShift({ ...between, bands })).toBeCloseTo(236.9 - 64, 5);
+      expect(pinShift({ ...call, bands: [] })).toBe(187);
+    });
+
+    it('treats a chip and the text inside it as one', () => {
+      // Edge at 96, inside the chip (80-109) and its text (84-105): hide (109) is 13 px away,
+      // show (80) 16 px.
+      const hero = { ...phone, viewport: 800, height: 832, reserved: 0, titleTop: 300 };
+      expect(pinShift({ ...hero, bands }, 'title')).toBe(109 - 64);
+    });
+
+    it('never pins below the top of the scene', () => {
+      // A scene that fits, whose header edge (64) is 4 px under the top of a band: showing that
+      // band would take the scene below the top of the screen.
+      const fits = { ...phone, height: 700, reserved: 0, viewport: 844 };
+      expect(pinShift({ ...fits, bands: [{ top: 60, bottom: 200 }] })).toBe(0);
+    });
+
+    it('keeps the hero rise short of its title, above every band of it', () => {
+      const hero = { ...phone, viewport: 667, height: 828, reserved: 0 };
+      expect(pinShift({ ...hero, bands }, 'title')).toBe(53);
+    });
   });
 
   it('keeps the hero headline in view: the hero rises only as far as its title allows', () => {
@@ -533,7 +722,9 @@ describe('the CSS the motion leans on', () => {
 
   it('pulses the siren and idles the parked van, and stops both under reduced motion', () => {
     expect(body(vanCss, '.siren--on')).toMatch(/animation:/);
-    expect(body(vanCss, '.siren--alert')).toMatch(/animation-duration:\s*0\.6s/);
+    // The blink is a faster playback rate (timeline.ts), not a new duration: a duration switch on
+    // a running animation makes the light jump.
+    expect(vanCss).not.toMatch(/animation-duration/);
     expect(vanCss).toMatch(/\[data-van='hero'\][^{]*\{[^}]*animation:/);
     expect(vanCss).toContain('@media (prefers-reduced-motion: reduce)');
     const reduced = reducedMedia(vanCss);
@@ -571,9 +762,12 @@ describe('the CSS the motion leans on', () => {
 
   it('fits the kitchen on phones, so its title stays in view while Dad slides away', () => {
     const phones = scenesCss.slice(scenesCss.indexOf('#scene-kitchen .body'));
+    // The paragraph stays for screen readers (display: none would drop it): clipped to a pixel.
     expect(scenesCss).toMatch(
-      /@media \(max-width: 899\.98px\)\s*\{\s*#scene-kitchen \.body\s*\{\s*display:\s*none/,
+      /@media \(max-width: 899\.98px\)\s*\{\s*#scene-kitchen \.body\s*\{[^}]*position:\s*absolute/,
     );
+    expect(body(scenesCss, '#scene-kitchen .body')).not.toMatch(/display:\s*none/);
+    expect(body(scenesCss, '#scene-kitchen .body')).toMatch(/clip-path:\s*inset\(50%\)/);
     expect(phones).toMatch(/#scene-kitchen \.card\s*\{[^}]*padding:\s*var\(--s2\)/);
   });
 
@@ -595,12 +789,28 @@ describe('the CSS the motion leans on', () => {
     );
   });
 
-  it('shows the header call pill only once the header has frosted', () => {
+  it('shows the header call pill only once the hero call has gone, and not beside the one under the steps', () => {
     const layoutCss = strip(read('src/styles/layout.css'));
+    // Hidden unless the hero call has scrolled away, whether or not the header is frosted ...
     expect(layoutCss).toMatch(
-      /\.header\[data-scrolled='false'\] \.cta--compact\s*\{[^}]*visibility:\s*hidden/,
+      /\.header:not\(\[data-cta-visible='true'\]\) \.cta--compact,\s*\.header\[data-inline-cta='true'\] \.cta--compact\s*\{[^}]*visibility:\s*hidden/,
     );
+    expect(layoutCss).not.toMatch(/data-scrolled='false'\] \.cta--compact/);
     expect(body(layoutCss, '.cta--compact')).toMatch(/display:\s*none/);
+    // ... and the phone bar steps aside for the call under the steps.
+    expect(layoutCss).toMatch(
+      /\.sticky-cta\[data-visible='false'\],\s*\.sticky-cta\[data-inline-cta='true'\]\s*\{[^}]*visibility:\s*hidden/,
+    );
+  });
+
+  it('clips the pinned scenes with clip-path, not overflow, which Chrome counts as a layout shift', () => {
+    const layoutCss = strip(read('src/styles/layout.css'));
+    // Pinning an overflow-clipped section reports a shift of ~1.0 each time (CLS of 5-8 over a
+    // scroll-through); clip-path paints the same and is not counted. <main> keeps any spill from widening the page.
+    const scene = body(layoutCss, '.scene');
+    expect(scene).toMatch(/clip-path:\s*inset\(0\)/);
+    expect(scene).not.toMatch(/overflow/);
+    expect(body(layoutCss, 'main')).toMatch(/overflow-x:\s*clip/);
   });
 
   it('promotes only the moving road layers and the road van', () => {

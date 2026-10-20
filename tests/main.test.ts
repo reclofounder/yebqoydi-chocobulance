@@ -29,9 +29,12 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
     configurable: true,
     value: { ready: new Promise<void>((resolve) => (fontsReady = resolve)) },
   });
+  // index.html ships hidden (base.css): the shell is revealed once its copy is in.
+  document.documentElement.setAttribute('data-booting', '');
 
   await import('../src/main');
 
+  expect(document.documentElement.hasAttribute('data-booting')).toBe(false);
   expect(document.documentElement.lang).toBe('uz');
   expect(text('[data-cta]')).toBe('Tez orada');
   expect(text('[data-state-note]')).toBe(
@@ -65,4 +68,20 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   await Promise.resolve();
   await Promise.resolve();
   expect(story.refresh).toHaveBeenCalledTimes(4);
+});
+
+test('the page is revealed even if a boot step throws, never left blank', async () => {
+  vi.resetModules();
+  vi.doMock('../src/state', () => ({
+    applyMode: () => {
+      throw new Error('boom');
+    },
+    applyPhoneHint: vi.fn(),
+  }));
+  document.documentElement.setAttribute('data-booting', '');
+
+  await expect(import('../src/main')).rejects.toThrow('boom');
+
+  expect(document.documentElement.hasAttribute('data-booting')).toBe(false);
+  vi.doUnmock('../src/state');
 });

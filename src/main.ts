@@ -10,11 +10,17 @@ import { mountScenes } from './scenes/mount';
 import { initScroll, refreshScroll } from './scroll/motion';
 import { applyMode, applyPhoneHint } from './state';
 
-// Art first, so the language pass also labels what it mounts (the van's aria-label).
-mountScenes(document);
-applyI18n(document, getLang());
-applyMode(document);
-applyPhoneHint(document);
+try {
+  // Art first, so the language pass also labels what it mounts (the van's aria-label).
+  mountScenes(document);
+  applyI18n(document, getLang());
+  applyMode(document);
+  applyPhoneHint(document);
+} finally {
+  // The shell is hidden until it is complete (base.css): painted empty, its buttons would jump
+  // down when the copy arrives, and that is layout shift. Revealed even if a step above threw.
+  document.documentElement.removeAttribute('data-booting');
+}
 
 // Delegated, so language buttons rendered after boot work too.
 document.addEventListener('click', (event) => {

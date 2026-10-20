@@ -1,14 +1,59 @@
 <!doctype html>
-<html lang="uz">
+<html lang="uz" data-booting>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#FFF6EC" />
     <title data-i18n="meta.title">Chocobulance</title>
     <meta name="description" content="Chocobulance" data-i18n="meta.description" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource/nunito/files/nunito-latin-900-normal.woff2"
+    />
+    <!-- Only a Russian visitor needs Cyrillic for the first paint; the script below promotes these. -->
+    <link
+      rel="x-preload-ru"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource/nunito/files/nunito-cyrillic-800-normal.woff2"
+    />
+    <link
+      rel="x-preload-ru"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource/nunito/files/nunito-cyrillic-900-normal.woff2"
+    />
+    <script>
+      // The language as getLang() (src/i18n.ts) will decide it: ?lang=, then the stored choice.
+      // Without this the Cyrillic subset arrives after the first paint and the headline reflows.
+      (function () {
+        var lang = new URLSearchParams(location.search).get('lang');
+        try {
+          if (lang !== 'uz' && lang !== 'ru') lang = localStorage.getItem('lang');
+        } catch (e) {}
+        if (lang !== 'ru') return;
+        document.querySelectorAll('link[rel="x-preload-ru"]').forEach(function (link) {
+          link.rel = 'preload';
+        });
+      })();
+    </script>
   </head>
   <body>
-    <header id="header" class="header" data-scrolled="false">
+    <a class="skip-link" href="#main" data-i18n="a11y.skip"></a>
+    <header id="header" class="header" data-scrolled="false" data-cta-visible="false">
       <div class="header__inner">
         <a class="brand" href="#hero" data-i18n="header.brand">Chocobulance</a>
         <a class="cta cta--compact" href="tel:105" data-cta data-i18n="sticky.cta"></a>
@@ -16,20 +61,24 @@
           <button
             type="button"
             class="lang__btn"
+            lang="uz"
             data-lang="uz"
+            aria-pressed="true"
             data-i18n="header.lang.uz"
           ></button>
           <button
             type="button"
             class="lang__btn"
+            lang="ru"
             data-lang="ru"
+            aria-pressed="false"
             data-i18n="header.lang.ru"
           ></button>
         </div>
       </div>
     </header>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
       <!-- Pinned scenes: .scene__copy holds the words, .scene__stage[data-stage] is filled with art later. -->
       <section id="hero" class="scene" data-scene="hero" aria-labelledby="hero-title">
         <div class="scene__copy">
@@ -83,7 +132,7 @@
         </div>
         <div class="scene__stage" data-stage></div>
         <!-- Copy that belongs to the art, laid over the stage: real text, so it translates and wraps. -->
-        <div class="scene__overlay" aria-hidden="false">
+        <div class="scene__overlay">
           <p id="bubble" class="bubble" data-i18n="call.bubble"></p>
         </div>
       </section>
@@ -104,7 +153,7 @@
           <p class="body" data-i18n="door.body"></p>
         </div>
         <div class="scene__stage" data-stage></div>
-        <div class="scene__overlay" aria-hidden="false">
+        <div class="scene__overlay">
           <div id="price-badge" class="price-badge">
             <p class="price-badge__price" data-i18n="door.price"></p>
             <p class="price-badge__note" data-i18n="door.price.note"></p>

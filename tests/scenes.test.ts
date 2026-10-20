@@ -111,7 +111,8 @@ describe('mountScenes on the real page', () => {
     ]);
     for (const overlay of overlays) {
       expect(overlay.previousElementSibling!.matches('.scene__stage')).toBe(true);
-      expect(overlay.getAttribute('aria-hidden')).toBe('false');
+      // Real copy, read by screen readers: never hidden (aria-hidden="false" would be a no-op).
+      expect(overlay.hasAttribute('aria-hidden')).toBe(false);
     }
 
     const bubble = document.getElementById('bubble')!;

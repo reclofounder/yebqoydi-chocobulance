@@ -16,6 +16,68 @@ describe('index.html markup', () => {
     expect(html.match(/<details/g)).toHaveLength(5);
   });
 
+  it('ships hidden until main.ts has built the page, so no empty shell is painted and shifted', () => {
+    expect(doc.documentElement.hasAttribute('data-booting')).toBe(true);
+    const base = readFileSync(resolve(process.cwd(), 'src/styles/base.css'), 'utf8');
+    expect(base).toMatch(/html\[data-booting\] body\s*\{\s*visibility:\s*hidden/);
+  });
+
+  it('preloads the Latin Nunito weights for everyone and the Cyrillic ones only for Russian', () => {
+    const preload = (rel: string) =>
+      [...doc.querySelectorAll<HTMLLinkElement>(`link[rel="${rel}"]`)].map((l) =>
+        l.getAttribute('href')!.replace(/^.*\//, ''),
+      );
+    expect(preload('preload')).toEqual([
+      'nunito-latin-800-normal.woff2',
+      'nunito-latin-900-normal.woff2',
+    ]);
+    expect(preload('x-preload-ru')).toEqual([
+      'nunito-cyrillic-800-normal.woff2',
+      'nunito-cyrillic-900-normal.woff2',
+    ]);
+    // Fonts are fetched anonymously (CORS mode) even from the same origin: without `crossorigin`
+    // the preloaded copy is not reused and the font downloads twice.
+    for (const link of doc.querySelectorAll('link[as="font"]')) {
+      expect(link.hasAttribute('crossorigin')).toBe(true);
+    }
+  });
+
+  describe('the inline script that promotes the Cyrillic preloads', () => {
+    const script = doc.head.querySelector('script:not([src])')!.textContent!;
+    const run = (url: string, stored: string | null) => {
+      window.history.replaceState({}, '', url);
+      if (stored) localStorage.setItem('lang', stored);
+      document.head.innerHTML = [...doc.querySelectorAll('link[rel="x-preload-ru"]')]
+        .map((l) => l.outerHTML)
+        .join('');
+      new Function(script)();
+      return [...document.head.querySelectorAll('link')].map((l) => l.getAttribute('rel'));
+    };
+    afterEach(() => {
+      localStorage.clear();
+      window.history.replaceState({}, '', '/');
+      document.head.innerHTML = '';
+    });
+
+    it('leaves them inert for the default language', () => {
+      expect(run('/', null)).toEqual(['x-preload-ru', 'x-preload-ru']);
+      expect(run('/?lang=uz', 'ru')).toEqual(['x-preload-ru', 'x-preload-ru']);
+    });
+
+    it('promotes them for ?lang=ru and for a stored Russian choice, as getLang() decides', () => {
+      expect(run('/?lang=ru', null)).toEqual(['preload', 'preload']);
+      expect(run('/', 'ru')).toEqual(['preload', 'preload']);
+    });
+
+    it('survives storage that throws', () => {
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('denied');
+      });
+      expect(run('/', null)).toEqual(['x-preload-ru', 'x-preload-ru']);
+      vi.restoreAllMocks();
+    });
+  });
+
   it('never writes the hook or the price as literal copy', () => {
     // The hook is {hook} and the price {price} in the JSON; only attributes (tel:105) may carry them.
     expect(html).not.toMatch(/>\s*105\s*</);

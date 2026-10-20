@@ -4,10 +4,25 @@
   box-sizing: border-box;
 }
 
+/* The copy and the art are injected by main.ts, which removes data-booting when the page is whole.
+   Until then the shell stays hidden: painted empty, its buttons would jump when the copy arrives
+   (layout shift, and a flash of empty pills). The page background still paints. */
+html[data-booting] body {
+  visibility: hidden;
+}
+
 html {
   scroll-behavior: auto;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* iOS and Android paint a grey flash over a tapped link; every control has its own :active. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Lenis (scroll/smooth.ts) puts .lenis on <html> while it smooths a wheel or a trackpad; there the
+   rubber band at the page ends would fight it. Touch keeps its native overscroll (and pull to refresh). */
+html.lenis {
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -51,9 +66,20 @@ a {
   color: inherit;
 }
 
+/* A tap fires at once (no wait for a double-tap zoom) on everything that is pressed. */
+a,
+button,
+summary,
+[role='button'] {
+  touch-action: manipulation;
+}
+
 button {
   font: inherit;
   color: inherit;
+  /* A long press on a control must not select its label. */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 :focus-visible {
@@ -72,4 +98,41 @@ button {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* First stop for the keyboard: jumps past the header to the story. Clipped away until it has focus. */
+.skip-link {
+  position: fixed;
+  top: max(var(--s1), env(safe-area-inset-top, 0px));
+  left: max(var(--s1), env(safe-area-inset-left, 0px));
+  z-index: 100;
+  padding: var(--s1) var(--s2);
+  border-radius: var(--r-m);
+  background: var(--choco);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.skip-link:not(:focus) {
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The ring sits inside the pill: outside it would land on the hero sky, where it cannot be seen. */
+.skip-link:focus-visible {
+  outline-color: var(--cream);
+  outline-offset: -4px;
+}
+
+/* <main> takes focus from the skip link; it is not a control, so it needs no ring. */
+main:focus {
+  outline: none;
 }

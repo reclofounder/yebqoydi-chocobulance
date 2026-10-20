@@ -282,10 +282,21 @@
 }
 
 /* Phones: the kitchen fits one screen with its title, so the line ("Dad ate it") and the joke (Dad
-   slinking off) are on screen together. The card says what the paragraph says, and funnier. */
+   slinking off) are on screen together. The card says what the paragraph says, and funnier. The
+   paragraph leaves the layout but not the page: clipped to a pixel (as base.css's .visually-hidden),
+   because display: none would take it away from screen readers too. */
 @media (max-width: 899.98px) {
   #scene-kitchen .body {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   #scene-kitchen .card {

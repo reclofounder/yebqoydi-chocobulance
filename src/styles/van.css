@@ -67,13 +67,11 @@
 
 /* The siren light pulses while the story runs (scroll/timeline.ts adds .siren--on): a slow
    2 s breath while parked, a 1.2 s blink once on alert (the road van, and the hero van as soon as
-   the visitor scrolls). Opacity only. */
+   the visitor scrolls). Opacity only. The blink is this same animation played 1 / 0.6 times faster
+   (timeline.ts sets the playback rate and marks it .siren--alert): a new duration on a running
+   animation would make the light jump to another phase, a new rate does not. */
 .siren--on {
   animation: siren-pulse 1s ease-in-out infinite alternate;
-}
-
-.siren--alert {
-  animation-duration: 0.6s;
 }
 
 @keyframes siren-pulse {

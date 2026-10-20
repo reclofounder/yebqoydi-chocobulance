@@ -92,6 +92,10 @@ export function applyI18n(root: ParentNode, lang: Lang): void {
   for (const el of root.querySelectorAll<HTMLElement>('[data-i18n-attr]')) {
     applyAttributes(el, lang);
   }
+  // The language buttons are a toggle: say which one is on (the styles read it too).
+  for (const el of root.querySelectorAll<HTMLElement>('[data-lang]')) {
+    el.setAttribute('aria-pressed', String(el.dataset.lang === lang));
+  }
   applyHreflang();
 }
 

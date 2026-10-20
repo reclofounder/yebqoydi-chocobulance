@@ -160,3 +160,22 @@ test('t without a lang follows the language last applied, even if ?lang= disagre
   setLang('uz');
   expect(t('hero.title')).toBe('Chococream tugadimi?');
 });
+
+test('the language buttons say which language is on (aria-pressed), on load and on every switch', () => {
+  document.body.innerHTML = `
+    <div role="group">
+      <button type="button" data-lang="uz">UZ</button>
+      <button type="button" data-lang="ru">RU</button>
+    </div>`;
+  const pressed = () =>
+    [...document.querySelectorAll('[data-lang]')].map((b) => b.getAttribute('aria-pressed'));
+
+  applyI18n(document, 'uz');
+  expect(pressed()).toEqual(['true', 'false']);
+
+  setLang('ru');
+  expect(pressed()).toEqual(['false', 'true']);
+
+  setLang('uz');
+  expect(pressed()).toEqual(['true', 'false']);
+});

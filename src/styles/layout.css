@@ -203,15 +203,17 @@ h3 {
   font-weight: 800;
   font-size: var(--fs-small);
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
 }
 
-/* The i18n engine sets <html lang>, so the active language needs no extra script. */
-:root[lang='uz'] .lang__btn[data-lang='uz'],
-:root[lang='ru'] .lang__btn[data-lang='ru'] {
+/* The active language: the i18n engine keeps aria-pressed in step, so the look and the announcement agree. */
+.lang__btn[aria-pressed='true'] {
   background: var(--choco);
   color: var(--cream);
+}
+
+/* The header floats over the hero's orange sky, where the red base ring is under 3:1. */
+.header :focus-visible {
+  outline-color: var(--choco);
 }
 
 /* ---------- Call to action ---------- */
@@ -235,8 +237,8 @@ h3 {
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
   transition:
     transform 0.12s ease-out,
     background-color 0.12s ease-out;
@@ -300,8 +302,10 @@ h3 {
   display: none;
 }
 
-/* Desktop's call action once the hero has scrolled away (phones have the sticky bar): a compact
-   pill in the header, between the brand and the language toggle, shown with the frosted bar. */
+/* Desktop's call action once the hero's own has scrolled away (phones have the sticky bar): a
+   compact pill in the header, between the brand and the language toggle. The scroll story sets
+   data-cta-visible on the header from the hero call, and data-inline-cta while the call under the
+   steps is on screen, so two red buttons are never up together. */
 .cta--compact {
   display: none;
 }
@@ -322,7 +326,8 @@ h3 {
       background-color 0.12s ease-out;
   }
 
-  .header[data-scrolled='false'] .cta--compact {
+  .header:not([data-cta-visible='true']) .cta--compact,
+  .header[data-inline-cta='true'] .cta--compact {
     opacity: 0;
     translate: 0 -4px;
     visibility: hidden;
@@ -372,8 +377,10 @@ h3 {
   text-align: center;
 }
 
-/* Hidden by default; a later task flips data-visible once the hero has scrolled away. */
-.sticky-cta[data-visible='false'] {
+/* Hidden until the hero's call has scrolled away (data-visible), and while the call under the
+   steps is on screen (data-inline-cta): the scroll story sets both. */
+.sticky-cta[data-visible='false'],
+.sticky-cta[data-inline-cta='true'] {
   transform: translateY(100%);
   opacity: 0;
   visibility: hidden;
@@ -396,11 +403,18 @@ h3 {
    mobile  -> copy in the top third (it may grow), stage fills the rest of the screen;
    >= 900  -> copy left (560 px column of the 1120 px container), stage right, bleeding to the edge. */
 
+/* The scenes are clipped to their box with clip-path, not overflow: Chrome reports a layout shift of
+   about 1.0 each time ScrollTrigger pins or releases a section that clips with overflow (its switch
+   to position: fixed), which adds up to a CLS of 5-8 over a scroll-through. Art that spills sideways
+   would no longer be cut by the scene, so <main> keeps the page from widening (nothing spills today). */
+main {
+  overflow-x: clip;
+}
+
 .scene {
   position: relative;
-  min-height: 100vh;
   min-height: 100svh;
-  overflow: clip;
+  clip-path: inset(0);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(33.334svh, auto) minmax(0, 1fr);
@@ -655,7 +669,13 @@ h3 {
   line-height: 1.25;
   cursor: pointer;
   list-style: none;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.faq__item summary:focus-visible {
+  border-radius: var(--r-s);
+  outline-offset: 2px;
 }
 
 .faq__item summary::-webkit-details-marker {
@@ -733,10 +753,27 @@ h3 {
   font-size: var(--fs-small);
 }
 
+/* The footer is night in both colour schemes. */
+.footer :focus-visible {
+  outline-color: var(--cream);
+}
+
+/* Tabbing down the page: a focused link or question scrolls clear of the fixed header (and, on
+   phones, of the call bar), not in under it. */
+.section :is(a, summary),
+.footer a {
+  scroll-margin-top: calc(var(--header-total) + var(--s2));
+}
+
 /* Phones: leave room so the sticky call bar never covers the last line. */
 @media (max-width: 899.98px) {
   .footer {
     padding-bottom: calc(var(--s10) + var(--s4) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .section :is(a, summary),
+  .footer a {
+    scroll-margin-bottom: calc(var(--s10) + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -753,6 +790,11 @@ h3 {
     --line: color-mix(in srgb, var(--cream) 20%, transparent);
     background: var(--night);
     color: var(--fg);
+  }
+
+  /* The base ring is red and the call button's is chocolate: neither reads on the night background. */
+  :is(#how, #coverage, #faq, #footer) :focus-visible {
+    outline-color: var(--cream);
   }
 
   /* Footer and FAQ share the night background, so a hairline keeps them apart. */
@@ -772,9 +814,11 @@ h3 {
   .header,
   .cta,
   .cta--compact,
-  .header[data-scrolled='false'] .cta--compact,
+  .header:not([data-cta-visible='true']) .cta--compact,
+  .header[data-inline-cta='true'] .cta--compact,
   .sticky-cta,
   .sticky-cta[data-visible='false'],
+  .sticky-cta[data-inline-cta='true'],
   .faq__item summary::after {
     transition: none;
   }

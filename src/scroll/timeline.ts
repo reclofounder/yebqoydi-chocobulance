@@ -37,6 +37,8 @@ const REVERSE_SPEED = 1.6;
 
 /** Hero: the first few px of its pin switch the parked van's siren to the road blink. */
 const HERO_ALERT_AT = 0.05;
+/** The blink's rate: van.css breathes a half-cycle in 1 s, the road blink takes 0.6 s. */
+const ALERT_RATE = 1 / 0.6;
 /** Kitchen: Dad sidles off over the first 75 % of the pin (fading over its second half). */
 const DAD_EXIT = 0.75;
 /** Call: the keys 1, 0, 5 light at these beats; the line runs 0.32-0.48; she answers at 0.54. */
@@ -94,6 +96,12 @@ const STAGE_SLACK = 24;
 
 /* ---------- Pin geometry ---------- */
 
+/** A band of a scene's copy (a line of text, the eyebrow chip, a card), in px from the scene's top. */
+export interface Band {
+  top: number;
+  bottom: number;
+}
+
 export interface PinMetrics {
   /** The scene's height. */
   height: number;
@@ -105,6 +113,30 @@ export interface PinMetrics {
   header: number;
   /** The fixed sticky bar's height when it is shown under this scene, else 0. */
   reserved: number;
+  /** The copy's bands, so the header's edge can be kept off the middle of a line (see pinShift). */
+  bands?: readonly Band[];
+}
+
+/** px: an edge this close to a band's own edge cuts nothing worth moving for. */
+const EDGE_TOLERANCE = 0.5;
+
+/**
+ * The header covers the top `header` px of the screen, so while a scene is pinned `shift` px up
+ * its copy is cut at `shift + header` from the scene's top. A line half under the frosted bar
+ * looks unfinished, so when that edge would cross bands of the copy it moves to the nearer edge of
+ * them: the crossed lines go wholly under the header, or come wholly out from under it. Costs
+ * under half a line (about 13 px of body): a sliver of stage under the sticky bar, or of cream
+ * above it.
+ */
+function clearOfBands(shift: number, header: number, bands: readonly Band[]): number {
+  const edge = shift + header;
+  const crossed = bands.filter(
+    (b) => b.top < edge - EDGE_TOLERANCE && b.bottom > edge + EDGE_TOLERANCE,
+  );
+  if (crossed.length === 0) return shift;
+  const hide = Math.max(...crossed.map((b) => b.bottom));
+  const show = Math.min(...crossed.map((b) => b.top));
+  return Math.max(0, (hide - edge < edge - show ? hide : show) - header);
 }
 
 /**
@@ -116,15 +148,48 @@ export interface PinMetrics {
  *   wins; its copy was read as it scrolled in.
  * - `title` first (the hero, and the kitchen, whose joke needs its line): it rises only as far as
  *   its title allows.
+ * Either way the rise then settles where the header's edge falls between two lines of the copy.
  */
 export function pinShift(
-  { height, titleTop, viewport, header, reserved }: PinMetrics,
+  { height, titleTop, viewport, header, reserved, bands = [] }: PinMetrics,
   first: 'stage' | 'title' = 'stage',
 ): number {
   const needed = Math.max(0, height + reserved - viewport);
   const titleRoom = Math.max(0, titleTop - header - TITLE_GAP);
   const keepTitle = first === 'title' || needed - titleRoom <= STAGE_SLACK;
-  return keepTitle ? Math.min(needed, titleRoom) : needed;
+  return clearOfBands(keepTitle ? Math.min(needed, titleRoom) : needed, header, bands);
+}
+
+/**
+ * The bands of a scene's copy: each line of text (a line-height tall, so one line's band ends
+ * where the next begins), and the boxes the text sits in (the eyebrow chip, the kitchen card).
+ */
+function copyBands(section: HTMLElement): Band[] {
+  const copy = section.querySelector('.scene__copy');
+  if (!copy) return [];
+  const origin = section.getBoundingClientRect().top;
+  const bands: Band[] = [];
+  const add = (top: number, bottom: number) => {
+    if (bottom > top) bands.push({ top: top - origin, bottom: bottom - origin });
+  };
+
+  const range = document.createRange();
+  const text = document.createTreeWalker(copy, NodeFilter.SHOW_TEXT);
+  for (let node = text.nextNode(); node; node = text.nextNode()) {
+    if (!node.textContent?.trim() || !node.parentElement) continue;
+    const lineHeight = parseFloat(getComputedStyle(node.parentElement).lineHeight);
+    range.selectNodeContents(node);
+    for (const line of range.getClientRects()) {
+      const height = Number.isFinite(lineHeight) ? lineHeight : line.height;
+      const middle = (line.top + line.bottom) / 2;
+      add(middle - height / 2, middle + height / 2);
+    }
+  }
+  for (const box of copy.querySelectorAll('.eyebrow, .card')) {
+    const { top, bottom } = box.getBoundingClientRect();
+    add(top, bottom);
+  }
+  return bands;
 }
 
 /** Reads a scene's pin metrics. Called by ScrollTrigger on each refresh, never per frame. */
@@ -138,6 +203,7 @@ function measure(section: HTMLElement, underStickyBar: boolean): PinMetrics {
     viewport: window.innerHeight,
     header: headerHeight(),
     reserved: barShown ? sticky.offsetHeight : 0,
+    bands: copyBands(section),
   };
 }
 
@@ -187,6 +253,20 @@ function gagTween(
 
 /* ---------- Scenes ---------- */
 
+/**
+ * Switches a siren between its parked breath and the road blink. Changing `animation-duration` on
+ * the running CSS animation would put the light in another phase (a jump), so the switch is the
+ * animation's playback rate, which keeps its place. The class only records the state (van.css
+ * does not style it), so a scroll frame inside the same state touches nothing.
+ */
+function setAlert(siren: Element | null, on: boolean): void {
+  if (!siren || siren.classList.contains('siren--alert') === on) return;
+  siren.classList.toggle('siren--alert', on);
+  for (const animation of siren.getAnimations?.() ?? []) {
+    animation.updatePlaybackRate(on ? ALERT_RATE : 1);
+  }
+}
+
 interface PinOptions {
   /** What must stay in view while pinned (see pinShift). */
   first: 'title' | 'stage';
@@ -235,8 +315,7 @@ function pinHero(pace: Pace): void {
   const siren = document.getElementById('siren-light-hero');
   // Its one beat: as soon as the visitor scrolls, the parked van's siren switches from a slow
   // breath to the road's blink. The numeral drifts and the hint fades as before.
-  const alert: Beat = (progress) =>
-    siren?.classList.toggle('siren--alert', progress >= HERO_ALERT_AT);
+  const alert: Beat = (progress) => setAlert(siren, progress >= HERO_ALERT_AT);
   const tl = pinScene(hero, DISTANCE.hero, pace, {
     first: 'title',
     underStickyBar: false,
@@ -268,7 +347,9 @@ function pinCall(pace: Pace): void {
     beat(
       gagTween(
         scene.querySelector(id),
-        { opacity: 0, scale: 0.88 },
+        // The pivot on both ends: GSAP's smooth-origin otherwise blends from the SVG's own (0 0)
+        // and leaves the key a pixel or so off where it rests.
+        { opacity: 0, scale: 0.88, transformOrigin: '50% 50%' },
         { opacity: 1, scale: 1, transformOrigin: '50% 50%', duration: 0.12, ease: 'power2.out' },
       ),
       DIGITS_AT[i],
@@ -396,15 +477,13 @@ function pinDoor(pace: Pace): void {
   hold(tl);
 }
 
-/** Both chrome triggers end one px past the bottom of the page (see headerAndSticky). */
-const PAGE_END = 'max+=1';
-
 /**
- * The header frosts past 40 px; the sticky call bar shows once the hero's call button has gone
- * under the header. Both follow the scroll position on every state change (onUpdate), not
- * `isActive`: a trigger ending at 'max' is no longer active at the very bottom of the page, and a
- * jump from there back to the top (Home, the brand link) changes no active state at all. Both are
- * also set on every refresh, wherever the page opens.
+ * The header frosts past 40 px; the sticky call bar (phones) and the header's call pill (desktop)
+ * show once the hero's call button has gone under the header, one trigger for both. All follow the
+ * scroll position on every state change (onUpdate), not `isActive`: a trigger ending at 'max' is
+ * no longer active at the very bottom of the page, and a jump from there back to the top (Home,
+ * the brand link) changes no active state at all. All are also set on every refresh, wherever the
+ * page opens. The pill is not tied to the frost, or it would sit beside the hero's own button.
  */
 function headerAndSticky(): void {
   const header = document.getElementById('header');
@@ -417,14 +496,17 @@ function headerAndSticky(): void {
   ScrollTrigger.create({ start: HEADER_OFFSET, end: 'max', onUpdate: frost, onRefresh: frost });
 
   if (!heroCall) return;
-  const bar = (self: ScrollTrigger) => setFlag(sticky, 'visible', past(self));
+  const call = (self: ScrollTrigger) => {
+    setFlag(sticky, 'visible', past(self));
+    setFlag(header, 'ctaVisible', past(self));
+  };
   ScrollTrigger.create({
     trigger: heroCall,
     pinnedContainer: hero,
     start: () => `bottom top+=${headerHeight()}`,
     end: 'max',
-    onUpdate: bar,
-    onRefresh: bar,
+    onUpdate: call,
+    onRefresh: call,
   });
 }
 
@@ -448,7 +530,8 @@ export function initTimeline(): void {
     const roadSiren = document.getElementById('siren-light-road');
     heroSiren?.classList.add('siren--on');
     // On the road the siren is always on alert.
-    roadSiren?.classList.add('siren--on', 'siren--alert');
+    roadSiren?.classList.add('siren--on');
+    setAlert(roadSiren, true);
 
     pinHero(pace);
     pinKitchen(pace);
