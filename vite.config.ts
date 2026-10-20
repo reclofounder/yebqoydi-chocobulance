@@ -1,6 +1,30 @@
+import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
+/**
+ * Fills `%VITE_SITE_URL%` in index.html (og:image, twitter:image, og:url, the hreflang links)
+ * with the site's public origin, a build variable set on Railway (README, Deploy). Link previews
+ * need those tags absolute. Unset, it becomes '' and the tags stay relative, never the literal
+ * placeholder (Vite's own %ENV% pass would leave an unknown name as it is). A trailing slash is
+ * dropped, so '%VITE_SITE_URL%/og.png' never turns into '//og.png'. Runs before Vite's own HTML
+ * passes, which then see a plain public path or an external URL.
+ */
+export function siteUrl(): Plugin {
+  let origin = '';
+  return {
+    name: 'chocobulance:site-url',
+    configResolved(config) {
+      origin = String(config.env.VITE_SITE_URL ?? '').replace(/\/+$/, '');
+    },
+    transformIndexHtml: {
+      order: 'pre',
+      handler: (html) => html.replaceAll('%VITE_SITE_URL%', origin),
+    },
+  };
+}
+
 export default defineConfig({
+  plugins: [siteUrl()],
   build: {
     // Script syntax is lowered to ES2020 (Chrome 80, Safari 14, Firefox 74 and newer), no further.
     target: 'es2020',

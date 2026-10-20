@@ -1,5 +1,6 @@
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { REDUCED_MOTION, initReduced, setFlag } from './reduced';
+import { fragmentTarget } from './smooth';
 import { initTimeline } from './timeline';
 
 export function prefersReducedMotion(): boolean {
@@ -57,15 +58,37 @@ function watchInlineCta(): void {
 }
 
 /**
+ * A link to a section from outside (`/#faq` in a post or a bio): the browser lands on it before
+ * the pins add their ~8 screens of scroll, and ScrollTrigger's first refresh then puts back that
+ * stale offset, mid-story. Once that refresh is done, land on the section again (its
+ * scroll-margin-top keeps it clear of the header; Lenis, idle at boot, follows a native jump).
+ * Only once: later refreshes (a resize, a language switch) leave the visitor where they are.
+ */
+function landOnFragment(): void {
+  const target = fragmentTarget(window.location.hash);
+  if (!target) return;
+  const land = () => {
+    ScrollTrigger.removeEventListener('refresh', land);
+    target.scrollIntoView({ block: 'start' });
+  };
+  ScrollTrigger.addEventListener('refresh', land);
+}
+
+/**
  * Starts the scroll story: pinned, scrubbed scenes, or still frames under reduced motion. Run it
  * once the fonts are in, since they set the scenes' heights. A visitor who turns reduced motion on
  * mid-visit gets the still frames at once (timeline.ts); one who starts reduced keeps them until
- * the next page load.
+ * the next page load. The still frames pin nothing, so the browser's own landing on a `#section`
+ * link holds there.
  */
 export function initScroll(): void {
   watchInlineCta();
-  if (prefersReducedMotion()) initReduced();
-  else initTimeline();
+  if (prefersReducedMotion()) {
+    initReduced();
+  } else {
+    initTimeline();
+    landOnFragment();
+  }
 }
 
 /** Re-measures the pinned scenes, e.g. after a language switch changed their copy's length. */

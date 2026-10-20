@@ -13,13 +13,16 @@
       data-i18n="meta.description"
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <!-- Languages: src/i18n.ts points the uz and ru hrefs at the current origin. Once the domain
-         exists, make og:image, twitter:image and these hrefs absolute (README, Deploy).
+    <!-- %VITE_SITE_URL% is the site's public origin, filled in at build time (vite.config.ts,
+         siteUrl): set VITE_SITE_URL on Railway and these tags become absolute, as link previews
+         need; unset, they stay relative (README, Deploy). Languages: src/i18n.ts also points the
+         uz and ru hrefs at the current origin at runtime, for crawlers that run scripts.
          vite-ignore: these are pages, not assets; Vite would try to bundle "/" and fail. -->
-    <link rel="alternate" hreflang="uz" href="/?lang=uz" vite-ignore />
-    <link rel="alternate" hreflang="ru" href="/?lang=ru" vite-ignore />
-    <link rel="alternate" hreflang="x-default" href="/" vite-ignore />
+    <link rel="alternate" hreflang="uz" href="%VITE_SITE_URL%/?lang=uz" vite-ignore />
+    <link rel="alternate" hreflang="ru" href="%VITE_SITE_URL%/?lang=ru" vite-ignore />
+    <link rel="alternate" hreflang="x-default" href="%VITE_SITE_URL%/" vite-ignore />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
     <meta property="og:site_name" content="Chocobulance" />
     <meta property="og:locale" content="uz_UZ" />
     <meta property="og:locale:alternate" content="ru_RU" />
@@ -33,7 +36,7 @@
       content="Chococream tugadimi? 105 ga qoʻngʻiroq qiling — Chocobulance yangi idishni Toshkent boʻylab uyingizgacha yetkazib beradi. 99 000 soʻm, toʻlov yetkazib berilganda."
       data-i18n="meta.description"
     />
-    <meta property="og:image" content="/og.png" />
+    <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -47,7 +50,7 @@
       content="Chococream tugadimi? 105 ga qoʻngʻiroq qiling — Chocobulance yangi idishni Toshkent boʻylab uyingizgacha yetkazib beradi. 99 000 soʻm, toʻlov yetkazib berilganda."
       data-i18n="meta.description"
     />
-    <meta name="twitter:image" content="/og.png" />
+    <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
     <link
       rel="preload"
       as="font"
@@ -107,6 +110,7 @@
       <div class="header__inner">
         <a class="brand" href="#hero" data-i18n="header.brand">Chocobulance</a>
         <a class="cta cta--compact" href="tel:105" data-cta data-i18n="sticky.cta"></a>
+        <span class="phone-hint header__hint" data-phone-hint hidden></span>
         <div class="lang" role="group" data-i18n-attr="aria-label:a11y.lang">
           <button
             type="button"
@@ -184,6 +188,11 @@
         <!-- Copy that belongs to the art, laid over the stage: real text, so it translates and wraps. -->
         <div class="scene__overlay">
           <p id="bubble" class="bubble" data-i18n="call.bubble"></p>
+          <!-- The real number on the dispatcher's desk, shown only once it differs from the hook (state.ts). -->
+          <p class="dispatcher-line" data-phone-line hidden>
+            <span class="dispatcher-line__label" data-i18n="call.phone.label"></span>
+            <span class="dispatcher-line__number" data-phone-number></span>
+          </p>
         </div>
       </section>
 
@@ -239,6 +248,7 @@
             </li>
           </ol>
           <a class="cta how__cta" href="tel:105" data-cta data-i18n="hero.cta"></a>
+          <p class="phone-hint how__hint" data-phone-hint hidden></p>
         </div>
       </section>
 
@@ -301,8 +311,10 @@
     <footer id="footer" class="footer">
       <div class="container footer__inner">
         <p class="footer__line" data-i18n="footer.line"></p>
-        <!-- TODO: add href to each social link once the handles exist (spec section 9). No href = inert text. -->
-        <ul class="footer__social" role="list">
+        <!-- TODO: the handles do not exist yet (spec section 9). Until they do, the list is hidden: a
+             bordered pill that goes nowhere reads as broken. Then give each link its href and drop
+             `hidden`; the copy is already in uz.json and ru.json (footer.social.*). -->
+        <ul class="footer__social" role="list" hidden>
           <li><a data-i18n="footer.social.instagram"></a></li>
           <li><a data-i18n="footer.social.telegram"></a></li>
         </ul>

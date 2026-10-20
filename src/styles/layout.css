@@ -153,7 +153,8 @@ h3 {
   transition: background-color 0.2s ease-out;
 }
 
-/* The frosted bar only appears once the page has scrolled (a later task toggles the attribute). */
+/* The frosted bar only appears once the page has scrolled past 40 px: the scroll story sets
+   data-scrolled (scroll/timeline.ts, and scroll/reduced.ts for the still frames). */
 .header[data-scrolled='true'] {
   background: var(--cream);
   background: color-mix(in srgb, var(--cream) 72%, transparent);
@@ -302,10 +303,10 @@ h3 {
   display: none;
 }
 
-/* Desktop's call action once the hero's own has scrolled away (phones have the sticky bar): a
-   compact pill in the header, between the brand and the language toggle. The scroll story sets
-   data-cta-visible on the header from the hero call, and data-inline-cta while the call under the
-   steps is on screen, so two red buttons are never up together. */
+/* Desktop's call action once the hero call's top edge reaches the header (phones have the sticky
+   bar): a compact pill in the header, between the brand and the language toggle. The scroll story
+   sets data-cta-visible on the header from that edge, and data-inline-cta while the call under the
+   steps is wholly on screen, so two red buttons are never up together. */
 .cta--compact {
   display: none;
 }
@@ -326,6 +327,8 @@ h3 {
       background-color 0.12s ease-out;
   }
 
+  .header:not([data-cta-visible='true']) .header__hint,
+  .header[data-inline-cta='true'] .header__hint,
   .header:not([data-cta-visible='true']) .cta--compact,
   .header[data-inline-cta='true'] .cta--compact {
     opacity: 0;
@@ -336,6 +339,27 @@ h3 {
       opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1),
       translate 0.2s cubic-bezier(0.23, 1, 0.32, 1),
       visibility 0s 0.2s;
+  }
+}
+
+/* The real number beside the pill, once it differs from the 105 hook (state.ts reveals it): tel:
+   does nothing on most desktops, so the visitor reads it and dials. It comes and goes with the
+   pill. Phones carry it in the call bar instead. Chocolate, not --choco-soft: the frosted bar lets
+   the page through, and over the night footer --choco-soft would fall under 4.5:1 (--choco: 7:1). */
+.header__hint {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .header__hint {
+    display: inline;
+    color: var(--choco);
+    font-weight: 700;
+    white-space: nowrap;
+    transition:
+      opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+      translate 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+      visibility 0s;
   }
 }
 
@@ -377,8 +401,8 @@ h3 {
   text-align: center;
 }
 
-/* Hidden until the hero's call has scrolled away (data-visible), and while the call under the
-   steps is on screen (data-inline-cta): the scroll story sets both. */
+/* Hidden until the hero call's top edge reaches the header (data-visible), and while the call
+   under the steps is wholly on screen (data-inline-cta): the scroll story sets both. */
 .sticky-cta[data-visible='false'],
 .sticky-cta[data-inline-cta='true'] {
   transform: translateY(100%);
@@ -533,6 +557,20 @@ main {
 @media (min-width: 600px) {
   .how__cta {
     width: fit-content;
+  }
+}
+
+/* The real number under it, once it differs from the hook (state.ts): centred under the
+   full-width button on phones, at its left edge from 600 px. --fg-soft follows dark mode. */
+.how__hint {
+  margin-top: var(--s1);
+  color: var(--fg-soft);
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .how__hint {
+    text-align: start;
   }
 }
 
@@ -814,6 +852,9 @@ main {
   .cta--compact,
   .header:not([data-cta-visible='true']) .cta--compact,
   .header[data-inline-cta='true'] .cta--compact,
+  .header__hint,
+  .header:not([data-cta-visible='true']) .header__hint,
+  .header[data-inline-cta='true'] .header__hint,
   .sticky-cta,
   .sticky-cta[data-visible='false'],
   .sticky-cta[data-inline-cta='true'],

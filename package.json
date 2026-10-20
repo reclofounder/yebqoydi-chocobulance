@@ -11,10 +11,10 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write index.html vite.config.ts src tests",
-    "start": "serve -s dist -l ${PORT:-3000}"
+    "start": "serve dist -l ${PORT:-3000}"
   },
   "engines": {
-    "node": ">=20.19"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "repository": {
     "type": "git",

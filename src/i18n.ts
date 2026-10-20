@@ -99,11 +99,22 @@ export function applyI18n(root: ParentNode, lang: Lang): void {
   applyHreflang();
 }
 
+/**
+ * The visitor's choice: stored, applied, and announced (`langchange`). A `?lang=` in the address
+ * (a shared link) beats the stored choice on the next load, so it is rewritten to the choice;
+ * other parameters, the fragment and the history entry's state stay. An address without one is
+ * left alone: the stored choice carries it.
+ */
 export function setLang(lang: Lang): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, lang);
   } catch {
     // Not persisted; the choice still applies for this page view.
+  }
+  const url = new URL(window.location.href);
+  if (url.searchParams.has('lang') && url.searchParams.get('lang') !== lang) {
+    url.searchParams.set('lang', lang);
+    window.history.replaceState(window.history.state, '', url.href);
   }
   applyI18n(document, lang);
   document.dispatchEvent(new CustomEvent('langchange', { detail: lang }));

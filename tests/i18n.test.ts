@@ -157,6 +157,29 @@ test('setLang persists, re-applies and dispatches langchange', () => {
   expect(heard).toEqual(['ru']);
 });
 
+test("setLang rewrites a ?lang= in the address, so a reload keeps the visitor's choice", () => {
+  // Opened from a ?lang=ru link and switched to Uzbek: the query would win over the stored
+  // choice on the next load. Other parameters and the fragment stay as they are.
+  window.history.replaceState({ kept: 1 }, '', '/?utm_source=bio&lang=ru#faq');
+
+  setLang('uz');
+
+  expect(window.location.pathname + window.location.search + window.location.hash).toBe(
+    '/?utm_source=bio&lang=uz#faq',
+  );
+  expect(window.history.state).toEqual({ kept: 1 });
+  expect(getLang()).toBe('uz');
+});
+
+test('setLang leaves an address without ?lang= alone (the stored choice carries it)', () => {
+  window.history.replaceState({}, '', '/?utm_source=bio#how');
+
+  setLang('ru');
+
+  expect(window.location.search + window.location.hash).toBe('?utm_source=bio#how');
+  expect(getLang()).toBe('ru');
+});
+
 test('setLang still applies when localStorage throws', () => {
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
     throw new Error('denied');

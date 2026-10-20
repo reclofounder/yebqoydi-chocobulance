@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { applyI18n, setLang, t } from '../src/i18n';
 import { applyMode, applyPhoneHint } from '../src/state';
 
@@ -155,4 +157,64 @@ describe('live mode', () => {
     setLang('ru');
     expect(hint().textContent).toBe('или +998901234567');
   });
+});
+
+describe('the real number across the whole page', () => {
+  // A desktop visitor cannot tap tel: and the sticky bar is phones-only, so once the dial number
+  // differs from the hook it is printed by every call: the hero, the call bar (phones), the header
+  // pill (desktop), the call under the steps, and on the dispatcher's desk in the call scene.
+  const page = new DOMParser().parseFromString(
+    readFileSync(resolve(process.cwd(), 'index.html'), 'utf8'),
+    'text/html',
+  ).body.innerHTML;
+  function boot(config: Partial<typeof DEFAULTS>) {
+    Object.assign(cfg, DEFAULTS, config);
+    document.body.innerHTML = page;
+    applyI18n(document, 'uz');
+    applyMode(document);
+    applyPhoneHint(document);
+  }
+  const line = () => document.querySelector<HTMLElement>('#scene-call .dispatcher-line')!;
+  const REAL = { PHONE: '+998901234567', PHONE_DISPLAY: '+998 90 123 45 67' };
+
+  test('prints it by every call, the header pill and the call under the steps included', () => {
+    boot(REAL);
+
+    for (const where of ['#header', '#hero', '#how', '#sticky-cta']) {
+      const hint = document.querySelector<HTMLElement>(`${where} [data-phone-hint]`);
+      expect(hint, `${where} has a hint`).not.toBeNull();
+      expect(hint!.hidden, `${where} hint shown`).toBe(false);
+      expect(hint!.textContent, where).toBe('yoki +998 90 123 45 67');
+    }
+  });
+
+  test("shows it on the dispatcher's desk, under her translated title", () => {
+    boot(REAL);
+
+    expect(line().hidden).toBe(false);
+    expect(line().querySelector('[data-phone-number]')!.textContent).toBe('+998 90 123 45 67');
+    const label = line().querySelector('[data-i18n="call.phone.label"]')!;
+    expect(label.textContent).toBe('Chocobulance dispetcheri');
+
+    setLang('ru');
+    expect(label.textContent).toBe('Диспетчер Chocobulance');
+    expect(line().querySelector('[data-phone-number]')!.textContent).toBe('+998 90 123 45 67');
+  });
+
+  test.each([
+    ['live', 'the number is the hook itself', { PHONE: '105', PHONE_DISPLAY: '105' }],
+    ['teaser', 'a real number is set', REAL],
+    ['ended', 'a real number is set', REAL],
+  ] as const)(
+    'keeps every hint and the desk line hidden in %s mode when %s',
+    (MODE, _why, numbers) => {
+      boot({ MODE, ...numbers });
+
+      const all = [
+        ...document.querySelectorAll<HTMLElement>('[data-phone-hint], [data-phone-line]'),
+      ];
+      expect(all).toHaveLength(5);
+      for (const el of all) expect(el.hidden).toBe(true);
+    },
+  );
 });

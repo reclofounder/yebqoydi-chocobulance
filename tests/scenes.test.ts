@@ -244,6 +244,21 @@ describe('scenes.css', () => {
     expect(body('.price-badge')).not.toMatch(/max-width:\s*\d+%/);
   });
 
+  it('sets the hero note and phone hint on a cream chip on desktop, where the street runs under them', () => {
+    // On short laptop screens (1280x720, 1366x650, 1440x790) they landed on the road, which is
+    // their own colour (--choco-soft, about 1:1). Phones keep the copy above the street.
+    expect(css).toMatch(
+      /@media \(min-width: 900px\)\s*\{\s*#hero \.note,\s*#hero \.phone-hint\s*\{/,
+    );
+    for (const selector of ['#hero .note', '#hero .phone-hint']) {
+      expect(body(selector)).toMatch(
+        /background:\s*color-mix\(in srgb, var\(--cream\) 92%, transparent\)/,
+      );
+      expect(body(selector)).toMatch(/width:\s*fit-content/);
+      expect(body(selector)).toMatch(/border-radius:\s*var\(--r-m\)/);
+    }
+  });
+
   it('turns the door on its own box, from the hinge side', () => {
     expect(body('#door-leaf')).toMatch(/transform-box:\s*fill-box/);
     expect(body('#door-leaf')).toMatch(/transform-origin:\s*left center/);

@@ -19,9 +19,16 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* ---------- Tuning: the numbers the story's feel depends on ---------- */
 
-/** The layout's breakpoint (layout.css, scenes.css): phones and tablets below, desktop from it. */
-export const NARROW = '(max-width: 899.98px)';
+/**
+ * The layout's breakpoint (layout.css, scenes.css): phones and tablets below, desktop from it.
+ * NARROW is WIDE's complement, so every width is one or the other: with `(max-width: 899.98px)`
+ * a fractional viewport between 899.98 and 900 px matched neither, and got no story and no header
+ * or call-bar flags. There the CSS's desktop rules are off too (the mobile layout), so it is
+ * NARROW. Not the range syntax `(width < 900px)`: Safari before 16.4 and Chrome before 104
+ * (inside the ES2020 script floor) read it as `not all`, which would drop the story there.
+ */
 export const WIDE = '(min-width: 900px)';
+export const NARROW = `not all and ${WIDE}`;
 
 /** How long each scene stays pinned, in % of the screen height, on desktop. */
 const DISTANCE = { hero: 60, kitchen: 120, call: 150, road: 300, door: 150 } as const;

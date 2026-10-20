@@ -138,6 +138,22 @@
   }
 }
 
+/* Desktop: the street runs on under the copy column, and on short laptop screens (1280x720,
+   1366x650, 1440x790) the note and the phone hint land on the kerb or the road, which is their own
+   colour. A cream chip keeps them readable wherever they fall: --choco-soft on it is 8:1, and
+   still 7:1 with the road showing through its 8 % (measured). The chip's edge keeps the column's
+   left edge, as the eyebrow's does. */
+@media (min-width: 900px) {
+  #hero .note,
+  #hero .phone-hint {
+    width: fit-content;
+    padding: 4px var(--s1);
+    border-radius: var(--r-m);
+    background: var(--cream);
+    background: color-mix(in srgb, var(--cream) 92%, transparent);
+  }
+}
+
 /* The numeral is a grid item of its own, drawn over the stage cell: it belongs to the art zone.
    Phones: top-left of the stage. Desktop: top of the right column, above the parked van. */
 .hero__numeral {
@@ -352,6 +368,49 @@
     --tail: 16%;
     bottom: 63%;
     max-width: 34%;
+  }
+}
+
+/* ---------- Call: the dispatcher's desk line ---------- */
+
+/* Her name card on the front edge of the desk, which call.svg draws over y 452-500 and x 420-800:
+   the stage's bottom ~10 %, from 55 % across on phones, and right of her (75 %) on desktop. Shown
+   only while the line is live with a real number that differs from the hook (state.ts): her title
+   and the number a desktop visitor reads to dial. */
+.dispatcher-line {
+  position: absolute;
+  right: 3%;
+  bottom: 2%;
+  display: grid;
+  justify-items: center;
+  max-width: 44%;
+  padding: 4px var(--s1);
+  border-radius: var(--r-s);
+  background: var(--white);
+  color: var(--choco);
+  line-height: 1.25;
+  text-align: center;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--choco) 18%, transparent);
+}
+
+.dispatcher-line__label {
+  color: var(--choco-soft);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.dispatcher-line__number {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  .dispatcher-line {
+    right: 2%;
+    max-width: 26%;
   }
 }
 

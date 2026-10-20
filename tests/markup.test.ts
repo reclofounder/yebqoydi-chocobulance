@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import uz from '../src/i18n/uz.json';
 import ru from '../src/i18n/ru.json';
 import { t } from '../src/i18n';
+import { siteUrl } from '../vite.config';
 
 const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
 const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -150,20 +151,43 @@ describe('index.html markup', () => {
 
   it('keeps a call action in reach after the hero: a header pill, and one under the steps', () => {
     // Desktop has no sticky bar: the header carries a compact call pill, between brand and language.
+    // The real number's hint sits beside the pill (state.ts reveals it once PHONE differs from HOOK).
     const inner = [...doc.querySelector('#header .header__inner')!.children];
-    expect(inner.map((el) => el.className)).toEqual(['brand', 'cta cta--compact', 'lang']);
+    expect(inner.map((el) => el.className)).toEqual([
+      'brand',
+      'cta cta--compact',
+      'phone-hint header__hint',
+      'lang',
+    ]);
     expect(inner[1].matches('a[data-cta][data-i18n="sticky.cta"]')).toBe(true);
-    // "Dial 105" in step one, with something to tap right under the steps (every width).
-    const how = doc.querySelector('#how .container')!;
-    expect(how.lastElementChild!.matches('a.cta[data-cta][data-i18n="hero.cta"]')).toBe(true);
-    expect(how.lastElementChild!.previousElementSibling!.matches('ol.steps')).toBe(true);
+    expect(inner[2].matches('span[data-phone-hint]')).toBe(true);
+    // "Dial 105" in step one, with something to tap right under the steps (every width), and the
+    // real number's hint under it.
+    const how = [...doc.querySelector('#how .container')!.children].slice(-3);
+    expect(how[0].matches('ol.steps')).toBe(true);
+    expect(how[1].matches('a.cta[data-cta][data-i18n="hero.cta"]')).toBe(true);
+    expect(how[2].matches('p.phone-hint[data-phone-hint]')).toBe(true);
   });
 
   it('starts the sticky bar hidden, with phone hints hidden until the engine reveals them', () => {
     expect(doc.querySelector('#sticky-cta')!.getAttribute('data-visible')).toBe('false');
     const hints = [...doc.querySelectorAll('[data-phone-hint]')];
-    expect(hints).toHaveLength(2);
+    expect(hints.map((h) => h.closest('[id]')!.id)).toEqual([
+      'header',
+      'hero',
+      'how',
+      'sticky-cta',
+    ]);
     for (const hint of hints) expect(hint.hasAttribute('hidden')).toBe(true);
+  });
+
+  it('gives the dispatcher a desk line for the real number, hidden until the engine fills it', () => {
+    const line = doc.querySelector('#scene-call > .scene__overlay > p.dispatcher-line')!;
+    expect(line).not.toBeNull();
+    expect(line.matches('[data-phone-line][hidden]')).toBe(true);
+    expect(line.querySelector('[data-i18n="call.phone.label"]')).not.toBeNull();
+    const number = line.querySelector('[data-phone-number]')!;
+    expect(number.textContent).toBe('');
   });
 
   it('builds the static sections: three steps, coverage with a stage and price, five questions', () => {
@@ -174,6 +198,17 @@ describe('index.html markup', () => {
     expect(doc.querySelector('#coverage [data-i18n="coverage.price"]')).not.toBeNull();
     expect(doc.querySelectorAll('#faq details > summary')).toHaveLength(5);
     expect(doc.querySelector('footer#footer')).not.toBeNull();
+  });
+
+  it('ships no dead social pills: the list stays hidden while a link has no handle', () => {
+    const list = doc.querySelector('#footer ul.footer__social')!;
+    const links = [...list.querySelectorAll('a')];
+    // The copy stays (footer.social.*) for the day the handles exist.
+    expect(links.map((a) => a.getAttribute('data-i18n'))).toEqual([
+      'footer.social.instagram',
+      'footer.social.telegram',
+    ]);
+    if (links.some((a) => !a.getAttribute('href'))) expect(list.hasAttribute('hidden')).toBe(true);
   });
 
   it('only uses copy keys that exist in both dictionaries', () => {
@@ -194,7 +229,7 @@ describe('index.html markup', () => {
 
     it('links the favicon and the share image, a real 1200x630 PNG', () => {
       expect(doc.head.querySelector('link[rel="icon"]')!.getAttribute('href')).toBe('/favicon.svg');
-      expect(content('meta[property="og:image"]')).toMatch(/\/og\.png$/);
+      expect(content('meta[property="og:image"]')).toBe('%VITE_SITE_URL%/og.png');
       expect(content('meta[property="og:image:width"]')).toBe('1200');
       expect(content('meta[property="og:image:height"]')).toBe('630');
       expect(content('meta[name="twitter:image"]')).toBe(content('meta[property="og:image"]'));
@@ -231,9 +266,48 @@ describe('index.html markup', () => {
     it('points search engines at each language, and at the Uzbek page by default', () => {
       const alt = (code: string) =>
         doc.head.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${code}"]`);
-      expect(alt('uz')!.getAttribute('href')).toBe('/?lang=uz');
-      expect(alt('ru')!.getAttribute('href')).toBe('/?lang=ru');
-      expect(alt('x-default')!.getAttribute('href')).toBe('/');
+      expect(alt('uz')!.getAttribute('href')).toBe('%VITE_SITE_URL%/?lang=uz');
+      expect(alt('ru')!.getAttribute('href')).toBe('%VITE_SITE_URL%/?lang=ru');
+      expect(alt('x-default')!.getAttribute('href')).toBe('%VITE_SITE_URL%/');
+      expect(content('meta[property="og:url"]')).toBe('%VITE_SITE_URL%/');
+    });
+
+    describe('the site origin, filled in at build time (VITE_SITE_URL)', () => {
+      /** index.html as the build writes it, with this environment. */
+      const build = (env: Record<string, string>) => {
+        const plugin = siteUrl();
+        (plugin.configResolved as (config: { env: Record<string, string> }) => void)({ env });
+        const hook = plugin.transformIndexHtml as { handler: (html: string) => string };
+        return new DOMParser().parseFromString(hook.handler(html), 'text/html');
+      };
+      const tags = (page: Document) => [
+        page.head.querySelector('meta[property="og:image"]')!.getAttribute('content'),
+        page.head.querySelector('meta[name="twitter:image"]')!.getAttribute('content'),
+        page.head.querySelector('meta[property="og:url"]')!.getAttribute('content'),
+        ...[...page.head.querySelectorAll('link[hreflang]')].map((l) => l.getAttribute('href')),
+      ];
+
+      it('makes the share image, og:url and the language links absolute once it is set', () => {
+        // Link previews (Telegram, X, Facebook) need an absolute og:image.
+        expect(tags(build({ VITE_SITE_URL: 'https://example.com' }))).toEqual([
+          'https://example.com/og.png',
+          'https://example.com/og.png',
+          'https://example.com/',
+          'https://example.com/?lang=uz',
+          'https://example.com/?lang=ru',
+          'https://example.com/',
+        ]);
+        // A trailing slash in the variable never makes "//og.png".
+        expect(tags(build({ VITE_SITE_URL: 'https://example.com/' }))[0]).toBe(
+          'https://example.com/og.png',
+        );
+      });
+
+      it('falls back to relative tags, never the literal placeholder, when it is unset', () => {
+        const page = build({});
+        expect(tags(page)).toEqual(['/og.png', '/og.png', '/', '/?lang=uz', '/?lang=ru', '/']);
+        expect(page.documentElement.outerHTML).not.toContain('%VITE_SITE_URL%');
+      });
     });
   });
 });

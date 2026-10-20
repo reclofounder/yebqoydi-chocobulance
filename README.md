@@ -5,7 +5,7 @@ A static, bilingual (Uzbek / Russian), scroll-driven story: Vite + TypeScript + 
 
 ## Commands
 
-Node 22 (`.nvmrc`); anything from 20.19 works.
+Node 20.19+ or 22.12+ (`.nvmrc` pins 22), as Vite 8 requires (`engines` in `package.json` says the same).
 
 | Command             | What it does                                                             |
 | ------------------- | ------------------------------------------------------------------------ |
@@ -13,7 +13,7 @@ Node 22 (`.nvmrc`); anything from 20.19 works.
 | `npm run dev`       | Vite dev server, http://localhost:5173.                                  |
 | `npm run build`     | Production build into `dist/`.                                           |
 | `npm run preview`   | Serve `dist/` with Vite's preview server, http://localhost:4173.         |
-| `npm start`         | Serve `dist/` with `serve` on `$PORT` (default 3000). Run a build first. |
+| `npm start`         | Serve `dist/` with `serve` on `$PORT` (default 3000); unknown paths 404. |
 | `npm test`          | Vitest (jsdom). `npx vitest run tests/markup.test.ts` runs one file.     |
 | `npm run typecheck` | `tsc --noEmit`, TypeScript strict.                                       |
 | `npm run format`    | Prettier over `index.html`, `vite.config.ts`, `src`, `tests`.            |
@@ -35,6 +35,8 @@ src/styles/          tokens, base, layout, scenes, van
 tests/               Vitest suites, one per area
 brief/, docs/        Campaign brief and key visuals; design spec and implementation plan
 railway.json         Railway build and start commands
+vite.config.ts       Build targets, the %VITE_SITE_URL% fill for the share tags, Vitest
+.env.example         VITE_SITE_URL, the site's public origin (see Deploy)
 ```
 
 ## Change the hotline number
@@ -44,7 +46,12 @@ Edit `src/config.ts`. Two different things are kept apart:
 - `HOOK` (`'105'`) is the campaign line shown in the copy ("105 ga qoʻngʻiroq qiling"). It is a parody of 103, the real ambulance number, and a brand cannot own a three-digit short code. Leave it `'105'`.
 - `PHONE` is what a tap dials: every `tel:` link uses it. `PHONE_DISPLAY` is how that number reads in print. Use the real number for both, for example `'+998901234567'` and `'+998 90 123 45 67'`.
 
-While `PHONE` equals `HOOK` (today) nothing extra shows. Once they differ and `MODE` is `'live'`, a small "yoki +998 90 123 45 67" hint appears under the hero button and next to the call bar, so people who cannot dial 105 still have a number. Rebuild after any change.
+While `PHONE` equals `HOOK` (today) nothing extra shows. Once they differ and `MODE` is `'live'`, the real number appears by every call, so people who cannot dial 105 still have one, and desktop visitors (who cannot tap `tel:`) have one to read:
+
+- a small "yoki +998 90 123 45 67" hint under the hero button, in the phone call bar, beside the desktop header pill (it comes and goes with the pill) and under the call below the steps;
+- a name card on the dispatcher's desk in the call scene: "Chocobulance dispetcheri" and the number.
+
+`applyPhoneHint` in `src/state.ts` switches all of them; teaser and ended modes keep them hidden. Rebuild after any change, then check the hero at 1366x650 and 1440x790 and the call scene with the number showing.
 
 ## Campaign mode
 
@@ -87,9 +94,20 @@ The site is static files plus `npm start`. Nothing here has been deployed yet.
 2. `railway init` (or create it in the dashboard), then connect this repo or run `railway up` from this folder.
 3. `railway.json` sets the builder (Railpack, Railway's current default) and the commands: build `npm run build`, start `npm start`. Railway runs the dependency install itself, so the build command does not repeat it. `PORT` is provided by Railway; `npm start` listens on it.
 4. Optional variable `RAILPACK_NODE_VERSION=22`, to pin Node explicitly (Railpack reads `engines.node` before `.nvmrc`).
-5. Generate a domain under Settings, then set the domain-dependent tags in `index.html`: make `og:image` and `twitter:image` absolute (`https://<domain>/og.png`), add `og:url`, and make the three `hreflang` links absolute (the script fills in `uz` and `ru` at runtime, but crawlers that skip scripts read the static ones).
+5. Generate a domain under Settings, then add the variable `VITE_SITE_URL` with the site's origin, for example `https://chocobulance.uz` (a trailing slash is dropped), and redeploy. The build writes it into `og:image`, `twitter:image`, `og:url` and the three `hreflang` links (`%VITE_SITE_URL%` in `index.html`, filled by `vite.config.ts`), so link previews get absolute URLs. It is read at build time, so change it, then rebuild. Without it the tags stay relative (`/og.png`), never the literal placeholder. `.env.example` shows the format for a local build.
 
-To check the production setup locally: `npm run build && PORT=4180 npm start`, then open http://localhost:4180.
+Config as code: Railway's docs mark it deprecated (legacy files honoured until 2026-12-01). If a deploy ignores `railway.json` (the build log shows no `vite build`, or the start command is not `npm start`), set build `npm run build` and start `npm start` in the service settings.
+
+After each deploy, a smoke check:
+
+- The build log shows `vite build` and ends with `built in`.
+- `/` and `/?lang=ru` return 200 and show the page in Uzbek and Russian.
+- `/og.png` returns 200 (`image/png`).
+- An unknown path such as `/nope` returns 404 (`serve` without `-s`: no copy of the page under every URL).
+- With `VITE_SITE_URL` set: the page source has absolute `og:image` and `og:url`, and a link pasted into Telegram and X shows the share card (re-scrape in their preview tools after a change).
+- A link to a section, such as `/#faq`, opens at that section, not mid-story.
+
+To check the production setup locally: `npm run build && PORT=4180 npm start`, then open http://localhost:4180 (and http://localhost:4180/nope for the 404).
 
 `og.png` is a screenshot of the Uzbek hero (van and the "105" numeral): 1600x840 viewport at 0.75 scale, header and scroll hint hidden. Redo it after any change to the hero.
 
@@ -97,8 +115,8 @@ To check the production setup locally: `npm run build && PORT=4180 npm start`, t
 
 - Real phone number: `PHONE` and `PHONE_DISPLAY` are still `105`.
 - Service hours: the coverage section says "to be announced" (`coverage.hours.value`).
-- Social links: the footer's Instagram and Telegram are inert text until the handles exist (see the TODO in `index.html`).
-- Domain: not chosen; see Deploy for the tags to update.
+- Social links: the footer's Instagram and Telegram list is hidden until the handles exist (see the TODO in `index.html`); the copy is kept.
+- Domain: not chosen; once it is, set `VITE_SITE_URL` (see Deploy).
 - Final van art: the current van is a placeholder.
 - Uzbek `ʻ` glyph: Nunito's `ʻ` (U+02BB) has a wide advance, so headlines such as "qoʻngʻiroq" look gappy. Not a defect; keep it (orthographically correct), switch to the ASCII `'`, or pick a narrower display font.
 - Launch date: `LAUNCH_DATE` is empty.

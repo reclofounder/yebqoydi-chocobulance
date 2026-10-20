@@ -1,4 +1,4 @@
-import { HOOK, LAUNCH_DATE, MODE, PHONE, PHONE_TEL } from './config';
+import { HOOK, LAUNCH_DATE, MODE, PHONE, PHONE_DISPLAY, PHONE_TEL } from './config';
 import { t } from './i18n';
 
 /** Sets the text and tags the element with its key, so a later applyI18n keeps it in sync. */
@@ -42,13 +42,22 @@ export function applyMode(root: ParentNode): void {
 }
 
 /**
- * Shows the "or {phone}" hint only while the line is live and the dial number differs from the
- * campaign hook (a number next to an inert "coming soon" or "ended" pill would make no sense).
+ * Shows the real number only while the line is live and the dial number differs from the campaign
+ * hook (a number next to an inert "coming soon" or "ended" pill would make no sense): the "or
+ * {phone}" hint by every call (hero, phone bar, desktop header pill, the call under the steps) and
+ * the dispatcher's desk line in the call scene, whose label is its own data-i18n copy. The one
+ * switch for all of them: a desktop visitor cannot tap `tel:`, so they need a number to read.
  */
 export function applyPhoneHint(root: ParentNode): void {
   const show = MODE === 'live' && PHONE !== HOOK;
   for (const el of root.querySelectorAll<HTMLElement>('[data-phone-hint]')) {
     el.toggleAttribute('hidden', !show);
     if (show) setCopy(el, 'cta.or');
+  }
+  for (const el of root.querySelectorAll<HTMLElement>('[data-phone-line]')) {
+    el.toggleAttribute('hidden', !show);
+  }
+  for (const el of root.querySelectorAll<HTMLElement>('[data-phone-number]')) {
+    el.textContent = show ? PHONE_DISPLAY : '';
   }
 }

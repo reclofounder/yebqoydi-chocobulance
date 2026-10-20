@@ -16,8 +16,11 @@ const fake = vi.hoisted(() => {
 
   type Context = { conditions: Record<string, boolean> };
   type Cleanup = (() => void) | void;
-  /** Each gsap.matchMedia().add(), re-runnable after `media` changes (as GSAP does on a change). */
-  const contexts: Array<{ rerun: () => void }> = [];
+  /**
+   * Each gsap.matchMedia().add(), re-runnable after `media` changes (as GSAP does on a change), and
+   * revertible (its cleanup), so no test leaves a listener behind for the next one.
+   */
+  const contexts: Array<{ rerun: () => void; revert: () => void }> = [];
 
   /** A stand-in for a paused GSAP tween: the gags are played and reversed in time. */
   const tween = () => {
@@ -57,7 +60,13 @@ const fake = vi.hoisted(() => {
             if (Object.values(state).some(Boolean)) cleanup = fn({ conditions: state });
           };
           rerun();
-          contexts.push({ rerun });
+          contexts.push({
+            rerun,
+            revert: () => {
+              cleanup?.();
+              cleanup = undefined;
+            },
+          });
           return mm;
         },
         revert: vi.fn(),
@@ -66,13 +75,26 @@ const fake = vi.hoisted(() => {
     }),
   };
 
-  const ScrollTrigger = { create: vi.fn(), refresh: vi.fn(), update: vi.fn() };
-  const lenis = { on: vi.fn(), raf: vi.fn(), destroy: vi.fn() };
+  /** ScrollTrigger's own events ('refresh' once every trigger is measured), and a way to fire them. */
+  const listeners = new Map<string, Set<() => void>>();
+  const fire = (type: string) => [...(listeners.get(type) ?? [])].forEach((fn) => fn());
+  const ScrollTrigger = {
+    create: vi.fn(),
+    refresh: vi.fn(),
+    update: vi.fn(),
+    addEventListener: vi.fn((type: string, fn: () => void) => {
+      listeners.set(type, (listeners.get(type) ?? new Set()).add(fn));
+    }),
+    removeEventListener: vi.fn((type: string, fn: () => void) => {
+      listeners.get(type)?.delete(fn);
+    }),
+  };
+  const lenis = { on: vi.fn(), raf: vi.fn(), destroy: vi.fn(), scrollTo: vi.fn() };
   const Lenis = vi.fn(function () {
     return lenis;
   });
 
-  return { media, contexts, gsap, ScrollTrigger, Lenis, lenis };
+  return { media, contexts, gsap, ScrollTrigger, listeners, fire, Lenis, lenis };
 });
 
 vi.mock('gsap', () => ({ gsap: fake.gsap, default: fake.gsap }));
@@ -83,9 +105,10 @@ vi.mock('gsap/ScrollTrigger', () => ({
 vi.mock('lenis', () => ({ default: fake.Lenis }));
 
 const REDUCE = '(prefers-reduced-motion: reduce)';
-// The motion's breakpoint is the layout's (layout.css / scenes.css switch at 900 px).
-const NARROW = '(max-width: 899.98px)';
+// The motion's breakpoint is the layout's (layout.css / scenes.css switch at 900 px). NARROW is
+// WIDE's complement, so every width (899.99 px too) is one or the other.
 const WIDE = '(min-width: 900px)';
+const NARROW = 'not all and (min-width: 900px)';
 const FINE = '(pointer: fine)';
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
@@ -142,6 +165,15 @@ function gag(id: string): FakeTween {
 }
 const played = (...ids: string[]) => ids.map((id) => gag(id).play.mock.calls.length);
 
+/** jsdom has no scrollIntoView: record which element was asked to come into view, and how. */
+const scrolledTo: Array<[string, unknown]> = [];
+Object.defineProperty(Element.prototype, 'scrollIntoView', {
+  configurable: true,
+  value(this: Element, options?: unknown) {
+    scrolledTo.push([this.id, options]);
+  },
+});
+
 function setScrollY(y: number): void {
   Object.defineProperty(window, 'scrollY', { value: y, configurable: true });
   window.dispatchEvent(new Event('scroll'));
@@ -151,6 +183,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   fake.media.clear();
   fake.contexts.length = 0;
+  fake.listeners.clear();
+  scrolledTo.length = 0;
   vi.stubGlobal('matchMedia', (query: string) => ({
     matches: fake.media.has(query),
     media: query,
@@ -167,6 +201,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  // Undo every story this test started (pins, Lenis and its link handling, still frames).
+  fake.contexts.forEach((context) => context.revert());
+  window.history.replaceState({}, '', '/');
   vi.unstubAllGlobals();
   Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
   root.classList.remove('reduced');
@@ -461,6 +498,106 @@ describe('initScroll with motion', () => {
     expect(isReduced()).toBe(false);
     expect(pins()).toHaveLength(10);
     expect(sirenOn('hero')).toBe(true);
+  });
+});
+
+describe('a link to a section, opened from outside (/#faq in a post or a bio)', () => {
+  const open = (url: string) => window.history.replaceState({}, '', url);
+
+  it('lands on the section once the pins are measured, not where the browser put it before them', () => {
+    open('/#faq');
+    fake.media.add(WIDE);
+    initScroll();
+
+    // The browser resolved #faq before the pins added their screens, and ScrollTrigger's first
+    // refresh puts back that stale offset (mid-story): only after it is the section in place.
+    expect(scrolledTo).toEqual([]);
+    fake.fire('refresh');
+    expect(scrolledTo).toEqual([['faq', { block: 'start' }]]);
+
+    // Once: later refreshes (a resize, a language switch) leave the visitor where they are.
+    fake.fire('refresh');
+    expect(scrolledTo).toHaveLength(1);
+    expect(fake.listeners.get('refresh')?.size ?? 0).toBe(0);
+  });
+
+  it('does the same on phones', () => {
+    open('/#how');
+    fake.media.add(NARROW);
+    initScroll();
+    fake.fire('refresh');
+    expect(scrolledTo).toEqual([['how', { block: 'start' }]]);
+  });
+
+  it("leaves the still frames to the browser's own landing: nothing is pinned there", () => {
+    open('/#faq');
+    fake.media.add(WIDE).add(REDUCE);
+    initScroll();
+    fake.fire('refresh');
+    expect(scrolledTo).toEqual([]);
+    expect(fake.ScrollTrigger.addEventListener).not.toHaveBeenCalled();
+  });
+
+  it.each(['/', '/#', '/#nothing-here', '/#%E0%A4%A'])('leaves the page alone at %s', (url) => {
+    open(url);
+    fake.media.add(WIDE);
+    expect(() => initScroll()).not.toThrow();
+    fake.fire('refresh');
+    expect(scrolledTo).toEqual([]);
+  });
+});
+
+describe('an in-page link clicked while Lenis smooths the scroll', () => {
+  const click = (target: Element, init: MouseEventInit = {}) => {
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0, ...init });
+    target.dispatchEvent(event);
+    return event;
+  };
+  const howLink = () => document.querySelector('#hero a.cta--ghost[href="#how"]')!;
+
+  it('jumps Lenis there at once, and leaves the browser to follow the link (hash, focus)', () => {
+    fake.media.add(WIDE).add(FINE);
+    initScroll();
+
+    const event = click(howLink());
+
+    // Left to the browser alone, a glide still in flight would carry the page back to where the
+    // wheel was heading. At once: a glide through the whole story would replay it at speed.
+    expect(fake.lenis.scrollTo).toHaveBeenCalledTimes(1);
+    expect(fake.lenis.scrollTo).toHaveBeenCalledWith(byId('how'), { immediate: true });
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it('leaves new-tab clicks and links to nothing on the page alone', () => {
+    fake.media.add(WIDE).add(FINE);
+    initScroll();
+    const nowhere = document.createElement('a');
+    nowhere.href = '#nothing-here';
+    document.body.append(nowhere);
+
+    click(howLink(), { metaKey: true });
+    click(howLink(), { ctrlKey: true });
+    click(howLink(), { shiftKey: true });
+    click(nowhere);
+
+    expect(fake.lenis.scrollTo).not.toHaveBeenCalled();
+  });
+
+  it('is not wired without Lenis (touch), nor once smooth scrolling is undone', () => {
+    fake.media.add(NARROW);
+    initScroll();
+    click(howLink());
+    expect(fake.lenis.scrollTo).not.toHaveBeenCalled();
+
+    fake.media.clear();
+    fake.media.add(WIDE).add(FINE);
+    fake.contexts.forEach((context) => context.rerun());
+    fake.media.add(REDUCE);
+    fake.contexts.forEach((context) => context.rerun());
+    expect(fake.lenis.destroy).toHaveBeenCalledTimes(1);
+
+    click(howLink());
+    expect(fake.lenis.scrollTo).not.toHaveBeenCalled();
   });
 });
 
@@ -882,7 +1019,7 @@ describe('the CSS the motion leans on', () => {
 
   it('shows the header call pill only once the hero call has gone, and not beside the one under the steps', () => {
     const layoutCss = strip(read('src/styles/layout.css'));
-    // Hidden unless the hero call has scrolled away, whether or not the header is frosted ...
+    // Hidden until the hero call's top edge reaches the header, whether or not it is frosted ...
     expect(layoutCss).toMatch(
       /\.header:not\(\[data-cta-visible='true'\]\) \.cta--compact,\s*\.header\[data-inline-cta='true'\] \.cta--compact\s*\{[^}]*visibility:\s*hidden/,
     );
