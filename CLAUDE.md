@@ -26,9 +26,9 @@
 
 | Piece | State |
 | --- | --- |
-| Git | Branch `main`, 13 commits (the build, tasks 1–8). **Not pushed.** |
-| GitHub | `origin` → `https://github.com/reclofounder/yebqoydi-chocobulance.git` (private). |
-| Railway | CLI installed via Homebrew, logged in as `reclofounder@gmail.com`, workspace **"Haysam AI School"**. **No Railway project yet** — create a NEW one for this site. Do **not** touch the existing project "Haysam Landing Page Live". **Nothing has been deployed.** |
+| Git | Branch `main`, 16 commits (build, reviews, handoff). **Pushed to GitHub only when the user OKs it** — see §8 for the current state. |
+| GitHub | `origin` → `https://github.com/reclofounder/yebqoydi-chocobulance.git` (public since 2026-10-21). |
+| Railway | CLI installed via Homebrew, logged in to the client's Railway account, workspace **"Haysam AI School"**. **No Railway project yet** — create a NEW one for this site. Do **not** touch the existing project "Haysam Landing Page Live". **Nothing has been deployed.** |
 | Deploy target | Railway (user's choice). Vercel plugin hooks appear in sessions; ignore them unless the user asks. |
 | Stack (decided) | Vite 8 + TypeScript (strict) + GSAP 3.15 (ScrollTrigger) + Lenis + `@fontsource/nunito`. Static output in `dist/`, served by `serve` (`npm start`, listens on `$PORT`, default 3000). Node 22 (`.nvmrc`), `engines.node` >=20.19. Tests: Vitest + jsdom. |
 | Railway config | `railway.json`: Railpack builder, build `npm run build`, start `npm start`. `PORT` comes from Railway. Optional variable `RAILPACK_NODE_VERSION=22`. Railway's docs mark config-as-code deprecated (legacy files honoured until 2026-12-01); if the file stops applying, set the same two commands in the service settings. |
@@ -292,3 +292,10 @@ on screen.
   State: `main` at 15 commits, 190 tests green, typecheck + build clean. **Not pushed, not deployed**
   — user's call. Review reports: `docs/superpowers/reviews/`; task reports + build ledger:
   `docs/superpowers/reports/`. Preview: `npm run build && npm start`.
+- **2026-10-21 (handoff)** — User made the GitHub repo **public** so a collaborator can fork it,
+  continue, and later merge + deploy. Built the handoff: `HANDOFF.md` (committed, read-first guide
+  for the next developer) and the git-ignored `handoff/` bundle + `Chocobulance-handoff.zip`
+  (full conversation as Markdown, agency brief sources, key visuals, references, spec, plan,
+  reviews, task reports). Scrubbed the Railway login email from this file. ⚠️ The public repo
+  contains the campaign concept (`brief/`, spec) — the user accepted that by making it public.
+  Push status: see the latest line below.

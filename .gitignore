@@ -5,3 +5,5 @@ dist
 chocobulance-pr-activation.html
 .tastemaker/
 .superpowers/
+handoff/
+*.zip
