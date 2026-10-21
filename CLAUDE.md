@@ -26,7 +26,7 @@
 
 | Piece | State |
 | --- | --- |
-| Git | Branch `main`, 16 commits (build, reviews, handoff). **Pushed to GitHub only when the user OKs it** — see §8 for the current state. |
+| Git | Branch `main`, tracks `origin/main`. **Pushed on 2026-10-21** (user's OK). Collaborator workflow: fork → branch → PR into this repo → merge → deploy. |
 | GitHub | `origin` → `https://github.com/reclofounder/yebqoydi-chocobulance.git` (public since 2026-10-21). |
 | Railway | CLI installed via Homebrew, logged in to the client's Railway account, workspace **"Haysam AI School"**. **No Railway project yet** — create a NEW one for this site. Do **not** touch the existing project "Haysam Landing Page Live". **Nothing has been deployed.** |
 | Deploy target | Railway (user's choice). Vercel plugin hooks appear in sessions; ignore them unless the user asks. |
@@ -298,4 +298,7 @@ on screen.
   (full conversation as Markdown, agency brief sources, key visuals, references, spec, plan,
   reviews, task reports). Scrubbed the Railway login email from this file. ⚠️ The public repo
   contains the campaign concept (`brief/`, spec) — the user accepted that by making it public.
-  Push status: see the latest line below.
+- **2026-10-21 (pushed)** — User said "push main to origin now"; pushed `main` (16 commits, head
+  `5a50b3a`) to the public repo and set upstream. Pre-push audit: no PDFs, no brief HTML, no
+  handoff bundle, no secrets in the tracked tree. Next: collaborator forks and continues; the
+  client sets the real phone number, hours, social links and domain; then deploy on Railway.
