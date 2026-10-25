@@ -37,6 +37,8 @@
 @media (min-width: 1024px) {
   :root {
     --gutter: var(--s4);
+    /* Room for the bigger logo on wide screens. */
+    --header-h: 88px;
   }
 }
 
@@ -85,14 +87,20 @@ h2,
 
 .brand {
   display: inline-flex;
+  flex: 0 1 auto;
   align-items: center;
+  min-width: 0;
   min-height: 44px;
   margin-right: auto;
 }
 
+/* The Chococream 20 lockup, as large as the header allows: 175 px wide on a phone (40 px tall), 280 px
+   on a wide screen (64 px tall). On a very narrow phone the link gives way (it may shrink, the image
+   with it), so the call and language buttons always stay on screen. */
 .brand img {
-  width: auto;
-  height: clamp(26px, 22px + 1vw, 36px);
+  width: clamp(175px, 130px + 10.5vw, 280px);
+  max-width: 100%;
+  height: auto;
 }
 
 /* The call button: a white pill with the number. On a phone it is just the handset (the number

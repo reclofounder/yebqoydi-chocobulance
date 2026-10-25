@@ -452,3 +452,8 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
 - **2026-10-26 (Railway removed)** — User: "remove railway". Deleted the Railway project `chocobulance`
   (deletion scheduled by Railway), unlinked the folder, removed `railway.json`, rewrote the README deploy
   section for Vercel only. Live site: https://chocobulance-omega.vercel.app.
+- **2026-10-26 (bigger logo)** — User: the Chococream logo in the header should be bigger. Logo now
+  sized by width, `clamp(175px, 130px + 10.5vw, 280px)` (64 px tall on wide screens, about 1.8x
+  before); header 88 px from 1024 px; on very narrow phones the logo link shrinks so the call and
+  language buttons stay on screen. Checked at 2000, 1440, 800, 390, 320 px. Committed, waiting for
+  the user's OK to push (a push deploys to Vercel).
