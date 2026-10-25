@@ -35,7 +35,6 @@ src/scroll/          car.ts (the car in each lane), motion.ts (header, words ris
 src/styles/          tokens (brand colours, fonts), base (the red field), layout (everything else), car (generated)
 tests/               Vitest suites, one per area
 brief/, docs/        Campaign brief and key visuals; earlier design spec and plan (v1)
-railway.json         Railway build and start commands
 vite.config.ts       Build targets, the %VITE_SITE_URL% fill for the share tags, Vitest
 .env.example         VITE_SITE_URL, the site's public origin (see Deploy)
 ```
@@ -99,34 +98,15 @@ Render with `render.swift`, not `pdftocairo`: the artwork is CMYK, and only Quar
 - Desktop mouse scrolling is smoothed with Lenis (`smooth.ts`); touch scrolling stays native.
 - Reduced motion (`prefers-reduced-motion: reduce`): no driving, no smoothing, no rising words. CSS hides every lane but the one at the door, where the car stands parked.
 
-## Deploy on Railway
-
-The site is static files plus `npm start`. **Live since 2026-10-25 at https://chocobulance-production.up.railway.app** (Railway project `chocobulance`, service built from this GitHub repo: every push to `main` redeploys). The steps below are how it was set up.
-
-1. Make a **new** Railway project in the workspace "Haysam AI School". Do not use the existing project "Haysam Landing Page Live".
-2. `railway init` (or create it in the dashboard), then connect this repo or run `railway up` from this folder.
-3. `railway.json` sets the builder (Railpack, Railway's current default) and the commands: build `npm run build`, start `npm start`. Railway runs the dependency install itself, so the build command does not repeat it. `PORT` is provided by Railway; `npm start` listens on it.
-4. Optional variable `RAILPACK_NODE_VERSION=22`, to pin Node explicitly (Railpack reads `engines.node` before `.nvmrc`).
-5. Generate a domain under Settings, then add the variable `VITE_SITE_URL` with the site's origin, for example `https://chocobulance.uz` (a trailing slash is dropped), and redeploy. The build writes it into `og:image`, `twitter:image`, `og:url` and the three `hreflang` links (`%VITE_SITE_URL%` in `index.html`, filled by `vite.config.ts`), so link previews get absolute URLs. It is read at build time, so change it, then rebuild. Without it the tags stay relative (`/og.png`), never the literal placeholder. `.env.example` shows the format for a local build.
-
-Config as code: Railway's docs mark it deprecated (legacy files honoured until 2026-12-01). If a deploy ignores `railway.json` (the build log shows no `vite build`, or the start command is not `npm start`), set build `npm run build` and start `npm start` in the service settings.
-
-After each deploy, a smoke check:
-
-- The build log shows `vite build` and ends with `built in`.
-- `/` and `/?lang=ru` return 200 and show the page in Uzbek and Russian.
-- `/og.png` returns 200 (`image/png`).
-- An unknown path such as `/nope` returns 404 (`serve` without `-s`: no copy of the page under every URL).
-- With `VITE_SITE_URL` set: the page source has absolute `og:image` and `og:url`, and a link pasted into Telegram and X shows the share card (re-scrape in their preview tools after a change).
-- A link to a section, such as `/#how`, opens at that section.
-
-To check the production setup locally: `npm run build && PORT=4180 npm start`, then open http://localhost:4180 (and http://localhost:4180/nope for the 404).
-
-`og.png` is a screenshot of the Uzbek first screen at 1200x630 (the arc and the car half in), taken once the hero's entrance has finished. Redo it after any change to the hero or the car.
-
 ## Deploy on Vercel
 
-Also live since 2026-10-25 at **https://chocobulance-omega.vercel.app** (Vercel project `chocobulance`, team "recloglobal's projects", linked to this GitHub repo: every push to `main` deploys there too, alongside Railway). Zero config: Vercel detects Vite (build `npm run build`, output `dist`); `railway.json` and `public/serve.json` are ignored there (Vercel serves `dist` itself and 404s unknown paths). The only setting is the production variable `VITE_SITE_URL=https://chocobulance-omega.vercel.app`, for the share tags. With a custom domain, add it under Settings → Domains and change `VITE_SITE_URL` to it.
+Live at **https://chocobulance-omega.vercel.app** (Vercel project `chocobulance`, team "recloglobal's projects", linked to this GitHub repo): **every push to `main` deploys to production**; other branches and pull requests get preview URLs (behind a Vercel login). Zero config: Vercel detects Vite (build `npm run build`, output `dist`) and serves `dist` itself, 404 for unknown paths. The only setting is the production variable `VITE_SITE_URL=https://chocobulance-omega.vercel.app`: the build writes it into `og:image`, `twitter:image`, `og:url` and the three `hreflang` links (`%VITE_SITE_URL%` in `index.html`, filled by `vite.config.ts`), so link previews get absolute URLs. It is read at build time, so change it, then redeploy. With a custom domain, add it under Settings → Domains and set `VITE_SITE_URL` to it.
+
+After a deploy, a smoke check: `/` and `/?lang=ru` return 200; `/og.png` is `image/png`; `/nope` is 404; the page source has absolute `og:image` and `og:url`; a link pasted into Telegram shows the share card.
+
+To check the production build locally: `npm run build && PORT=4180 npm start`, then open http://localhost:4180 (`npm start` serves `dist` with `serve`; `public/serve.json` turns off its directory listing).
+
+`og.png` is a screenshot of the Uzbek first screen at 1200x630 (the arc and the car half in), taken once the hero's entrance has finished. Redo it after any change to the hero or the car.
 
 ## Known open items
 

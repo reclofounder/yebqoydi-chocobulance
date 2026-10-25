@@ -13,8 +13,8 @@
 - **Status (2026-10-25):** **v2 built on `main`** (§7 "What was built (v2)", §8): one long red page in
   the style of the campaign teaser, the user's words in order, the car driving across between them.
   **The real car from the design PDF since 2026-10-25** (§7 "The car"). **Pushed and deployed 2026-10-25:**
-  live at **https://chocobulance-production.up.railway.app** (Railway) and
-  **https://chocobulance-omega.vercel.app** (Vercel); both auto-deploy every push to `main`. Open items in §6b and the README.
+  live at **https://chocobulance-omega.vercel.app** (Vercel), which auto-deploys every push to `main`.
+  **Railway removed 2026-10-26** (user's choice: Vercel is free). Open items in §6b and the README.
 
 ## 2. Rules set by the user
 
@@ -32,15 +32,13 @@
 | Git | Branch `main`, tracks `origin/main`. **Pushed on 2026-10-21** (user's OK). Collaborator workflow: fork → branch → PR into this repo → merge → deploy. |
 | GitHub | `origin` → `https://github.com/reclofounder/yebqoydi-chocobulance.git` (public since 2026-10-21). |
 | Vercel | **Deployed 2026-10-25** (user: "it is free"). Team **"recloglobal's projects"** (`team_ZF0hf2Mpabbgr99J3sLE9JAL`, the Vercel connector's account) → project **`chocobulance`** (`prj_54uJBknHMTgKxj1yJe5wCohiqyKB`), linked to the GitHub repo, production branch `main`: **every push to `main` deploys here too.** Public URL **https://chocobulance-omega.vercel.app** (the name "chocobulance.vercel.app" was taken). Framework Vite, build `npm run build`, output `dist`, Node 24. Env `VITE_SITE_URL=https://chocobulance-omega.vercel.app` (production). Deployment protection is the team default: the production domain is public, per-deployment and team-alias URLs ask for a Vercel login (302). Do not touch the team's other projects (ogir, haysamaischool-prvt, selfserverguide). |
-| Railway | **Deployed 2026-10-25.** Workspace "Haysam AI School" → project **`chocobulance`** (id `0aa292bb-6cc0-4c9f-97f8-940c580c4ee6`), environment `production`, service **`chocobulance`** built from the GitHub repo `reclofounder/yebqoydi-chocobulance`, branch `main`: **every push to `main` redeploys.** Domain **https://chocobulance-production.up.railway.app**. Variables: `VITE_SITE_URL` = that domain (makes og:image, og:url, hreflang absolute), `RAILPACK_NODE_VERSION=22`. This folder is linked (`railway status`). Do **not** touch the other projects ("Haysam Landing Page Live", "ögir.uz"). |
-| Deploy target | Railway (user's choice). Vercel plugin hooks appear in sessions; ignore them unless the user asks. |
+| Railway | **Removed 2026-10-26** at the user's request ("remove railway"): project `chocobulance` (`0aa292bb-…`) deleted with `railway delete`, this folder unlinked, `railway.json` removed. The CLI stays installed and logged in; the workspace's other projects ("Haysam Landing Page Live", "ögir.uz") were not touched. |
+| Deploy target | **Vercel only** (since 2026-10-26; Railway was used 2026-10-25 and removed). Pushing to `main` deploys to production, so push only with the user's OK. |
 | Stack (decided) | Vite 8 + TypeScript (strict) + GSAP 3.15 (ScrollTrigger) + Lenis + `@fontsource/baloo-2` (headlines) + `@fontsource/nunito` (Cyrillic fallback only). Static output in `dist/`, served by `serve` (`npm start`, listens on `$PORT`, default 3000). Node 22 (`.nvmrc`), `engines.node` >=20.19. Tests: Vitest + jsdom. |
-| Railway config | `railway.json`: Railpack builder, build `npm run build`, start `npm start`. `PORT` comes from Railway. Optional variable `RAILPACK_NODE_VERSION=22`. Railway's docs mark config-as-code deprecated (legacy files honoured until 2026-12-01); if the file stops applying, set the same two commands in the service settings. |
 | Preview config | `.claude/launch.json` (committed): `chocobulance-preview` (`vite preview`, 4173), `chocobulance-dev` (5173), `chocobulance-preview-4174`. Run `npm run build` first for the preview ones. |
 
-Deploy steps (run by the user's decision, see README "Deploy on Railway"): new Railway project in
-"Haysam AI School" → `railway init` / connect the repo → `railway up` → generate a domain → make
-`og:image`, `twitter:image` and the `hreflang` links absolute and add `og:url`.
+Deploying: push to `main` (README "Deploy on Vercel"). `npm start` (`serve`, with `public/serve.json`) is
+kept only for checking the production build locally.
 
 Conventions: commit after each milestone; push to `origin main` only when the user OKs it.
 
@@ -277,7 +275,7 @@ A bilingual (UZ default, RU) scroll-driven landing page, built from the spec and
 van and the "105" numeral, kitchen with Dad, the call, the road drive with parallax and rolling
 wheels, the door) then How it works, coverage with price and hours, FAQ, footer. Hotline only,
 Tashkent only, 99 000 UZS on delivery. Reduced motion gets still frames. How to operate it:
-`README.md` (change the number, campaign mode, copy, van swap, scenes and motion, Railway).
+`README.md` (change the number, campaign mode, copy, the car, motion, Vercel).
 
 File map:
 - `index.html` shell and head tags (title, description, Open Graph, Twitter, hreflang);
@@ -451,3 +449,6 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   first production deploy from `0b63a5a` READY in seconds. Smoke check passed on
   https://chocobulance-omega.vercel.app (pages, ru, og.png, robots.txt, car images, 404s, absolute share
   tags). Railway left running; both deploy on push. Next: user decides whether to keep both.
+- **2026-10-26 (Railway removed)** — User: "remove railway". Deleted the Railway project `chocobulance`
+  (deletion scheduled by Railway), unlinked the folder, removed `railway.json`, rewrote the README deploy
+  section for Vercel only. Live site: https://chocobulance-omega.vercel.app.

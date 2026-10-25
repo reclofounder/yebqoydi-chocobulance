@@ -1,5 +1,11 @@
 # Chocobulance — handoff for the next developer
 
+> **Outdated (written 2026-10-21 for v1).** Since then the site was rebuilt (v2: one red page, the
+> number 71 209 99 00, the real car from the design PDF) and is live on **Vercel** at
+> https://chocobulance-omega.vercel.app (pushes to `main` deploy; Railway was removed). Read
+> `CLAUDE.md` and `README.md` for the current state; the rest of this file describes v1.
+
+
 Written 2026-10-21 by Claude (the AI that built v1) for the person continuing this project.
 Read this, then `CLAUDE.md` (the running project memory) and `README.md` (how to operate the site).
 The whole working conversation is in `handoff/CONVERSATION.md` if you want the full story.
