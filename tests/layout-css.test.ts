@@ -1,34 +1,41 @@
-// Source-level guards for cascade details that jsdom cannot compute (it has no :hover).
+// Source-level guards for cascade details that jsdom cannot compute (it has no layout).
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const css = readFileSync(resolve(process.cwd(), 'src/styles/layout.css'), 'utf8');
+const css = readFileSync(resolve(process.cwd(), 'src/styles/layout.css'), 'utf8').replace(
+  /\/\*[\s\S]*?\*\//g,
+  '',
+);
 
-/** Every innermost `selectors { body }` block in source order (media wrappers are skipped). */
-const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m, order) => ({
-  order,
-  selectors: m[1]
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .split(',')
-    .map((s) => s.trim()),
-  body: m[2],
-}));
-const rulesFor = (selector: string) => rules.filter((r) => r.selectors.includes(selector));
+/** The bodies of every rule whose selector list includes `selector`, joined. */
+const rule = (selector: string) =>
+  [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter((m) => m[1].split(',').some((s) => s.trim() === selector))
+    .map((m) => m[2])
+    .join(';');
 
-describe('layout.css cascade', () => {
-  it('keeps the disabled pill grey on hover (same specificity as .cta:hover, so it must come later)', () => {
-    const hover = rulesFor('.cta:hover');
-    const disabledHover = rulesFor('.cta--disabled:hover');
-    expect(hover.length).toBeGreaterThan(0);
-    expect(disabledHover.length).toBeGreaterThan(0);
-    const last = disabledHover[disabledHover.length - 1];
-    expect(last.order).toBeGreaterThan(Math.max(...hover.map((r) => r.order)));
-    expect(last.body).toMatch(/background:\s*var\(--grey-out\)/);
-    expect(last.body).toMatch(/color:\s*var\(--choco-soft\)/);
+describe('layout.css', () => {
+  it('never wraps the number inside its pill', () => {
+    expect(rule('.tel')).toMatch(/white-space:\s*nowrap/);
+    expect(rule('.call')).toMatch(/white-space:\s*nowrap/);
   });
 
-  it('never wraps the price between its digit groups', () => {
-    const price = rulesFor('.price-card__price');
-    expect(price.some((r) => /white-space:\s*nowrap/.test(r.body))).toBe(true);
+  it('keeps the lanes a full screen apart, so only one car is ever on screen', () => {
+    expect(rule('.beat')).toMatch(/min-height:\s*100svh/);
+    expect(rule('.block')).toMatch(/min-height:\s*100svh/);
+  });
+
+  it('clips each lane, so a car off the edge never makes the page scroll sideways', () => {
+    expect(rule('.lane')).toMatch(/overflow:\s*clip/);
+  });
+
+  it('stretches the lane at the door: centred like the words, it would shrink to nothing', () => {
+    expect(rule('.beat--arrive > .lane')).toMatch(/justify-self:\s*stretch/);
+  });
+
+  it('moves the car only with transform (car.ts) and parks it in the middle of its lane', () => {
+    const car = rule('.car');
+    expect(car).toMatch(/left:\s*50%/);
+    expect(car).toMatch(/will-change:\s*transform/);
   });
 });

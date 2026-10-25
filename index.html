@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#FFF6EC" />
+    <meta name="theme-color" content="#C71920" />
     <!-- The title and description ship in Uzbek, filled from src/config.ts and uz.json (a test keeps
          them in step): link previews and crawlers do not run the script that translates them. -->
-    <title data-i18n="meta.title">Chocobulance · 105 — Chococream shokolad tez yordami</title>
+    <title data-i18n="meta.title">Chocobulance — Chococream shokolad tez yordami</title>
     <meta
       name="description"
-      content="Chococream tugadimi? 105 ga qoʻngʻiroq qiling — Chocobulance yangi idishni Toshkent boʻylab uyingizgacha yetkazib beradi. 99 000 soʻm, toʻlov yetkazib berilganda."
+      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Chaqirish bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
       data-i18n="meta.description"
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -28,12 +28,12 @@
     <meta property="og:locale:alternate" content="ru_RU" />
     <meta
       property="og:title"
-      content="Chocobulance · 105 — Chococream shokolad tez yordami"
+      content="Chocobulance — Chococream shokolad tez yordami"
       data-i18n="meta.title"
     />
     <meta
       property="og:description"
-      content="Chococream tugadimi? 105 ga qoʻngʻiroq qiling — Chocobulance yangi idishni Toshkent boʻylab uyingizgacha yetkazib beradi. 99 000 soʻm, toʻlov yetkazib berilganda."
+      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Chaqirish bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
       data-i18n="meta.description"
     />
     <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
@@ -42,12 +42,12 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Chocobulance · 105 — Chococream shokolad tez yordami"
+      content="Chocobulance — Chococream shokolad tez yordami"
       data-i18n="meta.title"
     />
     <meta
       name="twitter:description"
-      content="Chococream tugadimi? 105 ga qoʻngʻiroq qiling — Chocobulance yangi idishni Toshkent boʻylab uyingizgacha yetkazib beradi. 99 000 soʻm, toʻlov yetkazib berilganda."
+      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Chaqirish bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
       data-i18n="meta.description"
     />
     <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
@@ -56,23 +56,10 @@
       as="font"
       type="font/woff2"
       crossorigin
-      href="/node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2"
+      href="/node_modules/@fontsource/baloo-2/files/baloo-2-latin-800-normal.woff2"
     />
-    <link
-      rel="preload"
-      as="font"
-      type="font/woff2"
-      crossorigin
-      href="/node_modules/@fontsource/nunito/files/nunito-latin-900-normal.woff2"
-    />
-    <!-- Only a Russian visitor needs Cyrillic for the first paint; the script below promotes these. -->
-    <link
-      rel="x-preload-ru"
-      as="font"
-      type="font/woff2"
-      crossorigin
-      href="/node_modules/@fontsource/nunito/files/nunito-cyrillic-800-normal.woff2"
-    />
+    <!-- Baloo 2 has no Cyrillic, so Russian headlines are set in Nunito. Only a Russian visitor
+         needs it for the first paint; the script below promotes this to a preload. -->
     <link
       rel="x-preload-ru"
       as="font"
@@ -91,7 +78,7 @@
     >
     <script>
       // The language as getLang() (src/i18n.ts) will decide it: ?lang=, then the stored choice.
-      // Without this the Cyrillic subset arrives after the first paint and the headline reflows.
+      // Without this the Cyrillic font arrives after the first paint and the headline reflows.
       (function () {
         var lang = new URLSearchParams(location.search).get('lang');
         try {
@@ -106,11 +93,19 @@
   </head>
   <body>
     <a class="skip-link" href="#main" data-i18n="a11y.skip"></a>
-    <header id="header" class="header" data-scrolled="false" data-cta-visible="false">
+    <header id="header" class="header" data-scrolled="false">
       <div class="header__inner">
-        <a class="brand" href="#hero" data-i18n="header.brand">Chocobulance</a>
-        <a class="cta cta--compact" href="tel:105" data-cta data-i18n="sticky.cta"></a>
-        <span class="phone-hint header__hint" data-phone-hint hidden></span>
+        <a class="brand" href="#top">
+          <img
+            src="/brand/chococream-20-on-red.png"
+            width="783"
+            height="179"
+            alt="Chococream 20 yoshda"
+          />
+        </a>
+        <a class="call" href="tel:+998712099900" data-cta data-i18n-attr="aria-label:a11y.call"
+          ><span class="call__label" data-i18n="header.call"></span
+        ></a>
         <div class="lang" role="group" data-i18n-attr="aria-label:a11y.lang">
           <button
             type="button"
@@ -132,201 +127,167 @@
       </div>
     </header>
 
+    <!-- One long red page: the words in the order things happen, and the car driving between them.
+         Each lane is a strip the car crosses while it scrolls through the screen (scroll/car.ts);
+         data-lane says which way: enter (already half in, drives off left), ltr, rtl, or arrive
+         (comes in from the right and parks in the middle). -->
     <main id="main" tabindex="-1">
-      <!-- Pinned scenes: .scene__copy holds the words, .scene__stage[data-stage] is filled with art later. -->
-      <section id="hero" class="scene" data-scene="hero" aria-labelledby="hero-title">
-        <div class="scene__copy">
-          <p class="eyebrow" data-i18n="hero.eyebrow"></p>
-          <h1 id="hero-title" class="hero__title">
-            <span class="hero__line" data-i18n="hero.title"></span>
-            <span class="hero__line hero__line--accent" data-i18n="hero.title2"></span>
-          </h1>
-          <p class="body" data-i18n="hero.body"></p>
-          <div class="hero__actions">
-            <a class="cta" href="tel:105" data-cta data-i18n="hero.cta"></a>
-            <a class="cta cta--ghost" href="#how" data-i18n="hero.cta2"></a>
-          </div>
-          <p class="note" data-i18n="hero.note" data-state-note></p>
-          <p class="phone-hint" data-phone-hint hidden></p>
-        </div>
-        <div class="scene__stage" data-stage></div>
-        <!-- Part of the art zone: drawn over the stage cell, not inside the copy column. -->
-        <div class="hero__numeral" data-i18n="hero.numeral" aria-hidden="true"></div>
-        <p class="hero__scroll" data-i18n="hero.scroll" aria-hidden="true"></p>
+      <section id="top" class="hero" aria-labelledby="hero-title">
+        <h1 id="hero-title" class="hero__title">
+          <span class="visually-hidden" data-i18n="hero.title"></span>
+          <!-- The headline on a gentle arc, as in the campaign teaser. The real words are above, for
+               screen readers and search; this drawing of them is hidden from both. -->
+          <svg class="hero__arc" viewBox="0 0 1200 300" aria-hidden="true" focusable="false">
+            <path id="hero-arc" d="M 30 250 Q 600 90 1170 250" fill="none" />
+            <text>
+              <textPath
+                href="#hero-arc"
+                startOffset="50%"
+                text-anchor="middle"
+                data-i18n="hero.title"
+              ></textPath>
+            </text>
+          </svg>
+        </h1>
       </section>
 
-      <section
-        id="scene-kitchen"
-        class="scene"
-        data-scene="kitchen"
-        aria-labelledby="kitchen-title"
-      >
-        <div class="scene__copy">
-          <p class="eyebrow" data-i18n="kitchen.eyebrow"></p>
-          <h2 id="kitchen-title" data-i18n="kitchen.title"></h2>
-          <p class="body" data-i18n="kitchen.body"></p>
-          <div class="card">
-            <h3 class="card__title" data-i18n="kitchen.list.title"></h3>
-            <ul class="card__list" role="list">
-              <li data-i18n="kitchen.list.1"></li>
-              <li data-i18n="kitchen.list.2"></li>
-              <li data-i18n="kitchen.list.3"></li>
-              <li data-i18n="kitchen.list.4"></li>
-            </ul>
-          </div>
+      <div class="lane" data-lane="enter" aria-hidden="true">
+        <div class="car" data-car>
+          <img class="car__body" src="/car/body-left.svg" width="480" height="240" alt="" />
+          <img
+            class="car__wheel car__wheel--a"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
+          <img
+            class="car__wheel car__wheel--b"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
         </div>
-        <div class="scene__stage" data-stage></div>
+      </div>
+
+      <section class="beat" aria-labelledby="soothe-title">
+        <h2 id="soothe-title" class="beat__title" data-reveal data-i18n="soothe.title"></h2>
       </section>
 
-      <section id="scene-call" class="scene" data-scene="call" aria-labelledby="call-title">
-        <div class="scene__copy">
-          <p class="eyebrow" data-i18n="call.eyebrow"></p>
-          <h2 id="call-title" data-i18n="call.title"></h2>
-          <p class="body" data-i18n="call.body"></p>
+      <div class="lane" data-lane="ltr" aria-hidden="true">
+        <div class="car" data-car>
+          <img class="car__body" src="/car/body-right.svg" width="480" height="240" alt="" />
+          <img
+            class="car__wheel car__wheel--a"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
+          <img
+            class="car__wheel car__wheel--b"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
         </div>
-        <div class="scene__stage" data-stage></div>
-        <!-- Copy that belongs to the art, laid over the stage: real text, so it translates and wraps. -->
-        <div class="scene__overlay">
-          <p id="bubble" class="bubble" data-i18n="call.bubble"></p>
-          <!-- The real number on the dispatcher's desk, shown only once it differs from the hook (state.ts). -->
-          <p class="dispatcher-line" data-phone-line hidden>
-            <span class="dispatcher-line__label" data-i18n="call.phone.label"></span>
-            <span class="dispatcher-line__number" data-phone-number></span>
-          </p>
-        </div>
+      </div>
+
+      <section class="beat" aria-labelledby="call-title">
+        <h2 id="call-title" class="beat__title" data-reveal>
+          <span data-i18n="call.before"></span>
+          <a class="tel" href="tel:+998712099900" data-tel data-i18n="call.number"></a>
+          <span data-i18n="call.after"></span>
+        </h2>
       </section>
 
-      <section id="scene-road" class="scene" data-scene="road" aria-labelledby="road-title">
-        <div class="scene__copy">
-          <p class="eyebrow" data-i18n="road.eyebrow"></p>
-          <h2 id="road-title" data-i18n="road.title"></h2>
-          <p class="body" data-i18n="road.body"></p>
-        </div>
-        <div class="scene__stage" data-stage></div>
-      </section>
-
-      <section id="scene-door" class="scene" data-scene="door" aria-labelledby="door-title">
-        <div class="scene__copy">
-          <p class="eyebrow" data-i18n="door.eyebrow"></p>
-          <h2 id="door-title" data-i18n="door.title"></h2>
-          <p class="body" data-i18n="door.body"></p>
-        </div>
-        <div class="scene__stage" data-stage></div>
-        <div class="scene__overlay">
-          <div id="price-badge" class="price-badge">
-            <p class="price-badge__price" data-i18n="door.price"></p>
-            <p class="price-badge__note" data-i18n="door.price.note"></p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Static sections -->
-      <section id="how" class="section" aria-labelledby="how-title">
-        <div class="container">
-          <h2 id="how-title" class="section__title" data-i18n="how.title"></h2>
-          <ol class="steps" role="list">
-            <li>
-              <article class="step">
-                <span class="step__num" aria-hidden="true">1</span>
-                <h3 class="step__title" data-i18n="how.1.title"></h3>
-                <p class="step__body" data-i18n="how.1.body"></p>
-              </article>
-            </li>
-            <li>
-              <article class="step">
-                <span class="step__num" aria-hidden="true">2</span>
-                <h3 class="step__title" data-i18n="how.2.title"></h3>
-                <p class="step__body" data-i18n="how.2.body"></p>
-              </article>
-            </li>
-            <li>
-              <article class="step">
-                <span class="step__num" aria-hidden="true">3</span>
-                <h3 class="step__title" data-i18n="how.3.title"></h3>
-                <p class="step__body" data-i18n="how.3.body"></p>
-              </article>
-            </li>
-          </ol>
-          <a class="cta how__cta" href="tel:105" data-cta data-i18n="hero.cta"></a>
-          <p class="phone-hint how__hint" data-phone-hint hidden></p>
-        </div>
-      </section>
-
-      <section id="coverage" class="section" aria-labelledby="coverage-title">
-        <div class="container">
-          <div class="section__head">
-            <h2 id="coverage-title" class="section__title" data-i18n="coverage.title"></h2>
-            <p class="section__lead" data-i18n="coverage.body"></p>
-          </div>
-          <div class="coverage__grid">
-            <!-- coverage.svg is injected into [data-stage] by src/scenes/mount.ts; the labels are real text over it. -->
-            <div class="coverage__map">
-              <div class="coverage__stage" data-stage></div>
-              <p class="coverage__label coverage__label--in" data-i18n="coverage.inside"></p>
-              <p class="coverage__label coverage__label--out" data-i18n="coverage.outside"></p>
-            </div>
-            <div class="coverage__info">
-              <div class="price-card">
-                <p class="price-card__price" data-i18n="coverage.price"></p>
-                <p class="price-card__note" data-i18n="coverage.price.note"></p>
-              </div>
-              <dl class="hours">
-                <dt data-i18n="coverage.hours.label"></dt>
-                <dd data-i18n="coverage.hours.value"></dd>
-              </dl>
-            </div>
+      <section class="beat beat--arrive" aria-labelledby="door-title">
+        <h2 id="door-title" class="beat__title" data-reveal data-i18n="door.title"></h2>
+        <div class="lane" data-lane="arrive" aria-hidden="true">
+          <div class="car" data-car>
+            <img class="car__body" src="/car/body-left.svg" width="480" height="240" alt="" />
+            <img
+              class="car__wheel car__wheel--a"
+              src="/car/wheel.svg"
+              width="52"
+              height="52"
+              alt=""
+            />
+            <img
+              class="car__wheel car__wheel--b"
+              src="/car/wheel.svg"
+              width="52"
+              height="52"
+              alt=""
+            />
           </div>
         </div>
       </section>
 
-      <section id="faq" class="section" aria-labelledby="faq-title">
-        <div class="container">
-          <h2 id="faq-title" class="section__title" data-i18n="faq.title"></h2>
-          <div class="faq__list">
-            <details class="faq__item">
-              <summary data-i18n="faq.1.q"></summary>
-              <p data-i18n="faq.1.a"></p>
-            </details>
-            <details class="faq__item">
-              <summary data-i18n="faq.2.q"></summary>
-              <p data-i18n="faq.2.a"></p>
-            </details>
-            <details class="faq__item">
-              <summary data-i18n="faq.3.q"></summary>
-              <p data-i18n="faq.3.a"></p>
-            </details>
-            <details class="faq__item">
-              <summary data-i18n="faq.4.q"></summary>
-              <p data-i18n="faq.4.a"></p>
-            </details>
-            <details class="faq__item">
-              <summary data-i18n="faq.5.q"></summary>
-              <p data-i18n="faq.5.a"></p>
-            </details>
-          </div>
+      <section id="how" class="block" aria-labelledby="how-title">
+        <h2 id="how-title" class="block__title" data-reveal data-i18n="how.title"></h2>
+        <ol class="steps" data-reveal>
+          <li data-i18n="how.1"></li>
+          <li data-i18n="how.2"></li>
+          <li data-i18n="how.3"></li>
+        </ol>
+      </section>
+
+      <div class="lane" data-lane="ltr" aria-hidden="true">
+        <div class="car" data-car>
+          <img class="car__body" src="/car/body-right.svg" width="480" height="240" alt="" />
+          <img
+            class="car__wheel car__wheel--a"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
+          <img
+            class="car__wheel car__wheel--b"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
         </div>
+      </div>
+
+      <section id="price" class="block" aria-labelledby="price-title">
+        <h2 id="price-title" class="block__title" data-reveal data-i18n="price.free"></h2>
+        <p class="block__line" data-reveal data-i18n="price.tub"></p>
+      </section>
+
+      <div class="lane" data-lane="rtl" aria-hidden="true">
+        <div class="car" data-car>
+          <img class="car__body" src="/car/body-left.svg" width="480" height="240" alt="" />
+          <img
+            class="car__wheel car__wheel--a"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
+          <img
+            class="car__wheel car__wheel--b"
+            src="/car/wheel.svg"
+            width="52"
+            height="52"
+            alt=""
+          />
+        </div>
+      </div>
+
+      <section id="area" class="block" aria-labelledby="area-title">
+        <h2 id="area-title" class="block__title" data-reveal data-i18n="area.title"></h2>
       </section>
     </main>
 
-    <footer id="footer" class="footer">
-      <div class="container footer__inner">
-        <p class="footer__line" data-i18n="footer.line"></p>
-        <!-- TODO: the handles do not exist yet (spec section 9). Until they do, the list is hidden: a
-             bordered pill that goes nowhere reads as broken. Then give each link its href and drop
-             `hidden`; the copy is already in uz.json and ru.json (footer.social.*). -->
-        <ul class="footer__social" role="list" hidden>
-          <li><a data-i18n="footer.social.instagram"></a></li>
-          <li><a data-i18n="footer.social.telegram"></a></li>
-        </ul>
-        <p class="footer__note" data-i18n="footer.note"></p>
-        <p class="footer__copy" data-i18n="footer.copy"></p>
-      </div>
+    <footer class="footer">
+      <p data-i18n="footer.copy"></p>
     </footer>
-
-    <div id="sticky-cta" class="sticky-cta" data-visible="false">
-      <a class="cta" href="tel:105" data-cta data-i18n="sticky.cta"></a>
-      <span class="phone-hint" data-phone-hint hidden></span>
-    </div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

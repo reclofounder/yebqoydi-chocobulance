@@ -1,6 +1,6 @@
 import uz from './i18n/uz.json';
 import ru from './i18n/ru.json';
-import { HOOK, LAUNCH_DATE, PHONE_DISPLAY, PRICE } from './config';
+import { PHONE_DISPLAY, PRICE } from './config';
 
 export type Lang = 'uz' | 'ru';
 
@@ -29,13 +29,8 @@ export function getLang(): Lang {
 }
 
 function fill(template: string): string {
-  const values: Record<string, string> = {
-    hook: HOOK,
-    phone: PHONE_DISPLAY,
-    price: PRICE,
-    date: LAUNCH_DATE,
-  };
-  return template.replace(/\{(hook|phone|price|date)\}/g, (_, name: string) => values[name]);
+  const values: Record<string, string> = { phone: PHONE_DISPLAY, price: PRICE };
+  return template.replace(/\{(phone|price)\}/g, (_, name: string) => values[name]);
 }
 
 export function t(key: string, lang: Lang = active ?? getLang()): string {

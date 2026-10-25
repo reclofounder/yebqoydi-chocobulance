@@ -1,7 +1,7 @@
 # Chocobulance
 
-Landing page for the Chococream "105" PR activation: a chocolate ambulance you call when the tub is empty.
-A static, bilingual (Uzbek / Russian), scroll-driven story: Vite + TypeScript + GSAP, served as plain files from `dist/`.
+Landing page for the Chococream "Chocobulance" PR activation: a chocolate ambulance you call (71 209 99 00) when the tub is empty.
+One long red page in the style of the campaign teaser: the words in the order things happen, and the Chocobulance car driving across between them as you scroll. Bilingual (Uzbek / Russian), Vite + TypeScript + GSAP, served as plain files from `dist/`.
 
 ## Commands
 
@@ -21,70 +21,77 @@ Node 20.19+ or 22.12+ (`.nvmrc` pins 22), as Vite 8 requires (`engines` in `pack
 ## Project layout
 
 ```
-index.html           Page shell: head tags, the five pinned scenes, static sections. Copy comes from data-i18n keys.
-public/              favicon.svg, og.png (1200x630 share image)
-src/config.ts        PHONE, PHONE_DISPLAY, HOOK, PRICE, MODE, LAUNCH_DATE
+index.html           The page: header, the arched hero, the words, the car lanes, the footer. Copy comes from data-i18n keys.
+public/              favicon.svg, og.png (1200x630 share image), robots.txt
+public/brand/        The Chococream 20 logo for red backgrounds (from brand/design-system)
+public/car/          The car: body-left.svg, body-right.svg, wheel.svg (placeholder art, see "Swap the car")
+src/config.ts        PHONE, PHONE_DISPLAY, PRICE, MODE
 src/i18n.ts          Copy engine: t(), applyI18n(), language choice (?lang=, then localStorage, then uz)
 src/i18n/            uz.json, ru.json
-src/state.ts         Campaign mode (teaser / live / ended) and the phone hint
-src/main.ts          Boot: mount art, apply copy and mode, start the scroll story
-src/scenes/          Scene art as SVG (hero-bg, kitchen, call, road-*, door, coverage) and mount.ts
-src/van/             van.svg and van.ts: the swappable van and its geometry
-src/scroll/          timeline.ts (pinned story), reduced.ts (still frames), motion.ts, smooth.ts (Lenis)
-src/styles/          tokens, base, layout, scenes, van
+src/state.ts         Campaign mode (teaser / live / ended)
+src/main.ts          Boot: apply copy and mode, start the motion once the fonts are in
+src/scroll/          car.ts (the car in each lane), motion.ts (header, words rising, start-up), smooth.ts (Lenis)
+src/styles/          tokens (brand colours, fonts), base (the red field), layout (everything else)
 tests/               Vitest suites, one per area
-brief/, docs/        Campaign brief and key visuals; design spec and implementation plan
+brief/, docs/        Campaign brief and key visuals; earlier design spec and plan (v1)
 railway.json         Railway build and start commands
 vite.config.ts       Build targets, the %VITE_SITE_URL% fill for the share tags, Vitest
 .env.example         VITE_SITE_URL, the site's public origin (see Deploy)
 ```
 
+## The page
+
+Top to bottom, white on the red field:
+
+1. "Yebqoʻydingizmi?" on a gentle arc (an SVG `textPath`; the real words sit beside it, hidden, for screen readers).
+2. "Endi kichkintoyni tezlik bilan ovutish kerak".
+3. "Telefoningizni oling, 71 209 99 00 raqamiga qoʻngʻiroq qiling", the number a white pill that dials.
+4. "Chocobulance uyingiz eshigida", with the car pulling up and parking under it.
+5. How it works, three steps. 6. "Chaqirish bepul", the price per tub. 7. Tashkent city only. Then the © line.
+
+The car crosses in lanes between the blocks (`data-lane` in `index.html`): `enter` (half in on the first screen, drives off left), `ltr`, `arrive` (parks at the door), `ltr`, `rtl`. Every block between two lanes is at least a screen tall, so only one car is ever on screen.
+
+Fonts: Baloo 2 ExtraBold for the headlines (the closest match to the teaser's lettering; it has `ʻ`). It has no Cyrillic, so Russian headlines fall through to Nunito 900. Body text uses the system font.
+
 ## Change the hotline number
 
-Edit `src/config.ts`. Two different things are kept apart:
-
-- `HOOK` (`'105'`) is the campaign line shown in the copy ("105 ga qoʻngʻiroq qiling"). It is a parody of 103, the real ambulance number, and a brand cannot own a three-digit short code. Leave it `'105'`.
-- `PHONE` is what a tap dials: every `tel:` link uses it. `PHONE_DISPLAY` is how that number reads in print. Use the real number for both, for example `'+998901234567'` and `'+998 90 123 45 67'`.
-
-While `PHONE` equals `HOOK` (today) nothing extra shows. Once they differ and `MODE` is `'live'`, the real number appears by every call, so people who cannot dial 105 still have one, and desktop visitors (who cannot tap `tel:`) have one to read:
-
-- a small "yoki +998 90 123 45 67" hint under the hero button, in the phone call bar, beside the desktop header pill (it comes and goes with the pill) and under the call below the steps;
-- a name card on the dispatcher's desk in the call scene: "Chocobulance dispetcheri" and the number.
-
-`applyPhoneHint` in `src/state.ts` switches all of them; teaser and ended modes keep them hidden. Rebuild after any change, then check the hero at 1366x650 and 1440x790 and the call scene with the number showing.
+Edit `src/config.ts`: `PHONE` is what a tap dials (international form, `'+998712099900'`), `PHONE_DISPLAY` is how it reads (`'71\u00a0209\u00a099\u00a000'`, no-break spaces so it never wraps). The copy uses `{phone}`, so the header button, its label and the pill in the call line all follow. The two `tel:` links in `index.html` and the static Uzbek description in its `<head>` carry the number for visitors without the script: change those too (a test compares the description).
 
 ## Campaign mode
 
 `MODE` in `src/config.ts`:
 
-- `'teaser'` (before launch): the call buttons turn into inert "Tez orada" / "Скоро" pills and a note says the line opens soon. If `LAUNCH_DATE` is set the note names the day; empty means "date not announced". It is one string shown in both languages ("Liniya {date} kuni ochiladi", "Линия откроется {date}"), so use a language-neutral form such as `'01.11.2026'`.
-- `'live'` (today): buttons dial `PHONE`.
-- `'ended'`: buttons become "Aksiya yakunlandi" pills and a thank-you note replaces the call to action.
+- `'teaser'` (before launch): the header call button turns into an inert "Tez orada" / "Скоро" pill, and the number in the call line stays as text but no longer dials.
+- `'live'` (today): everything dials `PHONE`.
+- `'ended'`: the header button becomes "Aksiya yakunlandi" / "Акция завершена"; the number stays as text.
 
 ## Edit copy
 
-All copy lives in `src/i18n/uz.json` and `src/i18n/ru.json`; the HTML only carries keys (`data-i18n="hero.title"`). Both files must have the same keys (a test checks it). A key can use `{hook}`, `{phone}`, `{price}` and `{date}`, filled from `src/config.ts`; never type `105` or `99 000` into the copy (a test fails if you do).
+All copy lives in `src/i18n/uz.json` and `src/i18n/ru.json`; the HTML only carries keys (`data-i18n="soothe.title"`). Both files must have the same keys (a test checks it). A key can use `{phone}` and `{price}`, filled from `src/config.ts`; never type the number or `99 000` into the copy (a test fails if you do).
 
-Uzbek uses two different marks, never the ASCII `'`: `ʻ` (U+02BB) inside the letters oʻ and gʻ (qoʻngʻiroq), and `ʼ` (U+02BC) as the apostrophe (Chococreamʼni, eʼlon). Copy them from the existing strings.
+Uzbek uses two different marks, never the ASCII `'`: `ʻ` (U+02BB) inside the letters oʻ and gʻ (qoʻngʻiroq), and `ʼ` (U+02BC) as the apostrophe. Copy them from the existing strings.
 
 The page title and descriptions in `index.html` ship in Uzbek (for link previews that do not run scripts); if you change `meta.title` or `meta.description`, change the static copies too. A test compares them.
 
-## Swap the van
+The hero's arc fits "Yebqoʻydingizmi?" at `font-size: 136px` in its 1200-unit drawing (`.hero__arc text` in `layout.css`). A longer line drops the letters that do not fit on the path: lower the size, or lengthen the arc in `index.html` (`#hero-arc`).
 
-The van is one file, `src/van/van.svg` (the current art is a placeholder). To replace it:
+## Swap the car
 
-1. Draw it 480x240, facing right, and keep the six group ids: `van-shadow`, `van-body`, `van-siren`, `siren-light`, `van-wheel-rear`, `van-wheel-front`. `siren-light` is a `rect` inside `van-siren`.
-2. Make each wheel group's largest circle the tyre; its centre is the wheel's pivot. Put no `transform` on the wheel groups (the timeline spins them through CSS custom properties).
-3. Paint with the design tokens only (`fill: var(--red)`), no hard-coded colours.
-4. Update `VAN` in `src/van/van.ts` (`width`, `height`, `wheelRadius`, `wheelCenters`) to match the new drawing.
-5. Run `npm test`; `tests/van.test.ts` checks the ids, the geometry and the tokens. `mountVan` suffixes the ids per instance (`siren-light-hero`, `siren-light-road`) and sets `preserveAspectRatio`, so the file needs no other changes.
+The car is three images in `public/car/`. The current ones are a placeholder (the v1 van, 480x240).
 
-## Scenes and motion
+1. Export from Figma the car **without its wheels**, once facing left (`body-left`) and once facing right (`body-right`). Two views, not one mirrored: lettering on the car would read backwards. Transparent background. SVG, or PNG/WebP at 2x (about 1200 px wide).
+2. Export one wheel, square, tyre touching the edges (`wheel`), facing the viewer; it is spun around its centre.
+3. Put the files in `public/car/` and point the `src` attributes in `index.html` at them (one car per lane; `width` and `height` set to the files' own size).
+4. In `layout.css`: set `--car-ratio` to the body's height over its width, and the wheel boxes (`.car__wheel`: `top`, `width`; `--a` and `--b`: `left`) as percentages of the body. In `src/scroll/car.ts` set `WHEEL_SHARE` to the wheel's diameter over the body's width, so the spin matches the road.
+5. If the car has no separate wheels, delete the two `car__wheel` images in each lane; the car still drives.
+6. `npm test`, then scroll through at 1440x900 and 390x844. Redo `og.png` (below).
 
-- Art: `src/scenes/*.svg`, injected into each scene's `[data-stage]` by `src/scenes/mount.ts`. The timeline finds parts by id: `dad-peek`, `tub-lid`, `digit-1`, `digit-0`, `digit-5`, `call-line`, `bubble`, `road-lines`, `door-leaf`, `tub-full`, `heart-l`, `heart-r`, `dad-thumb`, `price-badge`, plus the van's. Keep these ids when redrawing a scene; `tests/scenes.test.ts` lists them.
-- Story: `src/scroll/timeline.ts`. Each scene is pinned while one scrubbed timeline plays. Tuning constants sit at the top of the file: `DISTANCE` (pin length per scene, in % of screen height), `NARROW_SCALE`, `SCRUB_TOUCH`, `REVERSE_SPEED`, the beat positions (`DIGITS_AT`, `LINE`, `BUBBLE_AT`, `DOOR_OPEN`, `HEARTS_AT`, `THUMB_AT`, `BADGE_AT`), the road's `VAN_FROM`/`VAN_TO`, `PARALLAX` and `SKY_TOP`/`SKY_BOTTOM`.
-- Everything animates `transform` and `opacity` (plus custom properties that CSS turns into transforms). Desktop mouse scrolling is smoothed with Lenis (`smooth.ts`); touch scrolling stays native.
-- Reduced motion (`prefers-reduced-motion: reduce`): no pins, no scrubbing, no smoothing. `src/scroll/reduced.ts` shows each scene as a still frame in its final state and keeps the header and call bar in step with the scroll. Switching the setting mid-visit swaps between the two.
+## Motion
+
+- `src/scroll/car.ts`: one ScrollTrigger per lane, scrubbed by the scroll, writing only `transform` (the car's offset, the wheels' turn). `laneRange` says where the car starts and ends in each kind of lane; `ENTER_SHOWN` is how much of it shows on the first screen; the `arrive` lane brakes (eases out) into the middle.
+- Words rise into place as they come on screen (`data-reveal`, `motion.ts`). The hero's arc pops in once on load (CSS).
+- Desktop mouse scrolling is smoothed with Lenis (`smooth.ts`); touch scrolling stays native.
+- Reduced motion (`prefers-reduced-motion: reduce`): no driving, no smoothing, no rising words. CSS hides every lane but the one at the door, where the car stands parked.
 
 ## Deploy on Railway
 
@@ -105,18 +112,14 @@ After each deploy, a smoke check:
 - `/og.png` returns 200 (`image/png`).
 - An unknown path such as `/nope` returns 404 (`serve` without `-s`: no copy of the page under every URL).
 - With `VITE_SITE_URL` set: the page source has absolute `og:image` and `og:url`, and a link pasted into Telegram and X shows the share card (re-scrape in their preview tools after a change).
-- A link to a section, such as `/#faq`, opens at that section, not mid-story.
+- A link to a section, such as `/#how`, opens at that section.
 
 To check the production setup locally: `npm run build && PORT=4180 npm start`, then open http://localhost:4180 (and http://localhost:4180/nope for the 404).
 
-`og.png` is a screenshot of the Uzbek hero (van and the "105" numeral): 1600x840 viewport at 0.75 scale, header and scroll hint hidden. Redo it after any change to the hero.
+`og.png` is a screenshot of the Uzbek first screen at 1200x630 (the arc and the car half in), taken once the hero's entrance has finished. Redo it after any change to the hero or the car.
 
 ## Known open items
 
-- Real phone number: `PHONE` and `PHONE_DISPLAY` are still `105`.
-- Service hours: the coverage section says "to be announced" (`coverage.hours.value`).
-- Social links: the footer's Instagram and Telegram list is hidden until the handles exist (see the TODO in `index.html`); the copy is kept.
-- Domain: not chosen; once it is, set `VITE_SITE_URL` (see Deploy).
-- Final van art: the current van is a placeholder.
-- Uzbek `ʻ` glyph: Nunito's `ʻ` (U+02BB) has a wide advance, so headlines such as "qoʻngʻiroq" look gappy. Not a defect; keep it (orthographically correct), switch to the ASCII `'`, or pick a narrower display font.
-- Launch date: `LAUNCH_DATE` is empty.
+- The real car: the art in `public/car/` is the v1 placeholder van, until the Figma file arrives (see "Swap the car").
+- Domain: not chosen; once it is, set `VITE_SITE_URL` (see Deploy), which also makes the `hreflang` links absolute (Lighthouse SEO flags them as relative until then).
+- Legal texts: the footer has only the © line for now.

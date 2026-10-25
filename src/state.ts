@@ -1,4 +1,4 @@
-import { HOOK, LAUNCH_DATE, MODE, PHONE, PHONE_DISPLAY, PHONE_TEL } from './config';
+import { MODE, PHONE_TEL } from './config';
 import { t } from './i18n';
 
 /** Sets the text and tags the element with its key, so a later applyI18n keeps it in sync. */
@@ -7,7 +7,7 @@ function setCopy(el: HTMLElement, key: string): void {
   el.textContent = t(key);
 }
 
-/** Turns a call-to-action into an inert span (in place if it already is one). */
+/** Turns a call button into an inert span (in place if it already is one). */
 function disableCta(el: HTMLElement, key: string): void {
   let span = el;
   if (el.localName !== 'span') {
@@ -21,10 +21,14 @@ function disableCta(el: HTMLElement, key: string): void {
   setCopy(span, key);
 }
 
-/** Applies the campaign mode (`MODE`) to every CTA and state note under `root`. */
+/**
+ * Applies the campaign mode (`MODE`) under `root`. Live: every call button (`[data-cta]`) and the
+ * number in the copy (`[data-tel]`) dial `PHONE`. Otherwise the buttons become inert "soon" /
+ * "ended" pills, and the number in the copy stays as text but is no longer a link.
+ */
 export function applyMode(root: ParentNode): void {
   if (MODE === 'live') {
-    for (const link of root.querySelectorAll<HTMLAnchorElement>('a[data-cta]')) {
+    for (const link of root.querySelectorAll<HTMLAnchorElement>('a[data-cta], a[data-tel]')) {
       link.setAttribute('href', PHONE_TEL);
     }
     return;
@@ -33,31 +37,7 @@ export function applyMode(root: ParentNode): void {
   for (const el of root.querySelectorAll<HTMLElement>('[data-cta]')) {
     disableCta(el, `state.${MODE}.cta`);
   }
-  // Only the teaser has a variant for "launch date not announced yet".
-  const noteKey =
-    MODE === 'teaser' && !LAUNCH_DATE ? 'state.teaser.note.nodate' : `state.${MODE}.note`;
-  for (const el of root.querySelectorAll<HTMLElement>('[data-state-note]')) {
-    setCopy(el, noteKey);
-  }
-}
-
-/**
- * Shows the real number only while the line is live and the dial number differs from the campaign
- * hook (a number next to an inert "coming soon" or "ended" pill would make no sense): the "or
- * {phone}" hint by every call (hero, phone bar, desktop header pill, the call under the steps) and
- * the dispatcher's desk line in the call scene, whose label is its own data-i18n copy. The one
- * switch for all of them: a desktop visitor cannot tap `tel:`, so they need a number to read.
- */
-export function applyPhoneHint(root: ParentNode): void {
-  const show = MODE === 'live' && PHONE !== HOOK;
-  for (const el of root.querySelectorAll<HTMLElement>('[data-phone-hint]')) {
-    el.toggleAttribute('hidden', !show);
-    if (show) setCopy(el, 'cta.or');
-  }
-  for (const el of root.querySelectorAll<HTMLElement>('[data-phone-line]')) {
-    el.toggleAttribute('hidden', !show);
-  }
-  for (const el of root.querySelectorAll<HTMLElement>('[data-phone-number]')) {
-    el.textContent = show ? PHONE_DISPLAY : '';
+  for (const el of root.querySelectorAll<HTMLElement>('[data-tel]')) {
+    el.removeAttribute('href');
   }
 }

@@ -1,27 +1,24 @@
-/* Design tokens. Colors per spec section 5.2; spacing is an 8-pt grid (section 5.4). */
+/* Design tokens, from the Chococream brand kit (brand/design-system/tokens). */
 :root {
   /* Brand */
-  --red: #e2231a;
-  --red-deep: #b5120b;
-  --cream: #fff6ec;
-  --choco: #3e1f0e;
-  --choco-soft: #6b4328;
-  --hazel: #c98a4b;
+  --red-700: #a31219;
+  --red-600: #c71920;
+  --red-500: #da3038;
+  --brown-900: #2e140d;
+  --brown-700: #4a2418;
+  --cream: #f7ede0;
   --white: #ffffff;
 
-  /* Scene skies, chrome and "outside the city" */
-  --sky-dawn-top: #ffb86b;
-  --sky-dawn-bottom: #ffe2b8;
-  --sky-day-top: #8fd3ff;
-  /* Road sky top on its way from dawn to day (scroll/timeline.ts): pale but never grey. */
-  --sky-sunrise-top: #ffd9a8;
-  --sky-morning-top: #cfeaff;
-  --sky-day-bottom: #e6f6ff;
-  --night: #1e1b2e;
-  --grey-out: #d9d4cc;
+  /* The campaign teaser's field: brand red, lit in the middle, darker toward the edges. */
+  --poster-bg: radial-gradient(
+    ellipse 75% 70% at 50% 50%,
+    var(--red-500) 0%,
+    var(--red-600) 55%,
+    var(--red-700) 100%
+  );
 
-  /* Type */
-  --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Type. Baloo 2 has no Cyrillic: Russian headlines fall through to Nunito, glyph by glyph. */
+  --font-display: 'Baloo 2', 'Nunito', 'Arial Rounded MT Bold', sans-serif;
   --font-body:
     -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, 'Segoe UI', Roboto, sans-serif;
 
@@ -30,15 +27,11 @@
   --s2: 16px;
   --s3: 24px;
   --s4: 32px;
-  --s5: 40px;
   --s6: 48px;
-  --s7: 56px;
   --s8: 64px;
-  --s9: 72px;
-  --s10: 80px;
+  --s12: 96px;
 
-  /* Radii */
-  --r-s: 8px;
-  --r-m: 16px;
-  --r-l: 28px;
+  /* Motion (brand kit): a gentle overshoot for entrances, a plain ease for fades. */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.25, 0.8, 0.5, 1);
 }

@@ -10,7 +10,9 @@
 - **Brand:** Chococream (official spelling; user sometimes types "Chocoream") — Uzbek chocolate-hazelnut spread, 20th anniversary.
 - **Purpose:** a landing page for a **new PR activation**. "Chocobulance" is the project/campaign
   codename (folder name and GitHub repo name).
-- **Status (2026-10-20):** v1 built on `main` (see §7 "What was built" and §8), reviewed, not pushed,
+- **Status (2026-10-25):** **v2 built on `main`** (§7 "What was built (v2)", §8): one long red page in
+  the style of the campaign teaser, the user's words in order, the car driving across between them.
+  Placeholder car (the v1 van) until the user's **Figma car** arrives. Not pushed since v1 (2026-10-21),
   not deployed. Open items in §6b and the README.
 
 ## 2. Rules set by the user
@@ -30,7 +32,7 @@
 | GitHub | `origin` → `https://github.com/reclofounder/yebqoydi-chocobulance.git` (public since 2026-10-21). |
 | Railway | CLI installed via Homebrew, logged in to the client's Railway account, workspace **"Haysam AI School"**. **No Railway project yet** — create a NEW one for this site. Do **not** touch the existing project "Haysam Landing Page Live". **Nothing has been deployed.** |
 | Deploy target | Railway (user's choice). Vercel plugin hooks appear in sessions; ignore them unless the user asks. |
-| Stack (decided) | Vite 8 + TypeScript (strict) + GSAP 3.15 (ScrollTrigger) + Lenis + `@fontsource/nunito`. Static output in `dist/`, served by `serve` (`npm start`, listens on `$PORT`, default 3000). Node 22 (`.nvmrc`), `engines.node` >=20.19. Tests: Vitest + jsdom. |
+| Stack (decided) | Vite 8 + TypeScript (strict) + GSAP 3.15 (ScrollTrigger) + Lenis + `@fontsource/baloo-2` (headlines) + `@fontsource/nunito` (Cyrillic fallback only). Static output in `dist/`, served by `serve` (`npm start`, listens on `$PORT`, default 3000). Node 22 (`.nvmrc`), `engines.node` >=20.19. Tests: Vitest + jsdom. |
 | Railway config | `railway.json`: Railpack builder, build `npm run build`, start `npm start`. `PORT` comes from Railway. Optional variable `RAILPACK_NODE_VERSION=22`. Railway's docs mark config-as-code deprecated (legacy files honoured until 2026-12-01); if the file stops applying, set the same two commands in the service settings. |
 | Preview config | `.claude/launch.json` (committed): `chocobulance-preview` (`vite preview`, 4173), `chocobulance-dev` (5173), `chocobulance-preview-4174`. Run `npm run build` first for the preview ones. |
 
@@ -108,24 +110,34 @@ Notes:
 | Topic | Decision |
 | --- | --- |
 | Mechanic | **Hotline only.** No Uklon integration on the site. |
-| Phone number | Real number is not ready. **`105` stays as the campaign hook** (`HOOK`) in copy, art and headlines; the dial target is `PHONE` / `PHONE_DISPLAY` in `src/config.ts` (placeholder `105`). ⚠️ **REMINDER: ask the user for the final working number before launch**, then set `PHONE` and `PHONE_DISPLAY` only — the `tel:` links, the "yoki {phone}" hints and the dispatcher line follow automatically. |
+| Phone number | **Superseded 2026-10-25:** the number is **71 209 99 00** (`PHONE = '+998712099900'`, `PHONE_DISPLAY` with no-break spaces, `src/config.ts`). **105 is dropped everywhere** (no `HOOK` any more). |
 | Site purpose | **Information only, for end users:** what Chocobulance is and how to call. No order form, no payment online. |
 | Coverage | **Tashkent city only.** Say clearly that addresses outside the city may not be served. |
-| Price | **99 000 UZS**, paid by the customer **when the service is completed** (on delivery). |
+| Price | **99 000 UZS** per tub, paid by the customer **when the service is completed** (on delivery). **Call-out is free** (2026-10-25). |
 | Design direction | "Super cool" animated **parallax** landing page: the **Chocobulance van moves with scroll, wheels animate**. Scroll-driven storytelling. Still must respect Apple HIG rules (clarity, restraint, reduced-motion fallback). |
 | Process | User wants **design references first**, then a design discussion, then build. |
+| **New direction (2026-10-25)** | Supersedes the v1 illustrated scenes. **One long red background** (the campaign teaser's radial red), **only the user's words** on it in their chronology, **nothing else added**, and **the real Chocobulance car** (from the user's Figma) driving **right to left, then left to right** across the page as you scroll. Hero: "Yebqoʻydingizmi?" on a **gentle arc**. Footer legal: **only the © line** for now. Headline font: Baloo 2 (closest to the teaser's lettering). |
 | Production approach (2026-10-20) | **Code only, no AI-generated video.** scroll-world is installed but rejected for this project (cost, and the final van visual is not ready so renders would be redone). Build the world in SVG/CSS/JS with scroll-driven motion. **The van must be a swappable component** (placeholder now, final art later, same anchor points for body/wheels/shadow). Creative but cheap. |
 
 ### 6b. Still open
 
 - Languages: Uzbek (Latin) is the base. Russian version? (Tashkent audience is bilingual.)
-- Brand assets: real logo, brand font, product packshots, and a **usable van image** (cut-out
-  or illustrated van with separable wheels is needed for the scroll animation). Current van
-  visuals are AI renders in `brief/key-visuals/`.
+- Brand assets: **logo lockup and display font received 2026-10-22** (§7 "Brand kit"). Still
+  missing: product packshots, a **usable van image** (cut-out or illustrated van with separable
+  wheels is needed for the scroll animation; current van visuals are AI renders in
+  `brief/key-visuals/`), a licensed (non-demo) Mochipop file, and a decision on headlines the
+  demo font cannot set (Cyrillic, the Uzbek ʻ/ʼ marks).
+- ~~Restyle the site to the brand kit?~~ Settled 2026-10-25 by the new direction (§6a): brand red
+  `#C71920` with the teaser's radial light, Baloo 2 headlines (not Mochipop: no Cyrillic, no ʻ), system
+  body font, the on-red logo in the header. The 2026-10-23 mockup artifact is obsolete.
 - Service hours and days.
 - Social links (Instagram / Telegram) for the UGC loop.
 - Domain name.
-- Final phone number (see reminder above).
+- **The real car from Figma** (user will send): needs both side views if it has lettering, wheels as
+  separate layers if they should spin (README "Swap the car").
+- Hero spelling: one word "Yebqoʻydingizmi?" as the user wrote it; the teaser had "yeb qoʻydilar" as two words.
+- Legal texts for the footer (only © for now).
+- Phone hero size: on a 390 px phone the arched headline is about 42 px (a 16-letter word on one arc).
 - **Before deploy (from the final review):** add `public/serve.json` with `{"directoryListing": false}` (plain `serve` lists `/assets/`); set `VITE_SITE_URL` on Railway and rebuild so og/hreflang are absolute; smoke list in README; check Telegram/X link previews; optional: a designed share card instead of the hero screenshot.
 
 ## 7. Brief and content (received 2026-10-19)
@@ -148,6 +160,60 @@ Sources in repo root (do not commit the 8.5 MB HTML as-is; decide on `.gitignore
 - Visual world: Chococream red, white, chocolate brown, hazelnuts; red oval tub with red lid;
   rounded bold display type in the decks; medical/ambulance cues (red cross-like mark, white
   uniform with brown trim, "SHOKOLAD DOCTOR" badge, red-striped white van, red cooler bag).
+
+### Brand kit (received 2026-10-22)
+
+The user exported a **Chococream design system** from Claude Design (built from the official logo
+SVG, the display font and a pasted brand brief) and dropped two files into the project root:
+`Chococream Design System.zip` (git-ignored by `*.zip`; **unpacked to `brand/design-system/`**,
+untracked until committed) and `Chococream Logo Lockup.html` (a self-contained Claude Design bundle
+of the "Logo Lockup" guideline card: the two logo PNGs on white, red and brown; nothing the zip does
+not already contain). Read `brand/design-system/readme.md` first; tokens in `tokens/*.css`;
+`SKILL.md` makes it a `/chococream-design` skill if copied to `.claude/skills/chococream-design/`.
+
+What is in it:
+- **Logo:** `assets/logo.svg` (vector, 783×178 viewBox, 35 paths) is the **"Chococream 20 yoshda"**
+  anniversary lockup: white rounded letters with a chocolate-brown outline on a red rounded field,
+  "20" plus a small "yoshda" tag. `assets/logo.png` is that render; `assets/logo-on-red.png` is the
+  variant for red backgrounds (white letters, brown outline, brown swoosh under the "20", no field).
+  ⚠️ **The SVG has lost its colours:** its paths use classes `cls-1`…`cls-8` but the file has no
+  `<style>` block, so every path renders black. Restore the fills (map the classes against the PNG)
+  before using the SVG on the web; also strip the 8 KB C2PA `<metadata>` block. `uploads/` holds
+  byte-identical copies of the four source files.
+- **Display font:** `assets/fonts/MochibopBold-Demo.ttf` (internal name "MochibopBold Demo"; the
+  brief calls it "Mochipop Bold Demo" and the CSS `@font-face` uses that name). Rounded, soft,
+  childlike; this is the typeface of the logo. ⚠️ **Demo cut, 172 glyphs:** Basic Latin, digits,
+  most Latin-1, `'` and `’`, `«`; **no Cyrillic, no ʻ (U+02BB) / ʼ (U+02BC), no »**, no em dash. It
+  cannot set the Russian page or the current Uzbek headlines (qoʻngʻiroq) without a fallback font
+  for those glyphs; a licensed full cut is also a launch question.
+- **Body font:** Inter (Google Fonts import in `tokens/typography.css`).
+- **Colour tokens** (`tokens/colors.css`): red 700/600/500/100 = `#A31219` / **`#C71920`** /
+  `#DA3038` / `#F7DBDC`; brown 900/700/500 = `#2E140D` / `#4A2418` / `#6B3A28`; cream `#F7EDE0`,
+  beige `#E3CFAE`, warm gray `#8A7B6E`, white, black `#1A0F0B`. Semantic: page = cream, card = white,
+  brand surface = red-600, text = brown-900, muted = warm gray, border = beige, focus = red-500.
+- **Type scale:** display xl/lg/md `clamp(48px,6vw,96px)` / `clamp(36px,4.5vw,64px)` /
+  `clamp(28px,3vw,40px)`, body 20/16/14, caption 12; leading 1.05 display, 1.5 body.
+- **Spacing** 4-px base (4…96); **radii** 8 / 16 / 28 / pill; **shadows** warm brown-tinted
+  `--shadow-card`, red-tinted `--shadow-pop`; **motion** `--ease-bounce` (overshoot) for
+  interactions, `--ease-soft` for fades, 150 / 250 ms.
+- **Components:** React `Button` (pill; primary red, secondary brown, ghost outline; press scales
+  to 0.96), `Badge`, `Card` (white, radius 28, eyebrow + display title + muted line).
+- **Rules from the brief:** two dominant colours per composition; white headlines on red; sentence
+  case, no emoji; voice playful, warm, nostalgic, "a memory, not a command"; logo in a corner or
+  free space, never recoloured or reproportioned; flat red fields or warm family photography as
+  backgrounds, **no gradients, no textures, no illustrated backgrounds; animation minimal, no
+  parallax, no spinning or looping decoration.** The last two rules were written for packaging and
+  social, before this site existed; they contradict the scroll-driven illustrated story the user
+  approved in §6a. Treat the kit as the source for colour, type, logo and components, and raise the
+  motion / background conflict with the user before restyling.
+
+How the kit maps onto the current build (`src/styles/tokens.css`): the site's `--red #E2231A` is
+brighter and more orange than brand red-600 `#C71920`; `--choco #3E1F0E` sits between brown-900 and
+brown-700; `--cream #FFF6EC` is pinker than cream-100 `#F7EDE0`; radii already match (8/16/28); the
+8-pt spacing grid is a subset of the 4-px scale; the CTA is already pill-like (radius 28, 56 px
+high). Headlines are Nunito 800/900 everywhere (`layout.css`, `scenes.css`); the header shows a text
+wordmark, no logo anywhere yet. The hero eyebrow already reads "Chococream 20 yoshda", the lockup's
+own line.
 
 ### Background: previous campaign "Yeb qo'ydi"
 Insight: kids' Chococream often disappears because a parent / sibling / grandma ate it.
@@ -232,6 +298,28 @@ convention (README); the call bar (phones) and header pill (desktop) take over f
 button as its top edge reaches the header, and step aside while the call under the steps is fully
 on screen.
 
+### What was built (v2, 2026-10-25)
+
+Replaces the v1 scenes (still in git history before this commit). One long red page:
+`body::before` paints the teaser's radial red (`--poster-bg`, brand red `#C71920` lit to `#DA3038` in
+the middle, `#A31219` at the edges) once, fixed. On it, white:
+
+1. Hero: "Yebqoʻydingizmi?" / «Всё съели?» on a gentle arc (SVG `textPath` in `h1`, real words beside it
+   visually hidden). 2. "Endi kichkintoyni tezlik bilan ovutish kerak". 3. "Telefoningizni oling,
+   [71 209 99 00] raqamiga qoʻngʻiroq qiling" (the number a white pill, `tel:`). 4. "Chocobulance
+   uyingiz eshigida" with the car parking under it. 5. Qanday ishlaydi? (3 steps). 6. Chaqirish bepul /
+   Shokolad pastasi — 99 000 soʻm / dona. 7. Xizmat faqat Toshkent shahri ichida. Footer: © line only.
+   Header: Chococream 20 logo (on-red PNG), call pill (icon only on phones), UZ/RU.
+
+The car: lanes between the blocks (`data-lane`: enter, ltr, arrive, ltr, rtl), one ScrollTrigger each
+(`src/scroll/car.ts`), writing only `transform`; wheels spin with the distance. Blocks are at least a
+screen tall so only one car is ever on screen. Placeholder art in `public/car/` (the v1 van converted
+to standalone SVGs, left and right views). Reduced motion: lanes hidden except the door, car parked.
+Removed: `src/scenes/`, `src/van/`, `timeline.ts`, `reduced.ts`, FAQ, coverage map, sticky bar, 105.
+Quality: 91 tests, typecheck and build clean; Lighthouse mobile performance 99, accessibility 100,
+best practices 100, CLS 0, about 110 kB (uz) / 118 kB (ru); SEO 83 only for relative hreflang
+(fixed by `VITE_SITE_URL` at deploy).
+
 ## 8. Session log
 
 - **2026-10-15** — User created private GitHub repo and connected `origin`. Installed Railway CLI
@@ -302,3 +390,31 @@ on screen.
   `5a50b3a`) to the public repo and set upstream. Pre-push audit: no PDFs, no brief HTML, no
   handoff bundle, no secrets in the tracked tree. Next: collaborator forks and continues; the
   client sets the real phone number, hours, social links and domain; then deploy on Railway.
+- **2026-10-22 (brand kit)** — Fresh session: re-read the whole repo (docs, brief, spec, plan,
+  reviews, source, styles, tests layout) for context. User added `Chococream Design System.zip` and
+  `Chococream Logo Lockup.html` from their Claude Design brand system. Unpacked the zip to
+  `brand/design-system/` (untracked, not committed) and documented it in §7 "Brand kit": official
+  "Chococream 20 yoshda" lockup (SVG has lost its colours, PNGs fine), Mochipop Bold **demo** font
+  (Latin only: no Cyrillic, no ʻ/ʼ), Inter body, brand red `#C71920`, warm neutrals, 4-px spacing,
+  28-px radius, pill buttons, and brand rules that forbid parallax and illustrated backgrounds.
+  Site not restyled yet; the conflicts to decide are listed in §6b. claude-mem observer is signed
+  out (needs `/login`), so only CLAUDE.md and the native memory file record this session.
+- **2026-10-23 (brand mockup)** — User ran `claude auth login` from the terminal tab; claude-mem saves
+  again. Then asked for a Design-artifact mockup of the landing restyled to the brand kit:
+  https://claude.ai/artifact/KyReJViwrXSeUSkRiG4NqL (six artboards: hero 1440 + 390, kitchen, road,
+  how it works, coverage; sources in the session scratchpad, not in the repo). Choices shown there:
+  hero and road on flat brand red `#C71920` with white Mochipop headlines and a white call pill;
+  kitchen on white, steps and coverage on cream `#F7EDE0` with white radius-28 cards; the existing
+  scene SVGs re-coloured through the token map (sky gradients flattened, hazel/skin to beige,
+  blue accents to white/beige); van kept white with a **chocolate roof** and red stripe (a red roof
+  vanished on red); Mochipop headlines use ‘ / ’ instead of ʻ / ʼ (glyphs missing); Inter for body
+  and buttons; secondary text brown-500 because the kit's warm gray is 4.1:1 on white. Next: user
+  reviews the canvas, then either apply to code (tokens, fonts, logo in header, flat skies) or revise.
+- **2026-10-25 (v2: the red page)** — User sent the campaign teaser (white rounded "Dadam yeb qoʻydilar" on
+  a radial red) and the new chronology, with the real number **71 209 99 00**. Decided: arched hero,
+  105 dropped everywhere, footer legal = © only. A plan mixing posters with the illustrated scenes was
+  rejected: the user wants **one long red background, only their words, nothing else, and their real
+  car (Figma) driving right-to-left / left-to-right on scroll**. Built it (§7 "What was built (v2)"):
+  Baloo 2 headlines (matched to the teaser in the browser), placeholder car until the Figma file arrives.
+  Committed on `main`, not pushed, not deployed. Next: user reviews; swap in the Figma car (README
+  "Swap the car"), redo `og.png`.

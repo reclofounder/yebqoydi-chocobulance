@@ -1,4 +1,4 @@
-// Static contract of index.html: the hooks the i18n engine, the scenes and the scroll timeline rely on.
+// Static contract of index.html: the hooks the i18n engine, the campaign mode and the cars rely on.
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import uz from '../src/i18n/uz.json';
@@ -11,11 +11,11 @@ const doc = new DOMParser().parseFromString(html, 'text/html');
 
 describe('index.html markup', () => {
   it('has the required ids, attributes and sections', () => {
-    expect(html).toContain('data-scene="road"');
-    expect(html).toContain('id="sticky-cta"');
-    expect(html).toContain('data-lang="ru"');
     expect(html).toContain('<html lang="uz"');
-    expect(html.match(/<details/g)).toHaveLength(5);
+    expect(html).toContain('data-lang="ru"');
+    for (const id of ['header', 'main', 'top', 'how', 'price', 'area']) {
+      expect(doc.getElementById(id), id).not.toBeNull();
+    }
   });
 
   it('ships hidden until main.ts has built the page, so no empty shell is painted and shifted', () => {
@@ -42,19 +42,13 @@ describe('index.html markup', () => {
     expect(base).toMatch(/@keyframes boot-reveal\s*\{\s*to\s*\{\s*visibility:\s*visible/);
   });
 
-  it('preloads the Latin Nunito weights for everyone and the Cyrillic ones only for Russian', () => {
+  it('preloads the Latin headline font for everyone and the Cyrillic one only for Russian', () => {
     const preload = (rel: string) =>
       [...doc.querySelectorAll<HTMLLinkElement>(`link[rel="${rel}"]`)].map((l) =>
         l.getAttribute('href')!.replace(/^.*\//, ''),
       );
-    expect(preload('preload')).toEqual([
-      'nunito-latin-800-normal.woff2',
-      'nunito-latin-900-normal.woff2',
-    ]);
-    expect(preload('x-preload-ru')).toEqual([
-      'nunito-cyrillic-800-normal.woff2',
-      'nunito-cyrillic-900-normal.woff2',
-    ]);
+    expect(preload('preload')).toEqual(['baloo-2-latin-800-normal.woff2']);
+    expect(preload('x-preload-ru')).toEqual(['nunito-cyrillic-900-normal.woff2']);
     // Fonts are fetched anonymously (CORS mode) even from the same origin: without `crossorigin`
     // the preloaded copy is not reused and the font downloads twice.
     for (const link of doc.querySelectorAll('link[as="font"]')) {
@@ -80,135 +74,131 @@ describe('index.html markup', () => {
     });
 
     it('leaves them inert for the default language', () => {
-      expect(run('/', null)).toEqual(['x-preload-ru', 'x-preload-ru']);
-      expect(run('/?lang=uz', 'ru')).toEqual(['x-preload-ru', 'x-preload-ru']);
+      expect(run('/', null)).toEqual(['x-preload-ru']);
+      expect(run('/?lang=uz', 'ru')).toEqual(['x-preload-ru']);
     });
 
     it('promotes them for ?lang=ru and for a stored Russian choice, as getLang() decides', () => {
-      expect(run('/?lang=ru', null)).toEqual(['preload', 'preload']);
-      expect(run('/', 'ru')).toEqual(['preload', 'preload']);
+      expect(run('/?lang=ru', null)).toEqual(['preload']);
+      expect(run('/', 'ru')).toEqual(['preload']);
     });
 
     it('survives storage that throws', () => {
       vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
         throw new Error('denied');
       });
-      expect(run('/', null)).toEqual(['x-preload-ru', 'x-preload-ru']);
+      expect(run('/', null)).toEqual(['x-preload-ru']);
       vi.restoreAllMocks();
     });
   });
 
-  it('never writes the hook or the price as literal copy', () => {
-    // The hook is {hook} and the price {price} in the JSON; only attributes (tel:105) may carry them.
-    expect(html).not.toMatch(/>\s*105\s*</);
+  it('never writes the number or the price as literal copy, and has no trace of the old 105', () => {
+    // The number is {phone} and the price {price} in the JSON; only tel: links carry the number.
     const text = doc.body.textContent ?? '';
-    expect(text).not.toMatch(/105/);
+    expect(text).not.toMatch(/71[\s ]?209/);
     expect(text).not.toMatch(/99[\s ]?000/);
+    expect(html).not.toMatch(/(?<![\d.])105(?![\d.])/);
   });
 
-  it('declares the five pinned scenes, each with copy and an empty stage', () => {
-    const scenes = [...doc.querySelectorAll<HTMLElement>('section.scene')];
-    expect(scenes.map((s) => s.dataset.scene)).toEqual(['hero', 'kitchen', 'call', 'road', 'door']);
-    for (const scene of scenes) {
-      expect(scene.querySelector(':scope > .scene__copy')).not.toBeNull();
-      const stage = scene.querySelector(':scope > .scene__stage[data-stage]');
-      expect(stage).not.toBeNull();
-      expect(stage!.childElementCount).toBe(0);
-    }
+  it('tells the story in order: the arched question, three steps, then the facts', () => {
+    const titles = [...doc.querySelectorAll<HTMLElement>('main h1, main h2')].map(
+      (h) => h.querySelector('[data-i18n]')?.getAttribute('data-i18n') ?? h.dataset.i18n,
+    );
+    expect(titles).toEqual([
+      'hero.title',
+      'soothe.title',
+      'call.before',
+      'door.title',
+      'how.title',
+      'price.free',
+      'area.title',
+    ]);
+    expect(doc.querySelector('#price [data-i18n="price.tub"]')).not.toBeNull();
+    expect(
+      [...doc.querySelectorAll('#how ol.steps > li')].map((li) => li.getAttribute('data-i18n')),
+    ).toEqual(['how.1', 'how.2', 'how.3']);
   });
 
-  it('gives the hero its split headline, numeral, actions, note and phone hint', () => {
-    const hero = doc.querySelector('#hero')!;
-    expect(hero.querySelector('h1 > [data-i18n="hero.title"]')).not.toBeNull();
-    expect(hero.querySelector('h1 > [data-i18n="hero.title2"]')).not.toBeNull();
-    expect(hero.querySelector('.hero__numeral[data-i18n="hero.numeral"]')).not.toBeNull();
-    expect(hero.querySelector('a.cta[data-cta][data-i18n="hero.cta"]')).not.toBeNull();
-    expect(hero.querySelector('a.cta--ghost[href="#how"]')).not.toBeNull();
-    expect(hero.querySelector('p.note[data-i18n="hero.note"][data-state-note]')).not.toBeNull();
-    expect(hero.querySelector('p.phone-hint[data-phone-hint]')).not.toBeNull();
+  it('sets the hero on an arc: real words for readers, a hidden drawing of them on a path', () => {
+    const h1 = doc.querySelector('#top > h1#hero-title')!;
+    expect(doc.querySelectorAll('h1')).toHaveLength(1);
+    expect(h1.querySelector(':scope > .visually-hidden[data-i18n="hero.title"]')).not.toBeNull();
+    const svg = h1.querySelector(':scope > svg.hero__arc')!;
+    expect(svg.getAttribute('aria-hidden')).toBe('true');
+    const path = svg.querySelector('path#hero-arc')!;
+    const textPath = svg.querySelector('text > textPath')!;
+    expect(textPath.getAttribute('href')).toBe('#hero-arc');
+    expect(textPath.getAttribute('startOffset')).toBe('50%');
+    expect(textPath.getAttribute('text-anchor')).toBe('middle');
+    expect(textPath.getAttribute('data-i18n')).toBe('hero.title');
+    // A gentle arc: the middle lifts by less than a sixth of the width.
+    const [x0, y0, cx, cy, x1, y1] = path
+      .getAttribute('d')!
+      .match(/-?\d+(\.\d+)?/g)!
+      .map(Number);
+    expect(y0).toBe(y1);
+    expect(cx).toBe((x0 + x1) / 2);
+    expect((y0 - cy) / 2).toBeLessThan((x1 - x0) / 6);
   });
 
-  it('has a header with a brand link and both language buttons', () => {
-    const header = doc.querySelector('header#header')!;
-    expect(header.querySelector('a.brand')).not.toBeNull();
-    const langs = [...header.querySelectorAll<HTMLElement>('.lang button[data-lang]')];
+  it('dials the hotline from the header button and from the number in the call line', () => {
+    const calls = [...doc.querySelectorAll<HTMLAnchorElement>('a[href^="tel:"]')];
+    expect(calls).toHaveLength(2);
+    for (const a of calls) expect(a.getAttribute('href')).toBe('tel:+998712099900');
+
+    // applyMode() swaps the header button for a span that keeps only its class and data-cta.
+    const call = doc.querySelector('#header a.call[data-cta]')!;
+    expect(call.getAttribute('data-i18n-attr')).toBe('aria-label:a11y.call');
+    expect(call.querySelector('.call__label[data-i18n="header.call"]')).not.toBeNull();
+
+    const tel = doc.querySelector('#call-title > a.tel[data-tel]')!;
+    expect(tel.getAttribute('data-i18n')).toBe('call.number');
+  });
+
+  it('has a header with the logo, the call button and both language buttons', () => {
+    const inner = [...doc.querySelector('#header .header__inner')!.children];
+    expect(inner.map((el) => el.className)).toEqual(['brand', 'call', 'lang']);
+    const logo = doc.querySelector<HTMLImageElement>('a.brand[href="#top"] > img')!;
+    expect(logo.getAttribute('src')).toBe('/brand/chococream-20-on-red.png');
+    expect(logo.getAttribute('alt')).toBeTruthy();
+    // Declared size, so the header never shifts when the image arrives.
+    expect([logo.getAttribute('width'), logo.getAttribute('height')]).toEqual(['783', '179']);
+    const langs = [...doc.querySelectorAll<HTMLElement>('#header .lang button[data-lang]')];
     expect(langs.map((b) => b.dataset.lang)).toEqual(['uz', 'ru']);
   });
 
-  it('keeps every call-to-action a plain-text anchor the engine can swap for a pill', () => {
-    // applyMode() replaces a CTA by a span that keeps only class and data-cta.
-    const ctas = [...doc.querySelectorAll<HTMLElement>('[data-cta]')];
-    expect(ctas).toHaveLength(4);
-    for (const cta of ctas) {
-      expect(cta.localName).toBe('a');
-      expect(cta.childElementCount).toBe(0);
-      expect(cta.hasAttribute('id')).toBe(false);
-      expect(cta.hasAttribute('aria-label')).toBe(false);
-      expect(cta.getAttribute('href')).toBe('tel:105');
+  it('lays the lanes between the words, alternating, with the car parking at the door', () => {
+    const lanes = [...doc.querySelectorAll<HTMLElement>('[data-lane]')];
+    expect(lanes.map((l) => l.dataset.lane)).toEqual(['enter', 'ltr', 'arrive', 'ltr', 'rtl']);
+    expect(lanes[2].closest('section')!.querySelector('#door-title')).not.toBeNull();
+    for (const lane of lanes) {
+      expect(lane.getAttribute('aria-hidden')).toBe('true');
+      const car = lane.querySelector('[data-car]')!;
+      const body = car.querySelector('img.car__body')!;
+      // The car faces the way it drives: the right-facing art only in left-to-right lanes.
+      const facing = lane.dataset.lane === 'ltr' ? 'right' : 'left';
+      expect(body.getAttribute('src')).toBe(`/car/body-${facing}.svg`);
+      expect(car.querySelectorAll('img.car__wheel')).toHaveLength(2);
+      for (const img of car.querySelectorAll('img')) {
+        expect(img.getAttribute('alt')).toBe('');
+        expect(img.getAttribute('width')).toBeTruthy();
+        expect(img.getAttribute('height')).toBeTruthy();
+      }
     }
-    expect(doc.querySelector('#sticky-cta a.cta[data-cta][data-i18n="sticky.cta"]')).not.toBeNull();
   });
 
-  it('keeps a call action in reach after the hero: a header pill, and one under the steps', () => {
-    // Desktop has no sticky bar: the header carries a compact call pill, between brand and language.
-    // The real number's hint sits beside the pill (state.ts reveals it once PHONE differs from HOOK).
-    const inner = [...doc.querySelector('#header .header__inner')!.children];
-    expect(inner.map((el) => el.className)).toEqual([
-      'brand',
-      'cta cta--compact',
-      'phone-hint header__hint',
-      'lang',
-    ]);
-    expect(inner[1].matches('a[data-cta][data-i18n="sticky.cta"]')).toBe(true);
-    expect(inner[2].matches('span[data-phone-hint]')).toBe(true);
-    // "Dial 105" in step one, with something to tap right under the steps (every width), and the
-    // real number's hint under it.
-    const how = [...doc.querySelector('#how .container')!.children].slice(-3);
-    expect(how[0].matches('ol.steps')).toBe(true);
-    expect(how[1].matches('a.cta[data-cta][data-i18n="hero.cta"]')).toBe(true);
-    expect(how[2].matches('p.phone-hint[data-phone-hint]')).toBe(true);
+  it('ships the car art the lanes point at', () => {
+    for (const file of ['body-left.svg', 'body-right.svg', 'wheel.svg']) {
+      const svg = readFileSync(resolve(process.cwd(), 'public/car', file), 'utf8');
+      expect(svg, file).toMatch(/^<svg[^>]*viewBox=/);
+      // An <img> cannot see the page's custom properties: the art must carry its own colours.
+      expect(svg, file).not.toContain('var(--');
+    }
   });
 
-  it('starts the sticky bar hidden, with phone hints hidden until the engine reveals them', () => {
-    expect(doc.querySelector('#sticky-cta')!.getAttribute('data-visible')).toBe('false');
-    const hints = [...doc.querySelectorAll('[data-phone-hint]')];
-    expect(hints.map((h) => h.closest('[id]')!.id)).toEqual([
-      'header',
-      'hero',
-      'how',
-      'sticky-cta',
-    ]);
-    for (const hint of hints) expect(hint.hasAttribute('hidden')).toBe(true);
-  });
-
-  it('gives the dispatcher a desk line for the real number, hidden until the engine fills it', () => {
-    const line = doc.querySelector('#scene-call > .scene__overlay > p.dispatcher-line')!;
-    expect(line).not.toBeNull();
-    expect(line.matches('[data-phone-line][hidden]')).toBe(true);
-    expect(line.querySelector('[data-i18n="call.phone.label"]')).not.toBeNull();
-    const number = line.querySelector('[data-phone-number]')!;
-    expect(number.textContent).toBe('');
-  });
-
-  it('builds the static sections: three steps, coverage with a stage and price, five questions', () => {
-    expect(doc.querySelectorAll('#how article.step')).toHaveLength(3);
-    expect(doc.querySelector('#coverage [data-stage]')).not.toBeNull();
-    expect(doc.querySelector('#coverage [data-i18n="coverage.inside"]')).not.toBeNull();
-    expect(doc.querySelector('#coverage [data-i18n="coverage.outside"]')).not.toBeNull();
-    expect(doc.querySelector('#coverage [data-i18n="coverage.price"]')).not.toBeNull();
-    expect(doc.querySelectorAll('#faq details > summary')).toHaveLength(5);
-    expect(doc.querySelector('footer#footer')).not.toBeNull();
-  });
-
-  it('ships no dead social pills: the list stays hidden while a link has no handle', () => {
-    const list = doc.querySelector('#footer ul.footer__social')!;
-    const links = [...list.querySelectorAll('a')];
-    // The copy stays (footer.social.*) for the day the handles exist.
-    expect(links.map((a) => a.getAttribute('data-i18n'))).toEqual([
-      'footer.social.instagram',
-      'footer.social.telegram',
-    ]);
-    if (links.some((a) => !a.getAttribute('href'))) expect(list.hasAttribute('hidden')).toBe(true);
+  it('ends with the copyright line only', () => {
+    const footer = doc.querySelector('body > footer.footer')!;
+    expect([...footer.children].map((el) => el.getAttribute('data-i18n'))).toEqual(['footer.copy']);
   });
 
   it('only uses copy keys that exist in both dictionaries', () => {
@@ -217,7 +207,7 @@ describe('index.html markup', () => {
     for (const el of doc.querySelectorAll<HTMLElement>('[data-i18n-attr]')) {
       for (const pair of el.dataset.i18nAttr!.split(',')) keys.add(pair.split(':')[1].trim());
     }
-    expect(keys.size).toBeGreaterThan(50);
+    expect(keys.size).toBeGreaterThan(15);
     for (const key of keys) {
       expect(uz, `uz.json is missing "${key}"`).toHaveProperty([key]);
       expect(ru, `ru.json is missing "${key}"`).toHaveProperty([key]);
@@ -246,7 +236,7 @@ describe('index.html markup', () => {
 
     it('keeps the title and description in step with the language, and ships them in Uzbek for crawlers', () => {
       // Crawlers that do not run scripts (link previews) read the static values: they are the
-      // Uzbek copy with the hook and price filled in, and the engine swaps them for the visitor.
+      // Uzbek copy with the number and price filled in, and the engine swaps them for the visitor.
       const pairs = [
         ['meta[property="og:title"]', 'meta.title'],
         ['meta[name="twitter:title"]', 'meta.title'],

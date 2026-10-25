@@ -1,15 +1,13 @@
-// Boot wiring: copy and campaign mode on load; the scroll story once fonts are in; language buttons
-// afterwards (they also re-measure the story, since copy length changes scene heights).
+// Boot wiring: copy and campaign mode on load; the motion once fonts are in; language buttons
+// afterwards (they also re-measure the lanes, since the copy's length moves them).
 const story = vi.hoisted(() => ({ init: vi.fn(), refresh: vi.fn() }));
 
 vi.doMock('../src/config', () => ({
-  HOOK: '105',
-  PHONE: '+998901234567',
-  PHONE_DISPLAY: '+998901234567',
-  PHONE_TEL: 'tel:+998901234567',
+  PHONE: '+998712099900',
+  PHONE_DISPLAY: '71 209 99 00',
+  PHONE_TEL: 'tel:+998712099900',
   PRICE: '99 000',
   MODE: 'teaser',
-  LAUNCH_DATE: '',
 }));
 vi.doMock('../src/scroll/motion', () => ({
   initScroll: story.init,
@@ -20,9 +18,9 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   document.body.innerHTML = `
     <button data-lang="uz">UZ</button>
     <button data-lang="ru"><span>RU</span></button>
-    <a class="cta" data-cta data-i18n="hero.cta" href="tel:105"></a>
-    <p data-state-note></p>
-    <p data-phone-hint hidden></p>`;
+    <a class="call" data-cta href="tel:+998712099900"></a>
+    <a class="tel" data-tel data-i18n="call.number" href="tel:+998712099900"></a>
+    <h2 data-i18n="hero.title"></h2>`;
   const text = (selector: string) => document.querySelector(selector)!.textContent;
   let fontsReady!: () => void;
   Object.defineProperty(document, 'fonts', {
@@ -37,12 +35,12 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   expect(document.documentElement.hasAttribute('data-booting')).toBe(false);
   expect(document.documentElement.lang).toBe('uz');
   expect(text('[data-cta]')).toBe('Tez orada');
-  expect(text('[data-state-note]')).toBe(
-    'Liniya tez orada ochiladi. Hozircha Chococreamʼni yashirib qoʻying.',
-  );
-  expect(document.querySelector('[data-phone-hint]')!.hasAttribute('hidden')).toBe(true);
+  expect(text('h2')).toBe('Yebqoʻydingizmi?');
+  // Teaser: the number in the copy stays readable, but is not a link yet.
+  expect(text('[data-tel]')).toBe('71 209 99 00');
+  expect(document.querySelector('[data-tel]')!.hasAttribute('href')).toBe(false);
 
-  // The story is measured with its final fonts, so it starts only once they are in.
+  // The lanes are measured with the final fonts, so the motion starts only once they are in.
   expect(story.init).not.toHaveBeenCalled();
   fontsReady();
   await Promise.resolve();
@@ -54,9 +52,7 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   expect(document.documentElement.lang).toBe('ru');
   expect(localStorage.getItem('lang')).toBe('ru');
   expect(text('[data-cta]')).toBe('Скоро');
-  expect(text('[data-state-note]')).toBe(
-    'Линия откроется совсем скоро. А пока спрячьте Chococream.',
-  );
+  expect(text('h2')).toBe('Всё съели?');
   // Re-measured at once, and again once the new script's font subset (Cyrillic) is in.
   expect(story.refresh).toHaveBeenCalledTimes(1);
   await Promise.resolve();
@@ -76,7 +72,6 @@ test('the page is revealed even if a boot step throws, never left blank', async 
     applyMode: () => {
       throw new Error('boom');
     },
-    applyPhoneHint: vi.fn(),
   }));
   document.documentElement.setAttribute('data-booting', '');
 

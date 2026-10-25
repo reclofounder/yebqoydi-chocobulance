@@ -1,97 +1,67 @@
+import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { REDUCED_MOTION, initReduced, setFlag } from './reduced';
-import { fragmentTarget } from './smooth';
-import { initTimeline } from './timeline';
+import { initCars } from './car';
+import { initSmoothScroll } from './smooth';
+
+gsap.registerPlugin(ScrollTrigger);
+
+export const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+/** Scroll distance (px) past which the header turns into its frosted bar. */
+export const HEADER_OFFSET = 40;
 
 export function prefersReducedMotion(): boolean {
   return window.matchMedia(REDUCED_MOTION).matches;
 }
 
-/** Undoes the running `watchInlineCta`, so starting the story again leaves one watch, not two. */
-let stopInlineCta: (() => void) | undefined;
-
-/**
- * While the call under the steps is wholly on screen, the phone bar and the desktop header pill
- * step aside (`data-inline-cta` on both), so there is never a second red call button up. Wholly:
- * the root is the viewport less the header at the top and the bar at the bottom, and the call must
- * be entirely inside it (threshold 1). A call with one px showing, or half hidden under the bar,
- * is nothing to tap, and the bar must stay up for that stretch. Watched by position on the page,
- * not by the story, so it holds with pins and still frames alike. The bar's height is 0 on
- * desktop, so the margins are measured again when the screen is resized (a tablet turned past the
- * 900 px breakpoint); the observer is only rebuilt if they changed.
- */
-function watchInlineCta(): void {
-  stopInlineCta?.();
-  stopInlineCta = undefined;
-
-  const cta = document.querySelector('#how [data-cta]');
+/** Keeps the header's `data-scrolled` (its frosted bar, layout.css) in step with the page scroll. */
+function watchHeader(): void {
   const header = document.getElementById('header');
-  const sticky = document.getElementById('sticky-cta');
-  if (!cta || typeof IntersectionObserver === 'undefined') return;
-
-  let observer: IntersectionObserver | undefined;
-  let margin = '';
-  const observe = () => {
-    const inset = (el: HTMLElement | null) => (el?.offsetHeight ? `-${el.offsetHeight}px` : '0px');
-    const next = `${inset(header)} 0px ${inset(sticky)} 0px`;
-    if (next === margin) return;
-    margin = next;
-    observer?.disconnect();
-    observer = new IntersectionObserver(
-      (entries) => {
-        // Any overlap is "intersecting"; only the ratio says the call is clear of both.
-        const wholly = entries[entries.length - 1].intersectionRatio >= 1;
-        setFlag(header, 'inlineCta', wholly);
-        setFlag(sticky, 'inlineCta', wholly);
-      },
-      { rootMargin: next, threshold: 1 },
-    );
-    observer.observe(cta);
+  if (!header) return;
+  const update = () => {
+    const value = String(window.scrollY > HEADER_OFFSET);
+    if (header.dataset.scrolled !== value) header.dataset.scrolled = value;
   };
-
-  observe();
-  window.addEventListener('resize', observe);
-  stopInlineCta = () => {
-    window.removeEventListener('resize', observe);
-    observer?.disconnect();
-  };
+  update();
+  window.addEventListener('scroll', update, { passive: true });
 }
 
 /**
- * A link to a section from outside (`/#faq` in a post or a bio): the browser lands on it before
- * the pins add their ~8 screens of scroll, and ScrollTrigger's first refresh then puts back that
- * stale offset, mid-story. Once that refresh is done, land on the section again (its
- * scroll-margin-top keeps it clear of the header; Lenis, idle at boot, follows a native jump).
- * Only once: later refreshes (a resize, a language switch) leave the visitor where they are.
+ * Words rise into place as they come on screen: `data-shown` on each `[data-reveal]`, once.
+ * `motion` on <html> is what hides them until then (layout.css), so without this script, or
+ * without IntersectionObserver, they are simply there.
  */
-function landOnFragment(): void {
-  const target = fragmentTarget(window.location.hash);
-  if (!target) return;
-  const land = () => {
-    ScrollTrigger.removeEventListener('refresh', land);
-    target.scrollIntoView({ block: 'start' });
-  };
-  ScrollTrigger.addEventListener('refresh', land);
+function revealWords(): void {
+  if (typeof IntersectionObserver === 'undefined') return;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        (entry.target as HTMLElement).dataset.shown = '';
+        observer.unobserve(entry.target);
+      }
+    },
+    { rootMargin: '0px 0px -12% 0px' },
+  );
+  for (const el of document.querySelectorAll('[data-reveal]')) observer.observe(el);
+  document.documentElement.classList.add('motion');
 }
 
 /**
- * Starts the scroll story: pinned, scrubbed scenes, or still frames under reduced motion. Run it
- * once the fonts are in, since they set the scenes' heights. A visitor who turns reduced motion on
- * mid-visit gets the still frames at once (timeline.ts); one who starts reduced keeps them until
- * the next page load. The still frames pin nothing, so the browser's own landing on a `#section`
- * link holds there.
+ * Starts the page's motion: the header bar always; the smooth wheel scrolling, the words rising
+ * and the driving car unless the visitor asked for reduced motion (then the CSS parks the car at
+ * the door and hides the other lanes). Run it once the fonts are in, since they set the heights
+ * the lanes are measured against.
  */
 export function initScroll(): void {
-  watchInlineCta();
-  if (prefersReducedMotion()) {
-    initReduced();
-  } else {
-    initTimeline();
-    landOnFragment();
-  }
+  watchHeader();
+  if (prefersReducedMotion()) return;
+  initSmoothScroll();
+  revealWords();
+  initCars();
 }
 
-/** Re-measures the pinned scenes, e.g. after a language switch changed their copy's length. */
+/** Re-measures the lanes, e.g. after a language switch changed the copy's length. */
 export function refreshScroll(): void {
   ScrollTrigger.refresh();
 }
