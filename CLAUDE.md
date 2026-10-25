@@ -12,8 +12,9 @@
   codename (folder name and GitHub repo name).
 - **Status (2026-10-25):** **v2 built on `main`** (§7 "What was built (v2)", §8): one long red page in
   the style of the campaign teaser, the user's words in order, the car driving across between them.
-  Placeholder car (the v1 van) until the user's **Figma car** arrives. Not pushed since v1 (2026-10-21),
-  not deployed. Open items in §6b and the README.
+  Placeholder car (the v1 van) until the user's **Figma car** arrives. **Pushed and deployed 2026-10-25:**
+  live at **https://chocobulance-production.up.railway.app** (Railway project "chocobulance", auto-deploys
+  every push to `main`). Open items in §6b and the README.
 
 ## 2. Rules set by the user
 
@@ -30,7 +31,7 @@
 | --- | --- |
 | Git | Branch `main`, tracks `origin/main`. **Pushed on 2026-10-21** (user's OK). Collaborator workflow: fork → branch → PR into this repo → merge → deploy. |
 | GitHub | `origin` → `https://github.com/reclofounder/yebqoydi-chocobulance.git` (public since 2026-10-21). |
-| Railway | CLI installed via Homebrew, logged in to the client's Railway account, workspace **"Haysam AI School"**. **No Railway project yet** — create a NEW one for this site. Do **not** touch the existing project "Haysam Landing Page Live". **Nothing has been deployed.** |
+| Railway | **Deployed 2026-10-25.** Workspace "Haysam AI School" → project **`chocobulance`** (id `0aa292bb-6cc0-4c9f-97f8-940c580c4ee6`), environment `production`, service **`chocobulance`** built from the GitHub repo `reclofounder/yebqoydi-chocobulance`, branch `main`: **every push to `main` redeploys.** Domain **https://chocobulance-production.up.railway.app**. Variables: `VITE_SITE_URL` = that domain (makes og:image, og:url, hreflang absolute), `RAILPACK_NODE_VERSION=22`. This folder is linked (`railway status`). Do **not** touch the other projects ("Haysam Landing Page Live", "ögir.uz"). |
 | Deploy target | Railway (user's choice). Vercel plugin hooks appear in sessions; ignore them unless the user asks. |
 | Stack (decided) | Vite 8 + TypeScript (strict) + GSAP 3.15 (ScrollTrigger) + Lenis + `@fontsource/baloo-2` (headlines) + `@fontsource/nunito` (Cyrillic fallback only). Static output in `dist/`, served by `serve` (`npm start`, listens on `$PORT`, default 3000). Node 22 (`.nvmrc`), `engines.node` >=20.19. Tests: Vitest + jsdom. |
 | Railway config | `railway.json`: Railpack builder, build `npm run build`, start `npm start`. `PORT` comes from Railway. Optional variable `RAILPACK_NODE_VERSION=22`. Railway's docs mark config-as-code deprecated (legacy files honoured until 2026-12-01); if the file stops applying, set the same two commands in the service settings. |
@@ -138,7 +139,7 @@ Notes:
 - Hero spelling: one word "Yebqoʻydingizmi?" as the user wrote it; the teaser had "yeb qoʻydilar" as two words.
 - Legal texts for the footer (only © for now).
 - Phone hero size: on a 390 px phone the arched headline is about 42 px (a 16-letter word on one arc).
-- **Before deploy (from the final review):** add `public/serve.json` with `{"directoryListing": false}` (plain `serve` lists `/assets/`); set `VITE_SITE_URL` on Railway and rebuild so og/hreflang are absolute; smoke list in README; check Telegram/X link previews; optional: a designed share card instead of the hero screenshot.
+- After deploy (2026-10-25): `serve.json` (no directory listing) and `VITE_SITE_URL` are done and smoke-checked. Still to do: check the Telegram/X link previews; a custom domain (then update `VITE_SITE_URL`); optional designed share card.
 
 ## 7. Brief and content (received 2026-10-19)
 
@@ -418,3 +419,10 @@ best practices 100, CLS 0, about 110 kB (uz) / 118 kB (ru); SEO 83 only for rela
   Baloo 2 headlines (matched to the teaser in the browser), placeholder car until the Figma file arrives.
   Committed on `main`, not pushed, not deployed. Next: user reviews; swap in the Figma car (README
   "Swap the car"), redo `og.png`.
+- **2026-10-25 (pushed + deployed)** — User: "push and deploy, I want to test it myself". Pushed `main`
+  (v2 + `public/serve.json`, no directory listing). Created Railway project `chocobulance` in "Haysam AI
+  School", service from the GitHub repo (auto-deploy on push), domain
+  https://chocobulance-production.up.railway.app, variables `VITE_SITE_URL` and `RAILPACK_NODE_VERSION=22`.
+  Smoke check passed: `/` and `/?lang=ru` 200, `/og.png` image/png, `/robots.txt` 200, `/assets/` and
+  `/nope` 404, absolute og/hreflang, `tel:+998712099900`, fonts and car load with no failed requests.
+  Next: user tests; Figma car; phone-size hero question (split "Yeb qoʻydingizmi?").

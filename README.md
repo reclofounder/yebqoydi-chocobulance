@@ -95,7 +95,7 @@ The car is three images in `public/car/`. The current ones are a placeholder (th
 
 ## Deploy on Railway
 
-The site is static files plus `npm start`. Nothing here has been deployed yet.
+The site is static files plus `npm start`. **Live since 2026-10-25 at https://chocobulance-production.up.railway.app** (Railway project `chocobulance`, service built from this GitHub repo: every push to `main` redeploys). The steps below are how it was set up.
 
 1. Make a **new** Railway project in the workspace "Haysam AI School". Do not use the existing project "Haysam Landing Page Live".
 2. `railway init` (or create it in the dashboard), then connect this repo or run `railway up` from this folder.
