@@ -124,6 +124,10 @@ To check the production setup locally: `npm run build && PORT=4180 npm start`, t
 
 `og.png` is a screenshot of the Uzbek first screen at 1200x630 (the arc and the car half in), taken once the hero's entrance has finished. Redo it after any change to the hero or the car.
 
+## Deploy on Vercel
+
+Also live since 2026-10-25 at **https://chocobulance-omega.vercel.app** (Vercel project `chocobulance`, team "recloglobal's projects", linked to this GitHub repo: every push to `main` deploys there too, alongside Railway). Zero config: Vercel detects Vite (build `npm run build`, output `dist`); `railway.json` and `public/serve.json` are ignored there (Vercel serves `dist` itself and 404s unknown paths). The only setting is the production variable `VITE_SITE_URL=https://chocobulance-omega.vercel.app`, for the share tags. With a custom domain, add it under Settings → Domains and change `VITE_SITE_URL` to it.
+
 ## Known open items
 
 - Domain: not chosen; once it is, set `VITE_SITE_URL` (see Deploy), which also makes the `hreflang` links absolute (Lighthouse SEO flags them as relative until then).
