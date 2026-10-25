@@ -17,8 +17,11 @@
   /* The car: 280 px wide on a phone, up to 720 px on a desktop (the `sizes` of its images in
      index.html follow these numbers). --car-ratio, its art's proportions, comes from car.css. Its
      lane is the car's height plus a little air. */
-  --car-w: clamp(280px, 48vw, 720px);
+  --car-w: clamp(240px, 48vw, 720px);
   --lane-h: calc(var(--car-w) * var(--car-ratio) + var(--s6));
+
+  /* Room kept clear at the bottom of the screen for the phones' call bar (0 where there is none). */
+  --bar-space: 0px;
 
   /* Fluid type: each clamp() starts at its minimum at a 360 px viewport and tops out at 1440 px. */
   --fs-beat: clamp(2.5rem, 1.333rem + 5.185vw, 6rem); /* 40-96 */
@@ -149,18 +152,67 @@ h2,
   outline-color: var(--white);
 }
 
+/* The call bar: on phones only, fixed to the bottom of the screen (clear of the home indicator),
+   the same white pill as the header's, wide enough for a thumb. */
+.call-bar {
+  display: none;
+}
+
 @media (max-width: 599px) {
-  .call {
-    padding: 0;
+  :root {
+    --bar-space: calc(56px + var(--s2) + env(safe-area-inset-bottom, 0px));
   }
 
-  .call__label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  /* There the call lives at the bottom, so the header is just the logo and the language. */
+  .header__inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .header .call {
+    display: none;
+  }
+
+  .call-bar {
+    position: fixed;
+    right: max(var(--s2), env(safe-area-inset-right, 0px));
+    bottom: max(var(--s2), env(safe-area-inset-bottom, 0px));
+    left: max(var(--s2), env(safe-area-inset-left, 0px));
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s1);
+    min-height: 56px;
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--red-600);
+    box-shadow: 0 10px 28px rgb(46 20 13 / 0.35);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.375rem;
+    line-height: 1;
+    text-decoration: none;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: scale 0.15s var(--ease-bounce);
+  }
+
+  .call-bar:active {
+    scale: 0.97;
+  }
+
+  .call-bar::before {
+    content: '';
+    flex: none;
+    width: 1.1em;
+    height: 1.1em;
+    background: currentColor;
+    -webkit-mask: var(--icon-phone) center / contain no-repeat;
+    mask: var(--icon-phone) center / contain no-repeat;
+  }
+
+  .call-bar.cta--disabled::before {
+    display: none;
   }
 }
 
@@ -210,7 +262,7 @@ h2,
 .hero {
   display: grid;
   place-items: center;
-  min-height: calc(100svh - var(--lane-h));
+  min-height: calc(100svh - var(--lane-h) - var(--bar-space));
   padding: calc(var(--header-total) + var(--s4)) var(--gutter) var(--s2);
   scroll-margin-top: 0;
 }
@@ -507,6 +559,20 @@ h2,
   transition-delay: 0.2s;
 }
 
+/* Phones: the question sits in the upper part of the first screen (not lost in the middle of a
+   tall one), and the blocks are tighter, so the words come sooner. */
+@media (max-width: 599px) {
+  .hero {
+    align-items: start;
+    padding-top: calc(var(--header-total) + 16svh);
+  }
+
+  .beat,
+  .block {
+    min-height: 45svh;
+  }
+}
+
 /* Words rise into place as they come on screen (scroll/motion.ts marks them data-shown). Only
    when motion is on and the script runs: without either, they are simply there. */
 .motion [data-reveal]:not([data-shown]) {
@@ -529,7 +595,7 @@ h2,
   align-content: stretch;
   height: 100svh;
   min-height: 0;
-  padding: calc(var(--header-total) + var(--s3)) var(--gutter) var(--s4);
+  padding: calc(var(--header-total) + var(--s3)) var(--gutter) calc(var(--s4) + var(--bar-space));
   scroll-margin-top: 0;
 }
 
@@ -537,6 +603,20 @@ h2,
   height: 100%;
   min-height: 240px;
   aspect-ratio: auto;
+}
+
+/* On a phone the map is a square card, the words and it together in the middle of the screen. */
+@media (max-width: 599px) {
+  #area {
+    grid-template-rows: auto auto;
+    align-content: center;
+  }
+
+  #area .area-map {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+  }
 }
 
 .area-map {
@@ -631,8 +711,10 @@ h2,
 
 /* ---------- Footer ---------- */
 
+/* The page ends above the phones' call bar, so the copyright line is never under it. */
 .footer {
-  padding: var(--s8) var(--gutter) max(var(--s6), env(safe-area-inset-bottom, 0px));
+  padding: var(--s8) var(--gutter)
+    calc(max(var(--s6), env(safe-area-inset-bottom, 0px)) + var(--bar-space));
   font-size: var(--fs-small);
   text-align: center;
 }

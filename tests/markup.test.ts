@@ -147,15 +147,20 @@ describe('index.html markup', () => {
     expect((y0 - cy) / 2).toBeLessThan((x1 - x0) / 6);
   });
 
-  it('dials the hotline from the header button and from the number in the call line', () => {
+  it('dials the hotline from the header button, the phone bar and the number in the call line', () => {
     const calls = [...doc.querySelectorAll<HTMLAnchorElement>('a[href^="tel:"]')];
-    expect(calls).toHaveLength(2);
+    expect(calls).toHaveLength(3);
     for (const a of calls) expect(a.getAttribute('href')).toBe('tel:+998712099900');
 
     // applyMode() swaps the header button for a span that keeps only its class and data-cta.
     const call = doc.querySelector('#header a.call[data-cta]')!;
     expect(call.getAttribute('data-i18n-attr')).toBe('aria-label:a11y.call');
     expect(call.querySelector('.call__label[data-i18n="header.call"]')).not.toBeNull();
+
+    // Phones: a bar fixed to the bottom of the screen, a call button like the header's.
+    const bar = doc.querySelector('body > a.call-bar[data-cta]')!;
+    expect(bar.getAttribute('data-i18n-attr')).toBe('aria-label:a11y.call');
+    expect(bar.querySelector('.call__label[data-i18n="header.call"]')).not.toBeNull();
 
     const tel = doc.querySelector('#call-title > a.tel[data-tel]')!;
     expect(tel.getAttribute('data-i18n')).toBe('call.number');

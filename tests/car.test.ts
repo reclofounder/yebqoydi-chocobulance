@@ -59,10 +59,20 @@ describe('wheelTurn', () => {
 });
 
 describe('carAt', () => {
-  it('follows the scroll linearly across a crossing lane', () => {
+  it('crosses from edge to edge, lingering in the middle where the whole car is in view', () => {
     expect(carAt('ltr', 0, VIEW, CAR).x).toBe(-OFF);
     expect(carAt('ltr', 0.5, VIEW, CAR).x).toBeCloseTo(0);
     expect(carAt('ltr', 1, VIEW, CAR).x).toBe(OFF);
+    // A quarter of the way it is nearer the middle than a steady crossing would put it...
+    expect(Math.abs(carAt('ltr', 0.25, VIEW, CAR).x)).toBeLessThan(OFF / 2);
+    // ...and it never turns back: each step of scroll moves it the same way.
+    let last = -Infinity;
+    for (let p = 0; p <= 1; p += 0.01) {
+      const { x } = carAt('ltr', p, VIEW, CAR);
+      expect(x).toBeGreaterThan(last);
+      last = x;
+    }
+    expect(carAt('rtl', 0.25, VIEW, CAR).x).toBeCloseTo(-carAt('ltr', 0.25, VIEW, CAR).x);
   });
 
   it('brakes into the parking spot instead of stopping dead', () => {

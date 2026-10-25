@@ -114,6 +114,17 @@ async function build(container: HTMLElement): Promise<MapLibreMap> {
   map.touchZoomRotate.disableRotation();
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
+  // The card can change size after the map is built (fonts arriving, a phone turned, the address
+  // bar hiding). MapLibre then keeps its zoom and the area can spill past the card: fit it again,
+  // unless the visitor has moved the map themselves.
+  let moved = false;
+  map.on('movestart', (event) => {
+    if ((event as { originalEvent?: Event }).originalEvent) moved = true;
+  });
+  map.on('resize', () => {
+    if (!moved) map.fitBounds(areaBounds(area), { padding: 24, animate: false });
+  });
+
   map.on('load', () => {
     map.addSource('area', { type: 'geojson', data: area });
     map.addSource('outside', {

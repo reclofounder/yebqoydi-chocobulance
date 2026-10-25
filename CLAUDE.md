@@ -503,3 +503,12 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
 - **2026-10-26** — "tezda" removed: "Endi kichkintoyni ovutish kerak" (RU «Теперь малыша нужно утешить»).
 - **2026-10-26 (pushed)** — The boys and the copy change pushed; live on Vercel, checked (page, both
   boy images as AVIF, the new line in the bundle).
+- **2026-10-26 (phones, cut area)** — Client feedback from a phone: (1) service area cut again to a
+  second blue guide (inside the previous one on the west and south), traced the same way (fit 0.15 px);
+  (2) the map spilled past its card on phones: it now refits on resize unless the visitor moved it, and
+  the phone card is square; (3) a white call bar fixed to the bottom of the screen on phones (<600 px),
+  the header's call hidden there; `--bar-space` keeps the first car, the map and the footer above it;
+  (4) the © line was hidden under that bar's spot: the footer rule overrode the phone padding, now the
+  footer reserves `--bar-space` itself; (5) phones: question in the upper part of the first screen,
+  blocks 45svh, car 240 px, and crossings `linger` in the middle so the car is in view whole for longer.
+  One car at a time re-checked at five sizes. Lighthouse 98 / 100 / 100 / SEO 92, CLS 0.

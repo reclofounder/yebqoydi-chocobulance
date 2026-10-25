@@ -45,6 +45,8 @@ describe('keyboard and landmarks', () => {
       'lang__btn',
       'lang__btn',
       'tel',
+      // Phones only (CSS): the call fixed to the bottom of the screen, last in the order.
+      'call-bar',
     ]);
   });
 
@@ -74,7 +76,7 @@ describe.each(['uz', 'ru'] as const)('names and labels (%s)', (lang) => {
   it('gives every button and link a name: its text, the alt of its image, or an aria-label', () => {
     render(lang);
     const controls = document.querySelectorAll<HTMLElement>('button, a[href]');
-    expect(controls).toHaveLength(6);
+    expect(controls).toHaveLength(7);
     for (const el of controls) {
       const name =
         el.getAttribute('aria-label') ??
@@ -84,6 +86,7 @@ describe.each(['uz', 'ru'] as const)('names and labels (%s)', (lang) => {
     }
     // On a phone the call button shows only the handset: the number is its name.
     expect(document.querySelector('.call')!.getAttribute('aria-label')).toMatch(/71\u00a0209/);
+    expect(document.querySelector('.call-bar')!.getAttribute('aria-label')).toMatch(/71\u00a0209/);
   });
 
   it('reads one h1, the question itself, and not the drawing of it on the arc', () => {

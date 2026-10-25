@@ -68,6 +68,15 @@ export function wheelTurn(distance: number, car: number, share: number = WHEEL_S
   return radius > 0 ? (distance / (2 * Math.PI * radius)) * 360 : 0;
 }
 
+/**
+ * A crossing lingers in the middle: fast past the edges, slower where the whole car is in view, so
+ * it is seen whole for longer (on a phone the car is most of the screen wide). Odd and monotonic,
+ * from -1 to 1, with the middle's speed a third of the edges' average.
+ */
+export function linger(u: number): number {
+  return 0.35 * u + 0.65 * u ** 3;
+}
+
 /** The car's offset and its wheels' turn at `progress` (0-1) through its lane. */
 export function carAt(
   kind: LaneKind,
@@ -77,9 +86,15 @@ export function carAt(
   share: number = WHEEL_SHARE,
 ): { x: number; turn: number } {
   const [from, to] = laneRange(kind, view, car);
-  // Pulling up at the door: it brakes (eases out) instead of stopping dead.
-  const p = kind === 'arrive' ? 1 - (1 - progress) ** 2 : progress;
-  const x = from + (to - from) * p;
+  let x: number;
+  if (kind === 'ltr' || kind === 'rtl') {
+    x = (from + to) / 2 + ((to - from) / 2) * linger(2 * progress - 1);
+  } else {
+    // Pulling up at the door: it brakes (eases out) instead of stopping dead. The first car simply
+    // drives off.
+    const p = kind === 'arrive' ? 1 - (1 - progress) ** 2 : progress;
+    x = from + (to - from) * p;
+  }
   return { x, turn: wheelTurn(x - from, car, share) };
 }
 
