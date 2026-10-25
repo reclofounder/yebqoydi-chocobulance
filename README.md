@@ -27,6 +27,7 @@ public/brand/        The Chococream 20 logo for red backgrounds (from brand/desi
 public/car/          The car from the design PDF: each view's body and rims, AVIF (see "The car")
 src/map/             area-map.ts and tashkent.json: the service area map (see "The service area map")
 tools/car/           render.swift and export.py: the PDF to public/car/ and src/styles/car.css
+public/boys/         The two boys with the empty tub (see "The boys"); tools/photos/export.py makes them
 src/config.ts        PHONE, PHONE_DISPLAY, PRICE, MODE
 src/i18n.ts          Copy engine: t(), applyI18n(), language choice (?lang=, then localStorage, then uz)
 src/i18n/            uz.json, ru.json
@@ -93,6 +94,16 @@ python tools/car/export.py /tmp/left.png /tmp/right.png public/car src/styles/ca
 ```
 
 Render with `render.swift`, not `pdftocairo`: the artwork is CMYK, and only Quartz converts it as Illustrator and Preview show it (red `#D9242A`, not `#ED1C24`). `export.py` finds the wheels itself and writes the images and `car.css`; if a new body or rim changes its pixel size, update the `width`, `height` and `srcset` widths in `index.html` (the script prints the sizes). Then `npm test`, a scroll through at 1440x900 and 390x844, and a new `og.png` (below).
+
+## The boys
+
+Two boys with an empty Chococream tub stand either side of "Endi kichkintoyni tezda ovutish kerak" (side by side under it on phones): `public/boys/curly.avif` and `yellow.avif`, plus 450 px tall versions for phones. They come from the client's transparent PNGs (`imgs/`, not committed). The photos end at the waist, so their lower edge fades into the page (a CSS mask). To redo or add one:
+
+```
+python tools/photos/export.py "imgs/<photo>.png" public/boys/<name> 900
+```
+
+The script makes the nearly opaque body fully opaque (otherwise the red page tints it), keeps the soft hair edges, crops to the subject and writes AVIF at 900 and 450 px tall.
 
 ## The service area map
 

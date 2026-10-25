@@ -493,3 +493,10 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   at a time re-checked at 1440x900, 1280x720, 390x844. Next: the client will send photos of a boy holding
   an empty Chococream tub (a preview arrived: profile, facing right, yellow T-shirt, white background) to
   be added tastefully.
+- **2026-10-26 (the boys)** — Client added two transparent PNGs to `imgs/` (curly-haired boy, boy in a
+  yellow T-shirt, both frontal, sad, holding an empty Chococream tub, cut at the waist). Placed either
+  side of "Endi kichkintoyni tezda ovutish kerak" (`.beat--boys`): same height (up to 540 px), bottoms
+  faded into the page with a mask, rising in after the words; side by side under the words on phones.
+  No drop shadow (the mask clipped it into a visible box). Exported with `tools/photos/export.py`
+  (body alpha >= 240 made opaque, AVIF 4:4:4 at 900 and 450 px). `imgs/` sources are not committed.
+  Committed; waiting for the client's OK to push.

@@ -297,6 +297,75 @@ h2,
   outline-offset: 4px;
 }
 
+/* "Now the little one needs comforting": the two boys with their empty tubs stand either side of
+   the words on a wide screen, side by side under them on a phone. Each photo ends at the waist, so
+   its lower edge fades into the page instead of stopping in a hard line. Same height for both, the
+   bottoms on the section's floor. */
+.beat--boys {
+  grid-template-columns: 1fr minmax(0, auto) 1fr;
+  grid-template-areas: 'a title b';
+  align-items: end;
+  column-gap: var(--s4);
+  padding-bottom: 0;
+}
+
+.beat--boys .beat__title {
+  grid-area: title;
+  align-self: center;
+  max-width: 11ch;
+  padding-bottom: var(--s8);
+  font-size: clamp(2.5rem, 1rem + 3.4vw, 4.5rem);
+}
+
+/* Fixed height, so both boys stand the same size; if the column is narrower, the photo shrinks
+   inside its box (contain) and stays on the floor (bottom), never stretched. */
+.boy {
+  width: auto;
+  max-width: 100%;
+  height: min(58svh, 540px);
+  object-fit: contain;
+  object-position: bottom;
+  -webkit-mask-image: linear-gradient(to bottom, #000 74%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 74%, transparent 100%);
+}
+
+.boy--a {
+  grid-area: a;
+  justify-self: end;
+}
+
+.boy--b {
+  grid-area: b;
+  justify-self: start;
+}
+
+/* The boys come up a moment after the words. */
+.motion .boy {
+  transition-delay: 0.15s;
+}
+
+@media (max-width: 899px) {
+  .beat--boys {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'title title'
+      'a b';
+    row-gap: var(--s4);
+    column-gap: var(--s2);
+  }
+
+  .beat--boys .beat__title {
+    max-width: 16ch;
+    padding-bottom: 0;
+  }
+
+  .boy {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+  }
+}
+
 /* "Hurrying to you": the words, then the lane where the car pulls up and stays. Extra room above,
    so it does not crowd the call line before it. */
 .beat--arrive {

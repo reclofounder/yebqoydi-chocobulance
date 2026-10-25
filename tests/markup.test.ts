@@ -234,6 +234,28 @@ describe('index.html markup', () => {
     }
   });
 
+  it('sets the two boys either side of the comfort line, decorative, lazy, and sized before they load', () => {
+    const section = doc.querySelector('section.beat--boys')!;
+    expect(section.querySelector('h2#soothe-title')).not.toBeNull();
+    const boys = [...section.querySelectorAll<HTMLImageElement>('img.boy')];
+    expect(boys.map((b) => b.getAttribute('src'))).toEqual([
+      '/boys/curly.avif',
+      '/boys/yellow.avif',
+    ]);
+    for (const boy of boys) {
+      // The words carry the message; the photos only show it.
+      expect(boy.getAttribute('alt')).toBe('');
+      expect(boy.getAttribute('loading')).toBe('lazy');
+      expect(boy.getAttribute('width')).toBeTruthy();
+      expect(boy.getAttribute('height')).toBe('900');
+      expect(boy.getAttribute('srcset')).toMatch(/-450\.avif \d+w, .*\.avif \d+w$/);
+    }
+    for (const file of ['curly', 'curly-450', 'yellow', 'yellow-450']) {
+      const avif = readFileSync(resolve(process.cwd(), 'public/boys', `${file}.avif`));
+      expect(avif.subarray(4, 12).toString('latin1'), file).toBe('ftypavif');
+    }
+  });
+
   it('ends with the copyright line only', () => {
     const footer = doc.querySelector('body > footer.footer')!;
     expect([...footer.children].map((el) => el.getAttribute('data-i18n'))).toEqual(['footer.copy']);
