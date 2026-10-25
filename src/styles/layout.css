@@ -76,8 +76,12 @@ h2,
   box-shadow: 0 1px 0 color-mix(in srgb, var(--white) 14%, transparent);
 }
 
+/* Three columns: the logo on the left, the call button in the middle of the screen, the language
+   toggle on the right. The side columns are equal, so the middle one is truly centred; the logo's
+   may shrink (on a very narrow phone) without pushing the others off screen. */
 .header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: var(--s1);
   height: var(--header-h);
@@ -87,11 +91,10 @@ h2,
 
 .brand {
   display: inline-flex;
-  flex: 0 1 auto;
+  justify-self: start;
   align-items: center;
-  min-width: 0;
+  max-width: 100%;
   min-height: 44px;
-  margin-right: auto;
 }
 
 /* The Chococream 20 lockup, as large as the header allows: 175 px wide on a phone (40 px tall), 280 px
@@ -174,6 +177,7 @@ h2,
 
 .lang {
   display: inline-flex;
+  justify-self: end;
   padding: 2px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--white) 16%, transparent);
@@ -366,6 +370,33 @@ h2,
   transition:
     opacity 0.5s var(--ease-soft),
     translate 0.6s var(--ease-bounce);
+}
+
+/* The service area: a map card under the words. Its height is set before the map arrives, so
+   nothing moves when it does; a map that cannot be built (no WebGL, offline) leaves no empty card. */
+.area-map {
+  width: min(100%, 1040px);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--cream);
+  box-shadow: 0 12px 32px rgb(46 20 13 / 0.35);
+}
+
+.area-map[data-state='failed'] {
+  display: none;
+}
+
+/* The map's credit line (required by the OpenStreetMap licence) stays visible, just small. */
+.area-map .maplibregl-ctrl-attrib {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@media (max-width: 599px) {
+  .area-map {
+    aspect-ratio: 4 / 5;
+  }
 }
 
 /* ---------- The car ---------- */

@@ -3,29 +3,29 @@
    the body's width (scroll/car.ts spins the rims by it); each rim's box is in % of the body. */
 :root {
   --car-ratio: 0.4322;
-  --tyre-share: 0.1403;
+  --tyre-share: 0.1395;
 }
 
 .car--left .car__wheel--a {
-  left: 10.936%;
-  top: 69.967%;
+  left: 10.942%;
+  top: 69.978%;
   width: 11.667%;
 }
 
 .car--left .car__wheel--b {
-  left: 75.388%;
-  top: 70.119%;
+  left: 75.384%;
+  top: 70.192%;
   width: 11.597%;
 }
 
 .car--right .car__wheel--a {
-  left: 12.818%;
-  top: 68.491%;
-  width: 11.806%;
+  left: 12.933%;
+  top: 70.122%;
+  width: 11.597%;
 }
 
 .car--right .car__wheel--b {
-  left: 77.305%;
-  top: 69.861%;
+  left: 77.309%;
+  top: 69.905%;
   width: 11.667%;
 }

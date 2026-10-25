@@ -325,7 +325,7 @@ in Chococream livery, page 1 facing left, 2 facing right, 3 rear, 4 front; CMYK 
 mask). Exported by `tools/car/` (README "The car"): rendered with Quartz for ColorSync colours (red
 `#D9242A`; pdftocairo gives `#ED1C24`), enclosed transparent holes (between the spokes) filled with
 what they show on white, cropped to one frame for both views, WebP at 1440 and 720 px wide; each rim
-cut out as a round disc (r = rim + 6 px) laid exactly over the photo's rim and spun by the distance
+cut out as a round disc (r = rim edge + 5 px) laid exactly over the photo's rim and spun by the distance
 rolled (`--tyre-share` 0.1403 from the measured tyre). `src/styles/car.css` is generated. Car size on
 the page: `clamp(280px, 48vw, 720px)`. On the red page the car gets "some shape" (user, 2026-10-25): a
 brown-tinted drop shadow on the body (`.car__body` filter) so the red spoiler and stripes read, and a
@@ -457,3 +457,18 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   before); header 88 px from 1024 px; on very narrow phones the logo link shrinks so the call and
   language buttons stay on screen. Checked at 2000, 1440, 800, 390, 320 px. Committed, waiting for
   the user's OK to push (a push deploys to Vercel).
+- **2026-10-26 (header, wheels, red lines, map, favicon)** — User feedback on the live site:
+  (1) phone number centred in the header: the header is a 3-column grid (logo | call | language);
+  (2) the rear wheel of the right-facing car was off its circle: the rim finder had counted a hole
+  filled white between the spokes as alloy (23 px off). `export.py` now finds rims on the unfilled
+  render, fits each centre to the rim's outer edge (spread about 1 px, mirrored wheels agree to
+  0.1 px) and fills holes inside wheels with the dark behind the spokes, not white;
+  (3) "red lines not accurate": lossy WebP's half-resolution colour smeared the livery's red edges;
+  the car is now AVIF 4:4:4 (edge error 34 to 8, files smaller);
+  (4) service area map: MapLibre GL 5 + OpenFreeMap (free, no key, commercial OK) with Tashkent city
+  (OSM relation 2216724) outlined in red, outside dimmed, cooperative gestures, lazy-loaded near the
+  section (about 270 kB gz, never on the first screen);
+  (5) favicon still said 105: now the "20 yoshda" of the lockup on brand red (`favicon.ico`,
+  `icon-192.png`, `apple-touch-icon.png`), `favicon.svg` removed. Also the bigger logo from the
+  previous entry. Lighthouse after: 99 / 100 / 100 / SEO 92 (hreflang, absolute on Vercel), CLS 0.
+  Committed; waiting for the user's OK to push.

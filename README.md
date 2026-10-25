@@ -22,9 +22,10 @@ Node 20.19+ or 22.12+ (`.nvmrc` pins 22), as Vite 8 requires (`engines` in `pack
 
 ```
 index.html           The page: header, the arched hero, the words, the car lanes, the footer. Copy comes from data-i18n keys.
-public/              favicon.svg, og.png (1200x630 share image), robots.txt
+public/              favicon.ico, icon-192.png, apple-touch-icon.png, og.png (1200x630 share image), robots.txt
 public/brand/        The Chococream 20 logo for red backgrounds (from brand/design-system)
-public/car/          The car from the design PDF: each view's body and rims, WebP (see "The car")
+public/car/          The car from the design PDF: each view's body and rims, AVIF (see "The car")
+src/map/             area-map.ts and tashkent.json: the service area map (see "The service area map")
 tools/car/           render.swift and export.py: the PDF to public/car/ and src/styles/car.css
 src/config.ts        PHONE, PHONE_DISPLAY, PRICE, MODE
 src/i18n.ts          Copy engine: t(), applyI18n(), language choice (?lang=, then localStorage, then uz)
@@ -77,9 +78,11 @@ The hero's arc fits "Yebqoʻydingizmi?" at `font-size: 136px` in its 1200-unit d
 
 ## The car
 
-The car is the design's own artwork (`Hyundai_starix_chococream_20.pdf`, Illustrator: a Hyundai Staria in Chococream livery; page 1 faces left, page 2 right, 3 and 4 are the rear and front). Two views, never one mirrored, or "Chococream" would read backwards. `public/car/` holds, per view, the body (`left.webp`, `left-720.webp`) and its two rims (`left-wheel-a.webp`, `-b`, each also at `-720`); `src/styles/car.css` says where each rim sits.
+The car is the design's own artwork (`Hyundai_starix_chococream_20.pdf`, Illustrator: a Hyundai Staria in Chococream livery; page 1 faces left, page 2 right, 3 and 4 are the rear and front). Two views, never one mirrored, or "Chococream" would read backwards. `public/car/` holds, per view, the body (`left.avif`, `left-720.avif`) and its two rims (`left-wheel-a.avif`, `-b`, each also at `-720`); `src/styles/car.css` says where each rim sits.
 
-The rims are round copies of the photo's own rims, laid exactly over them: standing still the car is the PDF; driving, the rims turn (by the distance rolled, with the tyre size in `--tyre-share`). Holes the photo cut-out left inside the car (between the spokes) show what they show on the white artboard, so the red page never shows through.
+- **Rims.** Round copies of the photo's own rims, laid exactly over them: standing still the car is the PDF; driving, the rims turn (by the distance rolled, with the tyre size in `--tyre-share`). Each rim's centre comes from a circle fitted to its outer edge (where the alloy meets the tyre), found on the render before anything is filled; the script prints how round each fit is (spread about 1 px).
+- **Holes.** The photo cut-out left see-through holes inside the car. Between the spokes they are filled with the dark of the brakes behind them (white there would spin with the rim as a light patch); anywhere else, with what they show on the white artboard. The red page never shows through.
+- **AVIF, full colour resolution.** Lossy WebP stores colour at half resolution, which smears the livery's thin red edges against the white body (measured: 4x the error on those edges). AVIF 4:4:4 keeps them crisp at a smaller size.
 
 To re-export after a design change (macOS; Python with Pillow, numpy and scipy, for example in a throwaway virtualenv):
 
@@ -89,7 +92,15 @@ swift tools/car/render.swift design.pdf 2 2.0833333 /tmp/right.png
 python tools/car/export.py /tmp/left.png /tmp/right.png public/car src/styles/car.css
 ```
 
-Render with `render.swift`, not `pdftocairo`: the artwork is CMYK, and only Quartz converts it as Illustrator and Preview show it (red `#D9242A`, not `#ED1C24`). `export.py` finds the wheels itself and writes the images and `car.css`; if a new body changes its pixel size, update the `width`, `height` and `srcset` widths in `index.html` (the script prints the sizes). Then `npm test`, a scroll through at 1440x900 and 390x844, and a new `og.png` (below).
+Render with `render.swift`, not `pdftocairo`: the artwork is CMYK, and only Quartz converts it as Illustrator and Preview show it (red `#D9242A`, not `#ED1C24`). `export.py` finds the wheels itself and writes the images and `car.css`; if a new body or rim changes its pixel size, update the `width`, `height` and `srcset` widths in `index.html` (the script prints the sizes). Then `npm test`, a scroll through at 1440x900 and 390x844, and a new `og.png` (below).
+
+## The service area map
+
+Under "Xizmat faqat Toshkent shahri ichida": OpenStreetMap (vector tiles from OpenFreeMap: free, no API key, commercial use allowed) with Tashkent city's boundary in brand red and everything outside dimmed (`src/map/area-map.ts`). The boundary is OpenStreetMap relation 2216724, simplified, in `src/map/tashkent.json`. The map's code (about 270 kB), its stylesheet and the boundary load only when the section comes within 600 px of the screen, so the first screen does not wait for them. One finger or the mouse wheel scrolls the page past it; two fingers or Ctrl/⌘ + wheel move the map (a hint in Uzbek or Russian says so). Without WebGL the card hides itself; the heading already says where the service runs. Keep the credit line visible: the OpenStreetMap licence requires it.
+
+## Icons
+
+`public/favicon.ico` (16, 32, 48 px), `icon-192.png` and `apple-touch-icon.png` (180 px, square: iOS rounds it) are the "20 yoshda" of the Chococream 20 lockup on brand red, cut from `brand/design-system/assets/logo-on-red.png`.
 
 ## Motion
 

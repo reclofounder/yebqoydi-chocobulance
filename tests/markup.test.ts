@@ -179,18 +179,18 @@ describe('index.html markup', () => {
       const car = lane.querySelector(`[data-car].car--${facing}`)!;
       expect(car, lane.dataset.lane).not.toBeNull();
       const body = car.querySelector('img.car__body')!;
-      expect(body.getAttribute('src')).toBe(`/car/${facing}.webp`);
+      expect(body.getAttribute('src')).toBe(`/car/${facing}.avif`);
       expect(body.getAttribute('srcset')).toBe(
-        `/car/${facing}-720.webp 720w, /car/${facing}.webp 1440w`,
+        `/car/${facing}-720.avif 720w, /car/${facing}.avif 1440w`,
       );
       const wheels = [...car.querySelectorAll('img.car__wheel')];
       expect(wheels.map((w) => w.getAttribute('src'))).toEqual([
-        `/car/${facing}-wheel-a.webp`,
-        `/car/${facing}-wheel-b.webp`,
+        `/car/${facing}-wheel-a.avif`,
+        `/car/${facing}-wheel-b.avif`,
       ]);
       // Phones get the half-size rims, as they get the half-size body.
       for (const w of wheels)
-        expect(w.getAttribute('srcset')).toMatch(/-720\.webp \d+w, .*\.webp \d+w$/);
+        expect(w.getAttribute('srcset')).toMatch(/-720\.avif \d+w, .*\.avif \d+w$/);
       for (const img of car.querySelectorAll('img')) {
         expect(img.getAttribute('alt')).toBe('');
         expect(img.getAttribute('width')).toBeTruthy();
@@ -204,14 +204,14 @@ describe('index.html markup', () => {
   it('ships the car art the lanes point at, and the generated positions of its rims', () => {
     for (const facing of ['left', 'right']) {
       for (const file of [
-        `${facing}.webp`,
-        `${facing}-720.webp`,
-        `${facing}-wheel-a.webp`,
-        `${facing}-wheel-b.webp`,
+        `${facing}.avif`,
+        `${facing}-720.avif`,
+        `${facing}-wheel-a.avif`,
+        `${facing}-wheel-b.avif`,
       ]) {
-        const webp = readFileSync(resolve(process.cwd(), 'public/car', file));
-        expect(webp.subarray(0, 4).toString('latin1'), file).toBe('RIFF');
-        expect(webp.subarray(8, 12).toString('latin1'), file).toBe('WEBP');
+        // AVIF: an ISO-BMFF file whose first box is ftyp with the avif brand.
+        const avif = readFileSync(resolve(process.cwd(), 'public/car', file));
+        expect(avif.subarray(4, 12).toString('latin1'), file).toBe('ftypavif');
       }
     }
     const css = readFileSync(resolve(process.cwd(), 'src/styles/car.css'), 'utf8');
@@ -249,7 +249,25 @@ describe('index.html markup', () => {
     const content = (selector: string) => doc.head.querySelector(selector)?.getAttribute('content');
 
     it('links the favicon and the share image, a real 1200x630 PNG', () => {
-      expect(doc.head.querySelector('link[rel="icon"]')!.getAttribute('href')).toBe('/favicon.svg');
+      // The icons are the logo's "20 yoshda" (no trace of the old 105): .ico for tabs, PNGs for phones.
+      const icons = [
+        ...doc.head.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]'),
+      ];
+      expect(icons.map((l) => l.getAttribute('href'))).toEqual([
+        '/favicon.ico',
+        '/icon-192.png',
+        '/apple-touch-icon.png',
+      ]);
+      const ico = readFileSync(resolve(process.cwd(), 'public/favicon.ico'));
+      expect([...ico.subarray(0, 4)]).toEqual([0, 0, 1, 0]); // ICONDIR, type 1 = icon
+      expect(ico.readUInt16LE(4)).toBe(3); // 16, 32 and 48 px
+      for (const [file, size] of [
+        ['icon-192.png', 192],
+        ['apple-touch-icon.png', 180],
+      ] as const) {
+        const png = readFileSync(resolve(process.cwd(), 'public', file));
+        expect([png.readUInt32BE(16), png.readUInt32BE(20)], file).toEqual([size, size]);
+      }
       expect(content('meta[property="og:image"]')).toBe('%VITE_SITE_URL%/og.png');
       expect(content('meta[property="og:image:width"]')).toBe('1200');
       expect(content('meta[property="og:image:height"]')).toBe('630');

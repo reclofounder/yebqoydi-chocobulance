@@ -5,6 +5,7 @@ import './styles/base.css';
 import './styles/layout.css';
 import './styles/car.css';
 import { applyI18n, getLang, isLang, setLang } from './i18n';
+import { initAreaMap } from './map/area-map';
 import { initScroll, refreshScroll } from './scroll/motion';
 import { applyMode } from './state';
 
@@ -32,6 +33,9 @@ document.addEventListener('langchange', () => {
   refreshScroll();
   void document.fonts?.ready.then(refreshScroll);
 });
+
+// The service area map loads its own code and tiles once its section is near.
+initAreaMap();
 
 // The motion last: the lanes are measured against the page, and the fonts set its heights.
 void (document.fonts?.ready ?? Promise.resolve()).then(initScroll);

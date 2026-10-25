@@ -12,7 +12,11 @@
       content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Chaqirish bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
       data-i18n="meta.description"
     />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- The "20 yoshda" of the Chococream 20 lockup on brand red: the .ico (16, 32, 48 px) for tabs
+         and bookmarks, 192 px for Android, 180 px (square, iOS rounds it) for the home screen. -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- %VITE_SITE_URL% is the site's public origin, filled in at build time (vite.config.ts,
          siteUrl): set VITE_SITE_URL on Railway and these tags become absolute, as link previews
          need; unset, they stay relative (README, Deploy). Languages: src/i18n.ts also points the
@@ -155,8 +159,8 @@
         <div class="car car--left" data-car>
           <img
             class="car__body"
-            src="/car/left.webp"
-            srcset="/car/left-720.webp 720w, /car/left.webp 1440w"
+            src="/car/left.avif"
+            srcset="/car/left-720.avif 720w, /car/left.avif 1440w"
             sizes="(max-width: 583px) 280px, (max-width: 1500px) 48vw, 720px"
             width="1440"
             height="622"
@@ -165,8 +169,8 @@
           />
           <img
             class="car__wheel car__wheel--a"
-            src="/car/left-wheel-a.webp"
-            srcset="/car/left-wheel-a-720.webp 84w, /car/left-wheel-a.webp 168w"
+            src="/car/left-wheel-a.avif"
+            srcset="/car/left-wheel-a-720.avif 84w, /car/left-wheel-a.avif 168w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
             width="168"
             height="168"
@@ -174,8 +178,8 @@
           />
           <img
             class="car__wheel car__wheel--b"
-            src="/car/left-wheel-b.webp"
-            srcset="/car/left-wheel-b-720.webp 84w, /car/left-wheel-b.webp 167w"
+            src="/car/left-wheel-b.avif"
+            srcset="/car/left-wheel-b-720.avif 84w, /car/left-wheel-b.avif 167w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
             width="167"
             height="167"
@@ -192,8 +196,8 @@
         <div class="car car--right" data-car>
           <img
             class="car__body"
-            src="/car/right.webp"
-            srcset="/car/right-720.webp 720w, /car/right.webp 1440w"
+            src="/car/right.avif"
+            srcset="/car/right-720.avif 720w, /car/right.avif 1440w"
             sizes="(max-width: 583px) 280px, (max-width: 1500px) 48vw, 720px"
             width="1440"
             height="622"
@@ -201,17 +205,17 @@
           />
           <img
             class="car__wheel car__wheel--a"
-            src="/car/right-wheel-a.webp"
-            srcset="/car/right-wheel-a-720.webp 85w, /car/right-wheel-a.webp 170w"
+            src="/car/right-wheel-a.avif"
+            srcset="/car/right-wheel-a-720.avif 84w, /car/right-wheel-a.avif 167w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
-            width="170"
-            height="170"
+            width="167"
+            height="167"
             alt=""
           />
           <img
             class="car__wheel car__wheel--b"
-            src="/car/right-wheel-b.webp"
-            srcset="/car/right-wheel-b-720.webp 84w, /car/right-wheel-b.webp 168w"
+            src="/car/right-wheel-b.avif"
+            srcset="/car/right-wheel-b-720.avif 84w, /car/right-wheel-b.avif 168w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
             width="168"
             height="168"
@@ -234,8 +238,8 @@
           <div class="car car--left" data-car>
             <img
               class="car__body"
-              src="/car/left.webp"
-              srcset="/car/left-720.webp 720w, /car/left.webp 1440w"
+              src="/car/left.avif"
+              srcset="/car/left-720.avif 720w, /car/left.avif 1440w"
               sizes="(max-width: 583px) 280px, (max-width: 1500px) 48vw, 720px"
               width="1440"
               height="622"
@@ -243,8 +247,8 @@
             />
             <img
               class="car__wheel car__wheel--a"
-              src="/car/left-wheel-a.webp"
-              srcset="/car/left-wheel-a-720.webp 84w, /car/left-wheel-a.webp 168w"
+              src="/car/left-wheel-a.avif"
+              srcset="/car/left-wheel-a-720.avif 84w, /car/left-wheel-a.avif 168w"
               sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
               width="168"
               height="168"
@@ -252,8 +256,8 @@
             />
             <img
               class="car__wheel car__wheel--b"
-              src="/car/left-wheel-b.webp"
-              srcset="/car/left-wheel-b-720.webp 84w, /car/left-wheel-b.webp 167w"
+              src="/car/left-wheel-b.avif"
+              srcset="/car/left-wheel-b-720.avif 84w, /car/left-wheel-b.avif 167w"
               sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
               width="167"
               height="167"
@@ -276,8 +280,8 @@
         <div class="car car--right" data-car>
           <img
             class="car__body"
-            src="/car/right.webp"
-            srcset="/car/right-720.webp 720w, /car/right.webp 1440w"
+            src="/car/right.avif"
+            srcset="/car/right-720.avif 720w, /car/right.avif 1440w"
             sizes="(max-width: 583px) 280px, (max-width: 1500px) 48vw, 720px"
             width="1440"
             height="622"
@@ -285,17 +289,17 @@
           />
           <img
             class="car__wheel car__wheel--a"
-            src="/car/right-wheel-a.webp"
-            srcset="/car/right-wheel-a-720.webp 85w, /car/right-wheel-a.webp 170w"
+            src="/car/right-wheel-a.avif"
+            srcset="/car/right-wheel-a-720.avif 84w, /car/right-wheel-a.avif 167w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
-            width="170"
-            height="170"
+            width="167"
+            height="167"
             alt=""
           />
           <img
             class="car__wheel car__wheel--b"
-            src="/car/right-wheel-b.webp"
-            srcset="/car/right-wheel-b-720.webp 84w, /car/right-wheel-b.webp 168w"
+            src="/car/right-wheel-b.avif"
+            srcset="/car/right-wheel-b-720.avif 84w, /car/right-wheel-b.avif 168w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
             width="168"
             height="168"
@@ -313,8 +317,8 @@
         <div class="car car--left" data-car>
           <img
             class="car__body"
-            src="/car/left.webp"
-            srcset="/car/left-720.webp 720w, /car/left.webp 1440w"
+            src="/car/left.avif"
+            srcset="/car/left-720.avif 720w, /car/left.avif 1440w"
             sizes="(max-width: 583px) 280px, (max-width: 1500px) 48vw, 720px"
             width="1440"
             height="622"
@@ -322,8 +326,8 @@
           />
           <img
             class="car__wheel car__wheel--a"
-            src="/car/left-wheel-a.webp"
-            srcset="/car/left-wheel-a-720.webp 84w, /car/left-wheel-a.webp 168w"
+            src="/car/left-wheel-a.avif"
+            srcset="/car/left-wheel-a-720.avif 84w, /car/left-wheel-a.avif 168w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
             width="168"
             height="168"
@@ -331,8 +335,8 @@
           />
           <img
             class="car__wheel car__wheel--b"
-            src="/car/left-wheel-b.webp"
-            srcset="/car/left-wheel-b-720.webp 84w, /car/left-wheel-b.webp 167w"
+            src="/car/left-wheel-b.avif"
+            srcset="/car/left-wheel-b-720.avif 84w, /car/left-wheel-b.avif 167w"
             sizes="(max-width: 583px) 34px, (max-width: 1500px) 5.6vw, 84px"
             width="167"
             height="167"
@@ -343,6 +347,13 @@
 
       <section id="area" class="block" aria-labelledby="area-title">
         <h2 id="area-title" class="block__title" data-reveal data-i18n="area.title"></h2>
+        <!-- OpenStreetMap with the city's boundary, built by src/map/area-map.ts once it is near. -->
+        <div
+          class="area-map"
+          data-area-map
+          role="region"
+          data-i18n-attr="aria-label:area.map"
+        ></div>
       </section>
     </main>
 
