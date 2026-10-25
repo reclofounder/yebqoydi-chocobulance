@@ -328,7 +328,9 @@ mask). Exported by `tools/car/` (README "The car"): rendered with Quartz for Col
 what they show on white, cropped to one frame for both views, WebP at 1440 and 720 px wide; each rim
 cut out as a round disc (r = rim + 6 px) laid exactly over the photo's rim and spun by the distance
 rolled (`--tyre-share` 0.1403 from the measured tyre). `src/styles/car.css` is generated. Car size on
-the page: `clamp(280px, 48vw, 720px)`. Higgsfield was offered for images; not used (the PDF is the
+the page: `clamp(280px, 48vw, 720px)`. On the red page the car gets "some shape" (user, 2026-10-25): a
+brown-tinted drop shadow on the body (`.car__body` filter) so the red spoiler and stripes read, and a
+contact shadow under the tyres (`.car::before`); rims on their own layers so the filter never redraws. Higgsfield was offered for images; not used (the PDF is the
 exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
 
 ## 8. Session log
@@ -440,3 +442,6 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   `tools/car/` pipeline and replaced the placeholder with both side views and spinning rims (§7 "The
   car"). User offered Higgsfield (skill `higgsfield-ai/skills`) for image generation, asked to spend
   credits only when needed; not installed or used. Pushed (auto-deploys).
+- **2026-10-25 (car shape)** — User: "give it some shape, push to GitHub, after I see it we will work
+  on it". Added the body's drop shadow and a ground shadow (layout.css), new `og.png`. Pushed (Railway
+  redeploys). Next: user reviews the live page and iterates.

@@ -381,9 +381,32 @@ h2,
   will-change: transform;
 }
 
+/* The car stands on the road: a soft contact shadow under the tyres, darkest where they touch.
+   Behind the body (z-index -1 stays inside the car, which is its own layer). */
+.car::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 3%;
+  right: 3%;
+  top: 90%;
+  height: 16%;
+  background: radial-gradient(
+    closest-side,
+    rgb(46 20 13 / 0.7),
+    rgb(46 20 13 / 0.3) 60%,
+    transparent
+  );
+}
+
+/* Its outline, so the red spoiler and stripes read against the red page: a warm brown shadow
+   (brand: shadows are brown-tinted, never black), close and crisp plus wide and soft. On the body
+   only: it moves with the car's layer and is never redrawn, while the rims turn on layers of their
+   own (below). */
 .car__body {
   width: 100%;
   height: auto;
+  filter: drop-shadow(0 2px 3px rgb(46 20 13 / 0.6)) drop-shadow(0 14px 22px rgb(46 20 13 / 0.4));
 }
 
 /* Each rim is a round copy of the photo's own rim, laid exactly over it, so the car looks the same
@@ -392,6 +415,7 @@ h2,
 .car__wheel {
   position: absolute;
   height: auto;
+  will-change: transform;
 }
 
 /* Reduced motion: no driving. Only the car at the door stays, parked in the middle. */
