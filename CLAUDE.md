@@ -500,3 +500,4 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   No drop shadow (the mask clipped it into a visible box). Exported with `tools/photos/export.py`
   (body alpha >= 240 made opaque, AVIF 4:4:4 at 900 and 450 px). `imgs/` sources are not committed.
   Committed; waiting for the client's OK to push.
+- **2026-10-26** — "tezda" removed: "Endi kichkintoyni ovutish kerak" (RU «Теперь малыша нужно утешить»).
