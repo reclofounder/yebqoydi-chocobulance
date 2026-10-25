@@ -29,7 +29,7 @@ test('no literal number or price in copy, only templates (and no trace of the ol
 test('t fills templates', () => {
   expect(t('call.number', 'uz')).toBe('71\u00a0209\u00a099\u00a000');
   expect(t('header.call', 'ru')).toBe('71\u00a0209\u00a099\u00a000');
-  expect(t('price.tub', 'uz')).toBe('Shokolad pastasi — 99\u00a0000 soʻm / dona');
+  expect(t('price.tub', 'uz')).toBe('Shokolad pastasi\u00a0— 99\u00a0000 soʻm.');
   expect(t('a11y.call', 'ru')).toBe('Позвонить по номеру 71\u00a0209\u00a099\u00a000');
 });
 
@@ -85,7 +85,7 @@ test('getLang survives localStorage throwing', () => {
 test('applyI18n sets lang and text', () => {
   document.body.innerHTML = '<p data-i18n="price.free">x</p>';
   applyI18n(document, 'ru');
-  expect(document.querySelector('p')!.textContent).toBe('Вызов бесплатный');
+  expect(document.querySelector('p')!.textContent).toBe('Обслуживание бесплатно!');
   expect(document.documentElement.lang).toBe('ru');
 });
 

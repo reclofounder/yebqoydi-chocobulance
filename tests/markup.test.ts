@@ -115,8 +115,14 @@ describe('index.html markup', () => {
     ]);
     expect(doc.querySelector('#price [data-i18n="price.tub"]')).not.toBeNull();
     expect(
-      [...doc.querySelectorAll('#how ol.steps > li')].map((li) => li.getAttribute('data-i18n')),
+      [...doc.querySelectorAll('#how ol.steps > li.step > .step__text')].map((p) =>
+        p.getAttribute('data-i18n'),
+      ),
     ).toEqual(['how.1', 'how.2', 'how.3']);
+    // Each card has its icon, hidden from screen readers (the words carry the step).
+    const icons = doc.querySelectorAll('#how .step > svg.step__icon');
+    expect(icons).toHaveLength(3);
+    for (const icon of icons) expect(icon.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('sets the hero on an arc: real words for readers, a hidden drawing of them on a path', () => {

@@ -472,3 +472,13 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   `icon-192.png`, `apple-touch-icon.png`), `favicon.svg` removed. Also the bigger logo from the
   previous entry. Lighthouse after: 99 / 100 / 100 / SEO 92 (hreflang, absolute on Vercel), CLS 0.
   Committed; waiting for the user's OK to push.
+- **2026-10-26 (feedback round 2, pushed)** — Map: the service area is **inside the big Tashkent Ring
+  Road** (4P1, OSM relation 3122331), not the city boundary; traced outline in
+  `src/map/service-area.json` (`tashkent.json` removed). Copy: call line in three lines
+  ("Telefoningizni oling," / 71 209 99 00 / "raqamiga qoʻngʻiroq qiling!", one line each from 900 px);
+  "Chocobulance uyingizga shoshadi" (RU «Chocobulance уже спешит к вам»); "Xizmat bepul!" and
+  "Shokolad pastasi — 99 000 soʻm." (RU «Обслуживание бесплатно!», «Шоколадная паста — 99 000 сум.»).
+  Spacing after the cars halved (blocks 60svh, the door 70svh); crossings now run while the lane is
+  in the middle third of the screen (`START`/`END` in car.ts), one car at a time measured at
+  1440x900, 1280x720, 390x844. "Qanday ishlaydi?": three white cards in a row (stacked on phones),
+  red number badges, phone / pin / heart icons, dashed connectors. Pushed on the user's instruction.

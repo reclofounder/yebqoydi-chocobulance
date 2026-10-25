@@ -88,18 +88,21 @@ describe('initCars', () => {
       </div>
     </div>`;
 
-  it('makes one scrubbed trigger per lane; the first runs from the top, the door parks mid-screen', () => {
-    document.body.innerHTML = ['enter', 'ltr', 'arrive', 'nonsense'].map(lane).join('');
+  it('makes one scrubbed trigger per lane; crossings run in the middle of the screen, one car at a time', () => {
+    document.body.innerHTML = ['enter', 'ltr', 'arrive', 'rtl', 'nonsense'].map(lane).join('');
     const triggers = initCars(document);
 
-    expect(triggers).toHaveLength(3);
+    expect(triggers).toHaveLength(4);
     expect(created.map((v) => [v.start, v.end])).toEqual([
-      [0, 'bottom top'],
-      ['top bottom', 'bottom top'],
+      // The first car is on screen at load and gone by the time its lane is halfway up.
+      [0, 'bottom 50%'],
+      ['top 65%', 'bottom 35%'],
+      // The car at the door parks once its lane is in the middle of the screen.
       ['top bottom', 'center center'],
+      ['top 65%', 'bottom 35%'],
     ]);
     expect(created.map((v) => v.trigger)).toEqual(
-      [...document.querySelectorAll('[data-lane]')].slice(0, 3),
+      [...document.querySelectorAll('[data-lane]')].slice(0, 4),
     );
   });
 

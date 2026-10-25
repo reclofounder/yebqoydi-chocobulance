@@ -249,13 +249,12 @@ h2,
 
 /* ---------- The words ---------- */
 
-/* One step of the story per screen: a single big line, centred, like the teaser. */
-/* Every block between two lanes is at least a screen tall, so the lanes sit a full screen apart:
-   a car has left the screen before the next one comes in, never two at once. */
+/* Each block is a bit over half a screen: one idea per screen, without long empty runs between the
+   car and the next words. (car.ts finishes each crossing a little early, so cars never meet.) */
 .beat {
   display: grid;
   place-items: center;
-  min-height: 100svh;
+  min-height: 60svh;
   padding: var(--s8) var(--gutter);
   text-align: center;
   scroll-margin-top: var(--header-total);
@@ -266,9 +265,21 @@ h2,
   font-size: var(--fs-beat);
 }
 
+/* The call line in three lines: "take your phone," / the number / "call it!". Wider than the other
+   lines, and sized to the screen, so on a desktop each of the three stays whole. */
+#call-title {
+  max-width: 28ch;
+  font-size: clamp(2.5rem, 6.2vw, 6rem);
+}
+
+#call-title > span {
+  display: block;
+}
+
 /* The number inside the call line: a white pill, so it reads as the thing to tap. */
 .tel {
   display: inline-block;
+  margin-block: 0.12em;
   padding: 0.04em 0.32em 0;
   border-radius: 999px;
   background: var(--white);
@@ -291,7 +302,7 @@ h2,
   grid-template-rows: auto auto;
   align-content: center;
   gap: var(--s4);
-  min-height: 100svh;
+  min-height: 70svh;
   padding-inline: 0;
 }
 
@@ -310,8 +321,8 @@ h2,
   justify-items: center;
   align-content: center;
   gap: var(--s4);
-  min-height: 100svh;
-  padding: var(--s12) var(--gutter);
+  min-height: 60svh;
+  padding: var(--s8) var(--gutter);
   text-align: center;
   scroll-margin-top: var(--header-total);
 }
@@ -322,41 +333,107 @@ h2,
 }
 
 .block__line {
-  max-width: 22ch;
+  max-width: 32ch;
   font-size: var(--fs-line);
 }
 
 .steps {
+  --step-gap: var(--s6);
   display: grid;
-  gap: var(--s3);
-  max-width: 34rem;
+  gap: var(--step-gap);
+  width: 100%;
+  max-width: 26rem;
+  margin-top: var(--s3);
   counter-reset: step;
-  text-align: left;
 }
 
-.steps li {
+/* A card per step: the number on a red badge sitting on its top edge, the icon, the words. */
+.step {
+  position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
+  justify-items: center;
+  align-content: start;
   gap: var(--s2);
-  font-size: var(--fs-step);
-  font-weight: 600;
-  line-height: 1.35;
+  padding: var(--s8) var(--s3) var(--s4);
+  border-radius: 28px;
+  background: var(--white);
+  box-shadow: 0 12px 32px rgb(46 20 13 / 0.3);
+  color: var(--brown-900);
   counter-increment: step;
 }
 
-.steps li::before {
+.step::before {
   content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% -50%;
   display: grid;
   place-items: center;
-  width: 2.4em;
-  height: 2.4em;
+  width: 56px;
+  height: 56px;
+  border: 4px solid var(--white);
   border-radius: 50%;
-  background: var(--white);
-  color: var(--red-600);
+  background: var(--red-600);
+  color: var(--white);
   font-family: var(--font-display);
   font-weight: 800;
+  font-size: 1.625rem;
   line-height: 1;
+}
+
+.step__icon {
+  width: 48px;
+  height: 48px;
+  fill: var(--red-600);
+}
+
+.step__text {
+  max-width: 16ch;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-step);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+/* The way from one step to the next: a dashed white line between the cards, down on a phone, */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 4px;
+  height: var(--step-gap);
+  translate: -50% 0;
+  background: repeating-linear-gradient(var(--white) 0 8px, transparent 8px 16px);
+}
+
+/* across on a wider screen, where the three cards sit in one row. */
+@media (min-width: 900px) {
+  .steps {
+    --step-gap: var(--s8);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 1040px;
+  }
+
+  .step:not(:last-child)::after {
+    top: 50%;
+    left: 100%;
+    width: var(--step-gap);
+    height: 4px;
+    translate: 0 -50%;
+    background: repeating-linear-gradient(90deg, var(--white) 0 8px, transparent 8px 16px);
+  }
+}
+
+/* The cards come up one after the other. */
+.motion .step:nth-child(2) {
+  transition-delay: 0.1s;
+}
+
+.motion .step:nth-child(3) {
+  transition-delay: 0.2s;
 }
 
 /* Words rise into place as they come on screen (scroll/motion.ts marks them data-shown). Only

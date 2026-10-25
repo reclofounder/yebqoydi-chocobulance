@@ -19,6 +19,27 @@ export function isLaneKind(value: unknown): value is LaneKind {
  */
 export const WHEEL_SHARE = 0.14;
 
+/**
+ * When each crossing runs, as ScrollTrigger positions ("lane edge, screen edge"). The first lane is
+ * on screen at load, so it runs from the very top of the page and is done by the time its lane is
+ * halfway up the screen; the car at the door parks once its lane is in the middle. The others drive
+ * across while their lane is in the middle third of the screen: with the blocks between lanes just
+ * over half a screen tall, one car has left before the next comes in (measured at 1440x900,
+ * 1280x720 and 390x844).
+ */
+const START: Record<LaneKind, number | string> = {
+  enter: 0,
+  ltr: 'top 65%',
+  rtl: 'top 65%',
+  arrive: 'top bottom',
+};
+const END: Record<LaneKind, string> = {
+  enter: 'bottom 50%',
+  ltr: 'bottom 35%',
+  rtl: 'bottom 35%',
+  arrive: 'center center',
+};
+
 /** Share of the car already on screen at the right edge when the page opens (`enter`). */
 const ENTER_SHOWN = 0.55;
 
@@ -95,10 +116,8 @@ export function initCars(root: ParentNode = document): ScrollTrigger[] {
     triggers.push(
       ScrollTrigger.create({
         trigger: lane,
-        // The first lane is on screen at load: it runs from the very top of the page.
-        start: kind === 'enter' ? 0 : 'top bottom',
-        // The car at the door parks once the lane is in the middle of the screen.
-        end: kind === 'arrive' ? 'center center' : 'bottom top',
+        start: START[kind],
+        end: END[kind],
         onRefreshInit: measure,
         onRefresh: (self) => draw(self.progress),
         onUpdate: (self) => draw(self.progress),

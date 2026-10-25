@@ -20,9 +20,16 @@ describe('layout.css', () => {
     expect(rule('.call')).toMatch(/white-space:\s*nowrap/);
   });
 
-  it('keeps the lanes a full screen apart, so only one car is ever on screen', () => {
-    expect(rule('.beat')).toMatch(/min-height:\s*100svh/);
-    expect(rule('.block')).toMatch(/min-height:\s*100svh/);
+  it('keeps each block just over half a screen tall (car.ts times the crossings to that)', () => {
+    expect(rule('.beat')).toMatch(/min-height:\s*60svh/);
+    expect(rule('.block')).toMatch(/min-height:\s*60svh/);
+  });
+
+  it('lays the steps out as three cards in a row on a wide screen, stacked on a phone', () => {
+    expect(rule('.step')).toMatch(/background:\s*var\(--white\)/);
+    expect(css).toMatch(
+      /@media \(min-width: 900px\)\s*\{\s*\.steps\s*\{[^}]*grid-template-columns:\s*repeat\(3/,
+    );
   });
 
   it('clips each lane, so a car off the edge never makes the page scroll sideways', () => {

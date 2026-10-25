@@ -5,22 +5,23 @@ import { getLang, type Lang } from '../i18n';
 /** OpenFreeMap: OpenStreetMap vector tiles, free, no key, commercial use allowed. A quiet, light style. */
 export const STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
 
-/** Brand red (tokens.css --red-600) for the city's edge, and its fill and the dimmed outside. */
+/** Brand red (tokens.css --red-600) for the area's edge and fill, and the brown that dims the outside. */
 const RED = '#c71920';
 const OUTSIDE = '#2e140d';
 
 /** How far from the screen the map starts loading (its code and tiles are only fetched near it). */
 const PRELOAD_MARGIN = '600px 0px';
 
-type City = FeatureCollection<MultiPolygon>;
+/** The service area: inside the Tashkent Ring Road (service-area.json). */
+type Area = FeatureCollection<MultiPolygon>;
 
-/** The city's bounds as [[west, south], [east, north]]. */
-export function cityBounds(city: City): [[number, number], [number, number]] {
+/** The area's bounds as [[west, south], [east, north]]. */
+export function areaBounds(area: Area): [[number, number], [number, number]] {
   let w = Infinity;
   let s = Infinity;
   let e = -Infinity;
   let n = -Infinity;
-  for (const feature of city.features) {
+  for (const feature of area.features) {
     for (const polygon of feature.geometry.coordinates) {
       for (const [x, y] of polygon[0]) {
         w = Math.min(w, x);
@@ -37,10 +38,10 @@ export function cityBounds(city: City): [[number, number], [number, number]] {
 }
 
 /**
- * Everything but the city: a polygon covering the world with the city's outlines cut out of it, so
- * the outside can be dimmed and the city stays clear. Outer ring counter-clockwise, holes clockwise.
+ * Everything but the area: a polygon covering the world with the area's outline cut out of it, so
+ * the outside can be dimmed and the area stays clear. Outer ring counter-clockwise, holes clockwise.
  */
-export function outsideMask(city: City): Polygon {
+export function outsideMask(area: Area): Polygon {
   const world: Position[] = [
     [-180, -85],
     [180, -85],
@@ -49,7 +50,7 @@ export function outsideMask(city: City): Polygon {
     [-180, -85],
   ];
   const holes: Position[][] = [];
-  for (const feature of city.features) {
+  for (const feature of area.features) {
     for (const polygon of feature.geometry.coordinates) holes.push(clockwise(polygon[0]));
   }
   return { type: 'Polygon', coordinates: [world, ...holes] };
@@ -84,21 +85,21 @@ const GESTURE_HINTS: Record<Lang, Record<string, string>> = {
   },
 };
 
-/** Builds the map in `container`: OpenStreetMap, the city outlined in red, the outside dimmed. */
+/** Builds the map in `container`: OpenStreetMap, the ring road's inside outlined in red, the outside dimmed. */
 async function build(container: HTMLElement): Promise<MapLibreMap> {
-  // The map's code, its stylesheet and the city's outline all come with it, not with the page.
+  // The map's code, its stylesheet and the area's outline all come with it, not with the page.
   const [{ default: maplibregl }, { default: data }] = await Promise.all([
     import('maplibre-gl'),
-    import('./tashkent.json'),
+    import('./service-area.json'),
     import('maplibre-gl/dist/maplibre-gl.css'),
   ]);
-  const city = data as City;
+  const area = data as Area;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const map = new maplibregl.Map({
     container,
     style: STYLE_URL,
-    bounds: cityBounds(city),
+    bounds: areaBounds(area),
     fitBoundsOptions: { padding: 24 },
     // The page scrolls past the map: one finger (or a plain wheel) scrolls the page, two fingers
     // (or Ctrl/⌘ + wheel) move the map, and a hint says so.
@@ -114,10 +115,10 @@ async function build(container: HTMLElement): Promise<MapLibreMap> {
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
   map.on('load', () => {
-    map.addSource('tashkent', { type: 'geojson', data: city });
+    map.addSource('area', { type: 'geojson', data: area });
     map.addSource('outside', {
       type: 'geojson',
-      data: { type: 'Feature', properties: {}, geometry: outsideMask(city) },
+      data: { type: 'Feature', properties: {}, geometry: outsideMask(area) },
     });
     map.addLayer({
       id: 'outside',
@@ -126,15 +127,15 @@ async function build(container: HTMLElement): Promise<MapLibreMap> {
       paint: { 'fill-color': OUTSIDE, 'fill-opacity': 0.28 },
     });
     map.addLayer({
-      id: 'tashkent-fill',
+      id: 'area-fill',
       type: 'fill',
-      source: 'tashkent',
+      source: 'area',
       paint: { 'fill-color': RED, 'fill-opacity': 0.08 },
     });
     map.addLayer({
-      id: 'tashkent-line',
+      id: 'area-line',
       type: 'line',
-      source: 'tashkent',
+      source: 'area',
       layout: { 'line-join': 'round' },
       paint: { 'line-color': RED, 'line-width': 3 },
     });

@@ -9,7 +9,7 @@
     <title data-i18n="meta.title">Chocobulance — Chococream shokolad tez yordami</title>
     <meta
       name="description"
-      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Chaqirish bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
+      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
       data-i18n="meta.description"
     />
     <!-- The "20 yoshda" of the Chococream 20 lockup on brand red: the .ico (16, 32, 48 px) for tabs
@@ -37,7 +37,7 @@
     />
     <meta
       property="og:description"
-      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Chaqirish bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
+      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
       data-i18n="meta.description"
     />
     <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
@@ -51,7 +51,7 @@
     />
     <meta
       name="twitter:description"
-      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Chaqirish bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
+      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
       data-i18n="meta.description"
     />
     <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
@@ -269,10 +269,32 @@
 
       <section id="how" class="block" aria-labelledby="how-title">
         <h2 id="how-title" class="block__title" data-reveal data-i18n="how.title"></h2>
-        <ol class="steps" data-reveal>
-          <li data-i18n="how.1"></li>
-          <li data-i18n="how.2"></li>
-          <li data-i18n="how.3"></li>
+        <!-- Three cards, step by step: the numbers come from a CSS counter, the icons are drawn here. -->
+        <ol class="steps">
+          <li class="step" data-reveal>
+            <svg class="step__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C9.61 21 3 14.39 3 6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"
+              />
+            </svg>
+            <p class="step__text" data-i18n="how.1"></p>
+          </li>
+          <li class="step" data-reveal>
+            <svg class="step__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M12 2a7.5 7.5 0 0 0-7.5 7.5c0 5.3 6.2 11.7 6.9 12.3a.86.86 0 0 0 1.2 0c.7-.6 6.9-7 6.9-12.3A7.5 7.5 0 0 0 12 2zm0 10.5a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"
+              />
+            </svg>
+            <p class="step__text" data-i18n="how.2"></p>
+          </li>
+          <li class="step" data-reveal>
+            <svg class="step__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M12 21.2c-.3 0-.6-.1-.8-.3C6.4 16.8 2.5 13.3 2.5 8.9 2.5 5.9 4.8 3.6 7.7 3.6c1.7 0 3.3.8 4.3 2.1 1-1.3 2.6-2.1 4.3-2.1 2.9 0 5.2 2.3 5.2 5.3 0 4.4-3.9 7.9-8.7 12-.2.2-.5.3-.8.3z"
+              />
+            </svg>
+            <p class="step__text" data-i18n="how.3"></p>
+          </li>
         </ol>
       </section>
 

@@ -135,7 +135,7 @@ describe('the styles for touch and keyboard', () => {
 
   it('uses the small viewport unit and never 100vh', () => {
     for (const css of sources) expect(css).not.toMatch(/\b100vh\b/);
-    expect(layout).toMatch(/min-height:\s*100svh/);
+    expect(layout).toMatch(/min-height:\s*\d+svh/);
   });
 
   it('stops overscroll only while Lenis smooths the scroll', () => {
