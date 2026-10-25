@@ -482,3 +482,14 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   in the middle third of the screen (`START`/`END` in car.ts), one car at a time measured at
   1440x900, 1280x720, 390x844. "Qanday ishlaydi?": three white cards in a row (stacked on phones),
   red number badges, phone / pin / heart icons, dashed connectors. Pushed on the user's instruction.
+- **2026-10-26 (feedback round 3)** — Service area = **the line the client drew** in blue over the map
+  (their Tashkent: the ring road N/W/E, a cut across the south above Babur and Abad); traced from the
+  screenshot, georeferenced against the previous outline (mean error < 1 px), in
+  `src/map/service-area.json`. Area heading "Xizmat faqat Toshkent shahrida koʻrsatiladi!" (RU
+  «Сервис работает только в Ташкенте!»); heading + map fill exactly one screen with the header
+  (`#area` 100svh, map takes the rest). Removed the car between the steps and the price ("card" in the
+  client's messages means the car); the last lane now drives left to right (L, R, L-park, R). More space
+  above "Chocobulance uyingizga shoshadi". "Endi kichkintoyni tezda ovutish kerak". One car on screen
+  at a time re-checked at 1440x900, 1280x720, 390x844. Next: the client will send photos of a boy holding
+  an empty Chococream tub (a preview arrived: profile, facing right, yellow T-shirt, white background) to
+  be added tastefully.

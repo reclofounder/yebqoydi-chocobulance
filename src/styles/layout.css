@@ -297,8 +297,10 @@ h2,
   outline-offset: 4px;
 }
 
-/* "At your door": the words, then the lane where the car pulls up and stays. */
+/* "Hurrying to you": the words, then the lane where the car pulls up and stays. Extra room above,
+   so it does not crowd the call line before it. */
 .beat--arrive {
+  padding-top: clamp(var(--s8), 14svh, 160px);
   grid-template-rows: auto auto;
   align-content: center;
   gap: var(--s4);
@@ -449,8 +451,25 @@ h2,
     translate 0.6s var(--ease-bounce);
 }
 
-/* The service area: a map card under the words. Its height is set before the map arrives, so
-   nothing moves when it does; a map that cannot be built (no WebGL, offline) leaves no empty card. */
+/* The service area: the words and the map together fill exactly one screen, header included, so
+   once the section reaches the top both are in view. The map takes whatever height the words
+   leave. Its size is set before the map arrives, so nothing moves when it does; a map that cannot
+   be built (no WebGL, offline) leaves no empty card. */
+#area {
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+  height: 100svh;
+  min-height: 0;
+  padding: calc(var(--header-total) + var(--s3)) var(--gutter) var(--s4);
+  scroll-margin-top: 0;
+}
+
+#area .area-map {
+  height: 100%;
+  min-height: 240px;
+  aspect-ratio: auto;
+}
+
 .area-map {
   width: min(100%, 1040px);
   aspect-ratio: 16 / 10;

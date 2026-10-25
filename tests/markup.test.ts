@@ -175,7 +175,8 @@ describe('index.html markup', () => {
 
   it('lays the lanes between the words, alternating, with the car parking at the door', () => {
     const lanes = [...doc.querySelectorAll<HTMLElement>('[data-lane]')];
-    expect(lanes.map((l) => l.dataset.lane)).toEqual(['enter', 'ltr', 'arrive', 'ltr', 'rtl']);
+    // Left, right, left (parks at the door), right: the car turns round every time.
+    expect(lanes.map((l) => l.dataset.lane)).toEqual(['enter', 'ltr', 'arrive', 'ltr']);
     expect(lanes[2].closest('section')!.querySelector('#door-title')).not.toBeNull();
     for (const lane of lanes) {
       expect(lane.getAttribute('aria-hidden')).toBe('true');
