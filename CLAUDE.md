@@ -499,5 +499,7 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   faded into the page with a mask, rising in after the words; side by side under the words on phones.
   No drop shadow (the mask clipped it into a visible box). Exported with `tools/photos/export.py`
   (body alpha >= 240 made opaque, AVIF 4:4:4 at 900 and 450 px). `imgs/` sources are not committed.
-  Committed; waiting for the client's OK to push.
+  Pushed with the next entry.
 - **2026-10-26** — "tezda" removed: "Endi kichkintoyni ovutish kerak" (RU «Теперь малыша нужно утешить»).
+- **2026-10-26 (pushed)** — The boys and the copy change pushed; live on Vercel, checked (page, both
+  boy images as AVIF, the new line in the bundle).
