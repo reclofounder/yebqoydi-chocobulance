@@ -14,10 +14,10 @@
   --header-h: 64px;
   --header-total: calc(var(--header-h) + env(safe-area-inset-top, 0px));
 
-  /* The car: 240 px wide on a phone, up to 560 px on a desktop; --car-ratio is its art's height
-     over its width (placeholder: 240 / 480). Its lane is the car's height plus a little air. */
-  --car-w: clamp(240px, 40vw, 560px);
-  --car-ratio: 0.5;
+  /* The car: 280 px wide on a phone, up to 720 px on a desktop (the `sizes` of its images in
+     index.html follow these numbers). --car-ratio, its art's proportions, comes from car.css. Its
+     lane is the car's height plus a little air. */
+  --car-w: clamp(280px, 48vw, 720px);
   --lane-h: calc(var(--car-w) * var(--car-ratio) + var(--s6));
 
   /* Fluid type: each clamp() starts at its minimum at a 360 px viewport and tops out at 1440 px. */
@@ -386,21 +386,12 @@ h2,
   height: auto;
 }
 
-/* Wheel boxes as shares of the body (placeholder art, 480 x 240: tyres r 26 at x 118 and 362,
-   y 196). A new car means new numbers here: README, "Swap the car". */
+/* Each rim is a round copy of the photo's own rim, laid exactly over it, so the car looks the same
+   standing still and the wheels can turn. Where each sits (in % of the body) is in car.css, which
+   tools/car/export.py writes from the design PDF. */
 .car__wheel {
   position: absolute;
-  top: 70.833%;
-  width: 10.833%;
   height: auto;
-}
-
-.car__wheel--a {
-  left: 19.167%;
-}
-
-.car__wheel--b {
-  left: 70%;
 }
 
 /* Reduced motion: no driving. Only the car at the door stays, parked in the middle. */

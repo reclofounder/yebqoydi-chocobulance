@@ -24,14 +24,15 @@ Node 20.19+ or 22.12+ (`.nvmrc` pins 22), as Vite 8 requires (`engines` in `pack
 index.html           The page: header, the arched hero, the words, the car lanes, the footer. Copy comes from data-i18n keys.
 public/              favicon.svg, og.png (1200x630 share image), robots.txt
 public/brand/        The Chococream 20 logo for red backgrounds (from brand/design-system)
-public/car/          The car: body-left.svg, body-right.svg, wheel.svg (placeholder art, see "Swap the car")
+public/car/          The car from the design PDF: each view's body and rims, WebP (see "The car")
+tools/car/           render.swift and export.py: the PDF to public/car/ and src/styles/car.css
 src/config.ts        PHONE, PHONE_DISPLAY, PRICE, MODE
 src/i18n.ts          Copy engine: t(), applyI18n(), language choice (?lang=, then localStorage, then uz)
 src/i18n/            uz.json, ru.json
 src/state.ts         Campaign mode (teaser / live / ended)
 src/main.ts          Boot: apply copy and mode, start the motion once the fonts are in
 src/scroll/          car.ts (the car in each lane), motion.ts (header, words rising, start-up), smooth.ts (Lenis)
-src/styles/          tokens (brand colours, fonts), base (the red field), layout (everything else)
+src/styles/          tokens (brand colours, fonts), base (the red field), layout (everything else), car (generated)
 tests/               Vitest suites, one per area
 brief/, docs/        Campaign brief and key visuals; earlier design spec and plan (v1)
 railway.json         Railway build and start commands
@@ -75,16 +76,21 @@ The page title and descriptions in `index.html` ship in Uzbek (for link previews
 
 The hero's arc fits "Yebqoʻydingizmi?" at `font-size: 136px` in its 1200-unit drawing (`.hero__arc text` in `layout.css`). A longer line drops the letters that do not fit on the path: lower the size, or lengthen the arc in `index.html` (`#hero-arc`).
 
-## Swap the car
+## The car
 
-The car is three images in `public/car/`. The current ones are a placeholder (the v1 van, 480x240).
+The car is the design's own artwork (`Hyundai_starix_chococream_20.pdf`, Illustrator: a Hyundai Staria in Chococream livery; page 1 faces left, page 2 right, 3 and 4 are the rear and front). Two views, never one mirrored, or "Chococream" would read backwards. `public/car/` holds, per view, the body (`left.webp`, `left-720.webp`) and its two rims (`left-wheel-a.webp`, `-b`, each also at `-720`); `src/styles/car.css` says where each rim sits.
 
-1. Export from Figma the car **without its wheels**, once facing left (`body-left`) and once facing right (`body-right`). Two views, not one mirrored: lettering on the car would read backwards. Transparent background. SVG, or PNG/WebP at 2x (about 1200 px wide).
-2. Export one wheel, square, tyre touching the edges (`wheel`), facing the viewer; it is spun around its centre.
-3. Put the files in `public/car/` and point the `src` attributes in `index.html` at them (one car per lane; `width` and `height` set to the files' own size).
-4. In `layout.css`: set `--car-ratio` to the body's height over its width, and the wheel boxes (`.car__wheel`: `top`, `width`; `--a` and `--b`: `left`) as percentages of the body. In `src/scroll/car.ts` set `WHEEL_SHARE` to the wheel's diameter over the body's width, so the spin matches the road.
-5. If the car has no separate wheels, delete the two `car__wheel` images in each lane; the car still drives.
-6. `npm test`, then scroll through at 1440x900 and 390x844. Redo `og.png` (below).
+The rims are round copies of the photo's own rims, laid exactly over them: standing still the car is the PDF; driving, the rims turn (by the distance rolled, with the tyre size in `--tyre-share`). Holes the photo cut-out left inside the car (between the spokes) show what they show on the white artboard, so the red page never shows through.
+
+To re-export after a design change (macOS; Python with Pillow, numpy and scipy, for example in a throwaway virtualenv):
+
+```
+swift tools/car/render.swift design.pdf 1 2.0833333 /tmp/left.png    # page 1, 150 dpi, ColorSync colours
+swift tools/car/render.swift design.pdf 2 2.0833333 /tmp/right.png
+python tools/car/export.py /tmp/left.png /tmp/right.png public/car src/styles/car.css
+```
+
+Render with `render.swift`, not `pdftocairo`: the artwork is CMYK, and only Quartz converts it as Illustrator and Preview show it (red `#D9242A`, not `#ED1C24`). `export.py` finds the wheels itself and writes the images and `car.css`; if a new body changes its pixel size, update the `width`, `height` and `srcset` widths in `index.html` (the script prints the sizes). Then `npm test`, a scroll through at 1440x900 and 390x844, and a new `og.png` (below).
 
 ## Motion
 
@@ -120,6 +126,5 @@ To check the production setup locally: `npm run build && PORT=4180 npm start`, t
 
 ## Known open items
 
-- The real car: the art in `public/car/` is the v1 placeholder van, until the Figma file arrives (see "Swap the car").
 - Domain: not chosen; once it is, set `VITE_SITE_URL` (see Deploy), which also makes the `hreflang` links absolute (Lighthouse SEO flags them as relative until then).
 - Legal texts: the footer has only the © line for now.

@@ -12,8 +12,12 @@ export function isLaneKind(value: unknown): value is LaneKind {
   return value === 'enter' || value === 'ltr' || value === 'rtl' || value === 'arrive';
 }
 
-/** Wheel diameter as a share of the car's width (placeholder art: 52 / 480). */
-export const WHEEL_SHARE = 52 / 480;
+/**
+ * The tyre's diameter as a share of the car's width: how far the car rolls per turn of its wheels.
+ * The real value comes from car.css (`--tyre-share`, written by tools/car/export.py from the
+ * design); this is the fallback when the stylesheet is not there (tests).
+ */
+export const WHEEL_SHARE = 0.14;
 
 /** Share of the car already on screen at the right edge when the page opens (`enter`). */
 const ENTER_SHOWN = 0.55;
@@ -38,8 +42,8 @@ export function laneRange(kind: LaneKind, view: number, car: number): [number, n
 }
 
 /** Degrees a wheel turns while the car rolls `distance` px (positive = to the right, clockwise). */
-export function wheelTurn(distance: number, car: number): number {
-  const radius = (car * WHEEL_SHARE) / 2;
+export function wheelTurn(distance: number, car: number, share: number = WHEEL_SHARE): number {
+  const radius = (car * share) / 2;
   return radius > 0 ? (distance / (2 * Math.PI * radius)) * 360 : 0;
 }
 
@@ -49,12 +53,13 @@ export function carAt(
   progress: number,
   view: number,
   car: number,
+  share: number = WHEEL_SHARE,
 ): { x: number; turn: number } {
   const [from, to] = laneRange(kind, view, car);
   // Pulling up at the door: it brakes (eases out) instead of stopping dead.
   const p = kind === 'arrive' ? 1 - (1 - progress) ** 2 : progress;
   const x = from + (to - from) * p;
-  return { x, turn: wheelTurn(x - from, car) };
+  return { x, turn: wheelTurn(x - from, car, share) };
 }
 
 /**
@@ -74,12 +79,14 @@ export function initCars(root: ParentNode = document): ScrollTrigger[] {
 
     let view = 0;
     let width = 0;
+    let share = WHEEL_SHARE;
     const measure = () => {
       view = lane.clientWidth;
       width = car.offsetWidth;
+      share = parseFloat(getComputedStyle(car).getPropertyValue('--tyre-share')) || WHEEL_SHARE;
     };
     const draw = (progress: number) => {
-      const { x, turn } = carAt(kind, progress, view, width);
+      const { x, turn } = carAt(kind, progress, view, width, share);
       car.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
       for (const wheel of wheels) wheel.style.transform = `rotate(${turn.toFixed(1)}deg)`;
     };

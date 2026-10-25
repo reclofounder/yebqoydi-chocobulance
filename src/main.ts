@@ -3,6 +3,7 @@ import '@fontsource/nunito/cyrillic-900.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/layout.css';
+import './styles/car.css';
 import { applyI18n, getLang, isLang, setLang } from './i18n';
 import { initScroll, refreshScroll } from './scroll/motion';
 import { applyMode } from './state';

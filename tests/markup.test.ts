@@ -173,26 +173,57 @@ describe('index.html markup', () => {
     expect(lanes[2].closest('section')!.querySelector('#door-title')).not.toBeNull();
     for (const lane of lanes) {
       expect(lane.getAttribute('aria-hidden')).toBe('true');
-      const car = lane.querySelector('[data-car]')!;
-      const body = car.querySelector('img.car__body')!;
-      // The car faces the way it drives: the right-facing art only in left-to-right lanes.
+      // The car faces the way it drives: the right-facing view only in left-to-right lanes. Two
+      // views from the design, never one mirrored, or "Chococream" would read backwards.
       const facing = lane.dataset.lane === 'ltr' ? 'right' : 'left';
-      expect(body.getAttribute('src')).toBe(`/car/body-${facing}.svg`);
-      expect(car.querySelectorAll('img.car__wheel')).toHaveLength(2);
+      const car = lane.querySelector(`[data-car].car--${facing}`)!;
+      expect(car, lane.dataset.lane).not.toBeNull();
+      const body = car.querySelector('img.car__body')!;
+      expect(body.getAttribute('src')).toBe(`/car/${facing}.webp`);
+      expect(body.getAttribute('srcset')).toBe(
+        `/car/${facing}-720.webp 720w, /car/${facing}.webp 1440w`,
+      );
+      const wheels = [...car.querySelectorAll('img.car__wheel')];
+      expect(wheels.map((w) => w.getAttribute('src'))).toEqual([
+        `/car/${facing}-wheel-a.webp`,
+        `/car/${facing}-wheel-b.webp`,
+      ]);
+      // Phones get the half-size rims, as they get the half-size body.
+      for (const w of wheels)
+        expect(w.getAttribute('srcset')).toMatch(/-720\.webp \d+w, .*\.webp \d+w$/);
       for (const img of car.querySelectorAll('img')) {
         expect(img.getAttribute('alt')).toBe('');
         expect(img.getAttribute('width')).toBeTruthy();
         expect(img.getAttribute('height')).toBeTruthy();
       }
     }
+    // The first car is on the first screen: it is what the page paints last, so it goes first.
+    expect(lanes[0].querySelector('.car__body')!.getAttribute('fetchpriority')).toBe('high');
   });
 
-  it('ships the car art the lanes point at', () => {
-    for (const file of ['body-left.svg', 'body-right.svg', 'wheel.svg']) {
-      const svg = readFileSync(resolve(process.cwd(), 'public/car', file), 'utf8');
-      expect(svg, file).toMatch(/^<svg[^>]*viewBox=/);
-      // An <img> cannot see the page's custom properties: the art must carry its own colours.
-      expect(svg, file).not.toContain('var(--');
+  it('ships the car art the lanes point at, and the generated positions of its rims', () => {
+    for (const facing of ['left', 'right']) {
+      for (const file of [
+        `${facing}.webp`,
+        `${facing}-720.webp`,
+        `${facing}-wheel-a.webp`,
+        `${facing}-wheel-b.webp`,
+      ]) {
+        const webp = readFileSync(resolve(process.cwd(), 'public/car', file));
+        expect(webp.subarray(0, 4).toString('latin1'), file).toBe('RIFF');
+        expect(webp.subarray(8, 12).toString('latin1'), file).toBe('WEBP');
+      }
+    }
+    const css = readFileSync(resolve(process.cwd(), 'src/styles/car.css'), 'utf8');
+    expect(css).toMatch(/--car-ratio:\s*0\.\d+/);
+    expect(css).toMatch(/--tyre-share:\s*0\.\d+/);
+    for (const rule of [
+      '.car--left .car__wheel--a',
+      '.car--left .car__wheel--b',
+      '.car--right .car__wheel--a',
+      '.car--right .car__wheel--b',
+    ]) {
+      expect(css, rule).toContain(`${rule} {`);
     }
   });
 

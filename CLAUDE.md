@@ -12,7 +12,7 @@
   codename (folder name and GitHub repo name).
 - **Status (2026-10-25):** **v2 built on `main`** (§7 "What was built (v2)", §8): one long red page in
   the style of the campaign teaser, the user's words in order, the car driving across between them.
-  Placeholder car (the v1 van) until the user's **Figma car** arrives. **Pushed and deployed 2026-10-25:**
+  **The real car from the design PDF since 2026-10-25** (§7 "The car"). **Pushed and deployed 2026-10-25:**
   live at **https://chocobulance-production.up.railway.app** (Railway project "chocobulance", auto-deploys
   every push to `main`). Open items in §6b and the README.
 
@@ -134,8 +134,6 @@ Notes:
 - Service hours and days.
 - Social links (Instagram / Telegram) for the UGC loop.
 - Domain name.
-- **The real car from Figma** (user will send): needs both side views if it has lettering, wheels as
-  separate layers if they should spin (README "Swap the car").
 - Hero spelling: one word "Yebqoʻydingizmi?" as the user wrote it; the teaser had "yeb qoʻydilar" as two words.
 - Legal texts for the footer (only © for now).
 - Phone hero size: on a 390 px phone the arched headline is about 42 px (a 16-letter word on one arc).
@@ -321,6 +319,18 @@ Quality: 91 tests, typecheck and build clean; Lighthouse mobile performance 99, 
 best practices 100, CLS 0, about 110 kB (uz) / 118 kB (ru); SEO 83 only for relative hreflang
 (fixed by `VITE_SITE_URL` at deploy).
 
+### The car (2026-10-25)
+
+Source: the user's `~/Desktop/Hyundai_starix_chococream_20.pdf` (Illustrator, 4 pages: Hyundai Staria
+in Chococream livery, page 1 facing left, 2 facing right, 3 rear, 4 front; CMYK photo with a soft
+mask). Exported by `tools/car/` (README "The car"): rendered with Quartz for ColorSync colours (red
+`#D9242A`; pdftocairo gives `#ED1C24`), enclosed transparent holes (between the spokes) filled with
+what they show on white, cropped to one frame for both views, WebP at 1440 and 720 px wide; each rim
+cut out as a round disc (r = rim + 6 px) laid exactly over the photo's rim and spun by the distance
+rolled (`--tyre-share` 0.1403 from the measured tyre). `src/styles/car.css` is generated. Car size on
+the page: `clamp(280px, 48vw, 720px)`. Higgsfield was offered for images; not used (the PDF is the
+exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
+
 ## 8. Session log
 
 - **2026-10-15** — User created private GitHub repo and connected `origin`. Installed Railway CLI
@@ -426,3 +436,7 @@ best practices 100, CLS 0, about 110 kB (uz) / 118 kB (ru); SEO 83 only for rela
   Smoke check passed: `/` and `/?lang=ru` 200, `/og.png` image/png, `/robots.txt` 200, `/assets/` and
   `/nope` 404, absolute og/hreflang, `tel:+998712099900`, fonts and car load with no failed requests.
   Next: user tests; Figma car; phone-size hero question (split "Yeb qoʻydingizmi?").
+- **2026-10-25 (the real car)** — User sent the car design as a PDF (Illustrator, 4 views). Built the
+  `tools/car/` pipeline and replaced the placeholder with both side views and spinning rims (§7 "The
+  car"). User offered Higgsfield (skill `higgsfield-ai/skills`) for image generation, asked to spend
+  credits only when needed; not installed or used. Pushed (auto-deploys).
