@@ -93,7 +93,7 @@ describe.each(['uz', 'ru'] as const)('names and labels (%s)', (lang) => {
     render(lang);
     const h1 = document.querySelector('h1')!;
     const spoken = h1.querySelector('.visually-hidden')!.textContent;
-    expect(spoken).toBe(lang === 'uz' ? 'Yebqoʻydingizmi?' : 'Всё съели?');
+    expect(spoken).toBe(lang === 'uz' ? 'Yeb qoʻydingizmi?' : 'Всё съели?');
     expect(h1.querySelector('textPath')!.textContent).toBe(spoken);
     expect(h1.querySelector('svg')!.getAttribute('aria-hidden')).toBe('true');
   });

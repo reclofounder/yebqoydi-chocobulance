@@ -1,5 +1,5 @@
 {
-  "meta.title": "Chocobulance — шоколадная скорая помощь Chococream",
+  "meta.title": "yebqoydi.uz — Chocobulance: шоколадная скорая помощь Chococream",
   "meta.description": "Всё съели? Позвоните по номеру {phone} — шоко-доктора приедут к вам домой и утешат малыша. Обслуживание бесплатно, шоколадная паста — {price} сум. Только в пределах Ташкента.",
   "header.lang.uz": "UZ",
   "header.lang.ru": "RU",
@@ -18,7 +18,7 @@
   "price.tub": "Шоколадная паста — {price} сум.",
   "area.title": "Сервис работает только в Ташкенте!",
   "area.map": "Карта зоны обслуживания: границы города Ташкента",
-  "footer.copy": "© 2026 Chococream. Все права защищены.",
+  "footer.copy": "© 2026 Chococream · yebqoydi.uz. Все права защищены.",
   "state.teaser.cta": "Скоро",
   "state.ended.cta": "Акция завершена",
   "a11y.call": "Позвонить по номеру {phone}",

@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "chocobulance-omega.vercel.app"
+        }
+      ],
+      "destination": "https://yebqoydi.uz/:path*",
+      "permanent": true
+    }
+  ]
+}

@@ -11,9 +11,10 @@ const signedArea = (ring: Position[]) =>
   2;
 
 describe('the service area', () => {
-  it('is the area the client drew over the map, a closed ring, with the map data credited', () => {
+  it("is Tashkent's official border cut along real streets and waterways, a closed ring, credited", () => {
     const [feature] = area.features;
-    expect(feature.properties!.source).toMatch(/Drawn by the client/);
+    expect(feature.properties!.source).toMatch(/OpenStreetMap relation 2216724/);
+    expect(feature.properties!.source).toMatch(/routed along the real streets/);
     expect(feature.properties!.source).toMatch(/OpenStreetMap contributors/);
     for (const polygon of feature.geometry.coordinates) {
       const ring = polygon[0];

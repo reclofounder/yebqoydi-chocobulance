@@ -13,7 +13,8 @@
 - **Status (2026-10-25):** **v2 built on `main`** (§7 "What was built (v2)", §8): one long red page in
   the style of the campaign teaser, the user's words in order, the car driving across between them.
   **The real car from the design PDF since 2026-10-25** (§7 "The car"). **Pushed and deployed 2026-10-25:**
-  live at **https://chocobulance-omega.vercel.app** (Vercel), which auto-deploys every push to `main`.
+  live at **https://yebqoydi.uz** (Vercel; www and the vercel.app address redirect to it), which auto-deploys
+  every push to `main`.
   **Railway removed 2026-10-26** (user's choice: Vercel is free). Open items in §6b and the README.
 
 ## 2. Rules set by the user
@@ -512,3 +513,15 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   footer reserves `--bar-space` itself; (5) phones: question in the upper part of the first screen,
   blocks 45svh, car 240 px, and crossings `linger` in the middle so the car is in view whole for longer.
   One car at a time re-checked at five sizes. Lighthouse 98 / 100 / 100 / SEO 92, CLS 0.
+- **2026-10-26 (domain, SEO, real city map)** — Client moved the site to **yebqoydi.uz** (Vercel domains:
+  apex canonical, www 308 to apex). `VITE_SITE_URL` on Vercel set to https://yebqoydi.uz; `vercel.json`
+  308-redirects chocobulance-omega.vercel.app to it. Hero "Yeb qoʻydingizmi?" (with a space) and a new
+  `og.png`. SEO: canonical (follows the language), hreflang uz = `/`, ru = `?lang=ru`, build-time
+  `robots.txt` + `sitemap.xml`, the Uzbek copy pre-rendered into the HTML (Yandex), JSON-LD (WebSite
+  with alternate names Yebqoʻydi.uz etc., Organization, Service with phone/price/area), title starting
+  with the domain, IndexNow key file. Lighthouse SEO 100. Owner steps in `SEO.md` (Yandex Webmaster,
+  Search Console, Bing, links, Yandex Business / Google Business / 2GIS). Map: the client sent the real
+  Tashkent border (red) and the served part (blue, rough): service area = official border (OSM
+  2216724) on the west/north, cut along real roads, the Chirchiq and canals nearest the blue line
+  (Overpass data, least-cost route), 349 points; pipeline in `tools/map/`. Map refits after load and
+  keeps 48 px at the bottom for the credit line. Committed; push waits for the client's OK.

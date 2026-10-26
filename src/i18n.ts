@@ -28,17 +28,18 @@ export function getLang(): Lang {
   return DEFAULT_LANG;
 }
 
-function fill(template: string): string {
+/** Fills `{phone}` and `{price}` from src/config.ts (also used at build time, vite.config.ts). */
+export function fillTemplate(template: string): string {
   const values: Record<string, string> = { phone: PHONE_DISPLAY, price: PRICE };
   return template.replace(/\{(phone|price)\}/g, (_, name: string) => values[name]);
 }
 
 export function t(key: string, lang: Lang = active ?? getLang()): string {
   const own = DICTS[lang][key];
-  if (own !== undefined) return fill(own);
+  if (own !== undefined) return fillTemplate(own);
   console.warn('[i18n] missing', key, lang);
   const fallback = DICTS[DEFAULT_LANG][key];
-  return fallback !== undefined ? fill(fallback) : key;
+  return fallback !== undefined ? fillTemplate(fallback) : key;
 }
 
 function applyText(el: HTMLElement, text: string): void {
@@ -66,16 +67,25 @@ function applyAttributes(el: HTMLElement, lang: Lang): void {
   }
 }
 
-/** Point each `link[hreflang]` alternate at this page with the matching `?lang=`. */
-function applyHreflang(): void {
+/** This page's address in `lang`: Uzbek is the plain address (the canonical one), Russian `?lang=ru`. */
+function pageUrl(lang: Lang): string {
+  const url = new URL(window.location.href);
+  url.search = lang === 'uz' ? '' : `?lang=${lang}`;
+  url.hash = '';
+  return url.href;
+}
+
+/**
+ * Point each `link[hreflang]` alternate at this page in its language, and the canonical link at the
+ * page in the language shown (so a Russian view is never declared a copy of the Uzbek one).
+ */
+function applyHreflang(lang: Lang): void {
   for (const link of document.querySelectorAll<HTMLLinkElement>('link[hreflang]')) {
     const code = link.getAttribute('hreflang');
     if (!isLang(code)) continue;
-    const url = new URL(window.location.href);
-    url.search = `?lang=${code}`;
-    url.hash = '';
-    link.setAttribute('href', url.href);
+    link.setAttribute('href', pageUrl(code));
   }
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href', pageUrl(lang));
 }
 
 export function applyI18n(root: ParentNode, lang: Lang): void {
@@ -91,7 +101,7 @@ export function applyI18n(root: ParentNode, lang: Lang): void {
   for (const el of root.querySelectorAll<HTMLElement>('[data-lang]')) {
     el.setAttribute('aria-pressed', String(el.dataset.lang === lang));
   }
-  applyHreflang();
+  applyHreflang(lang);
 }
 
 /**

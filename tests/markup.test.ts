@@ -57,7 +57,7 @@ describe('index.html markup', () => {
   });
 
   describe('the inline script that promotes the Cyrillic preloads', () => {
-    const script = doc.head.querySelector('script:not([src])')!.textContent!;
+    const script = doc.head.querySelector('script:not([src]):not([type])')!.textContent!;
     const run = (url: string, stored: string | null) => {
       window.history.replaceState({}, '', url);
       if (stored) localStorage.setItem('lang', stored);
@@ -339,10 +339,14 @@ describe('index.html markup', () => {
     it('points search engines at each language, and at the Uzbek page by default', () => {
       const alt = (code: string) =>
         doc.head.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${code}"]`);
-      expect(alt('uz')!.getAttribute('href')).toBe('%VITE_SITE_URL%/?lang=uz');
+      expect(alt('uz')!.getAttribute('href')).toBe('%VITE_SITE_URL%/');
       expect(alt('ru')!.getAttribute('href')).toBe('%VITE_SITE_URL%/?lang=ru');
       expect(alt('x-default')!.getAttribute('href')).toBe('%VITE_SITE_URL%/');
       expect(content('meta[property="og:url"]')).toBe('%VITE_SITE_URL%/');
+      // One address is the page: the Uzbek one (i18n.ts points it at the language shown).
+      expect(doc.head.querySelector('link[rel="canonical"]')!.getAttribute('href')).toBe(
+        '%VITE_SITE_URL%/',
+      );
     });
 
     describe('the site origin, filled in at build time (VITE_SITE_URL)', () => {
@@ -366,7 +370,7 @@ describe('index.html markup', () => {
           'https://example.com/og.png',
           'https://example.com/og.png',
           'https://example.com/',
-          'https://example.com/?lang=uz',
+          'https://example.com/',
           'https://example.com/?lang=ru',
           'https://example.com/',
         ]);
@@ -378,7 +382,7 @@ describe('index.html markup', () => {
 
       it('falls back to relative tags, never the literal placeholder, when it is unset', () => {
         const page = build({});
-        expect(tags(page)).toEqual(['/og.png', '/og.png', '/', '/?lang=uz', '/?lang=ru', '/']);
+        expect(tags(page)).toEqual(['/og.png', '/og.png', '/', '/', '/?lang=ru', '/']);
         expect(page.documentElement.outerHTML).not.toContain('%VITE_SITE_URL%');
       });
     });

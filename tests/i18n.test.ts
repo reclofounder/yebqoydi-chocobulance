@@ -104,7 +104,7 @@ test('applyI18n sets document title and meta content, not textContent of meta', 
   document.head.innerHTML =
     '<title data-i18n="meta.title">x</title><meta name="description" content="x" data-i18n="meta.description">';
   applyI18n(document, 'uz');
-  expect(document.title).toBe('Chocobulance — Chococream shokolad tez yordami');
+  expect(document.title).toBe('yebqoydi.uz — Chocobulance: Chococream shokolad tez yordami');
   expect(document.querySelector('title')!.textContent).toBe(document.title);
   const meta = document.querySelector('meta[name="description"]')!;
   expect(meta.getAttribute('content')).toBe(t('meta.description', 'uz'));
@@ -128,7 +128,8 @@ test('applyI18n works with no hreflang links and updates them when present', () 
   const hrefs = [...document.querySelectorAll<HTMLLinkElement>('link[hreflang]')].map(
     (l) => new URL(l.href).search,
   );
-  expect(hrefs).toEqual(['?lang=uz', '?lang=ru']);
+  // Uzbek is the plain address (the canonical page), Russian the ?lang=ru one.
+  expect(hrefs).toEqual(['', '?lang=ru']);
 });
 
 test('applyI18n leaves the x-default alternate as it is', () => {
@@ -141,7 +142,20 @@ test('applyI18n leaves the x-default alternate as it is', () => {
   const href = (code: string) =>
     document.querySelector(`link[hreflang="${code}"]`)!.getAttribute('href');
   expect(href('x-default')).toBe('/');
-  expect(new URL(href('uz')!).search).toBe('?lang=uz');
+  expect(new URL(href('uz')!).search).toBe('');
+});
+
+test('the canonical link names the page in the language shown', () => {
+  window.history.replaceState({}, '', '/?lang=ru&utm_source=bio#how');
+  document.head.innerHTML = '<link rel="canonical" href="/">';
+  const canonical = () =>
+    new URL(document.querySelector('link[rel="canonical"]')!.getAttribute('href')!);
+
+  applyI18n(document, 'ru');
+  expect(canonical().pathname + canonical().search + canonical().hash).toBe('/?lang=ru');
+
+  applyI18n(document, 'uz');
+  expect(canonical().pathname + canonical().search + canonical().hash).toBe('/');
 });
 
 test('setLang persists, re-applies and dispatches langchange', () => {
@@ -196,7 +210,7 @@ test('t without a lang follows the language last applied, even if ?lang= disagre
   setLang('ru');
   expect(t('hero.title')).toBe('Всё съели?');
   setLang('uz');
-  expect(t('hero.title')).toBe('Yebqoʻydingizmi?');
+  expect(t('hero.title')).toBe('Yeb qoʻydingizmi?');
 });
 
 test('the language buttons say which language is on (aria-pressed), on load and on every switch', () => {

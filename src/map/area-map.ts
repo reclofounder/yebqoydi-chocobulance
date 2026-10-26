@@ -9,6 +9,9 @@ export const STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
 const RED = '#c71920';
 const OUTSIDE = '#2e140d';
 
+/** Room around the area when the map fits it: more at the bottom, where the credit line sits. */
+const FIT_PADDING = { top: 24, right: 24, bottom: 48, left: 24 };
+
 /** How far from the screen the map starts loading (its code and tiles are only fetched near it). */
 const PRELOAD_MARGIN = '600px 0px';
 
@@ -100,7 +103,7 @@ async function build(container: HTMLElement): Promise<MapLibreMap> {
     container,
     style: STYLE_URL,
     bounds: areaBounds(area),
-    fitBoundsOptions: { padding: 24 },
+    fitBoundsOptions: { padding: FIT_PADDING },
     // The page scrolls past the map: one finger (or a plain wheel) scrolls the page, two fingers
     // (or Ctrl/⌘ + wheel) move the map, and a hint says so.
     cooperativeGestures: true,
@@ -121,9 +124,12 @@ async function build(container: HTMLElement): Promise<MapLibreMap> {
   map.on('movestart', (event) => {
     if ((event as { originalEvent?: Event }).originalEvent) moved = true;
   });
-  map.on('resize', () => {
-    if (!moved) map.fitBounds(areaBounds(area), { padding: 24, animate: false });
-  });
+  const fit = () => {
+    if (!moved) map.fitBounds(areaBounds(area), { padding: FIT_PADDING, animate: false });
+  };
+  map.on('resize', fit);
+  // And once loaded: the size the constructor fitted to is not always the card's final one.
+  map.once('load', fit);
 
   map.on('load', () => {
     map.addSource('area', { type: 'geojson', data: area });

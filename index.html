@@ -6,10 +6,12 @@
     <meta name="theme-color" content="#C71920" />
     <!-- The title and description ship in Uzbek, filled from src/config.ts and uz.json (a test keeps
          them in step): link previews and crawlers do not run the script that translates them. -->
-    <title data-i18n="meta.title">Chocobulance — Chococream shokolad tez yordami</title>
+    <title data-i18n="meta.title">
+      yebqoydi.uz — Chocobulance: Chococream shokolad tez yordami
+    </title>
     <meta
       name="description"
-      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
+      content="Yeb qoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahrida."
       data-i18n="meta.description"
     />
     <!-- The "20 yoshda" of the Chococream 20 lockup on brand red: the .ico (16, 32, 48 px) for tabs
@@ -22,22 +24,23 @@
          need; unset, they stay relative (README, Deploy). Languages: src/i18n.ts also points the
          uz and ru hrefs at the current origin at runtime, for crawlers that run scripts.
          vite-ignore: these are pages, not assets; Vite would try to bundle "/" and fail. -->
-    <link rel="alternate" hreflang="uz" href="%VITE_SITE_URL%/?lang=uz" vite-ignore />
+    <link rel="canonical" href="%VITE_SITE_URL%/" vite-ignore />
+    <link rel="alternate" hreflang="uz" href="%VITE_SITE_URL%/" vite-ignore />
     <link rel="alternate" hreflang="ru" href="%VITE_SITE_URL%/?lang=ru" vite-ignore />
     <link rel="alternate" hreflang="x-default" href="%VITE_SITE_URL%/" vite-ignore />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="%VITE_SITE_URL%/" />
-    <meta property="og:site_name" content="Chocobulance" />
+    <meta property="og:site_name" content="yebqoydi.uz" />
     <meta property="og:locale" content="uz_UZ" />
     <meta property="og:locale:alternate" content="ru_RU" />
     <meta
       property="og:title"
-      content="Chocobulance — Chococream shokolad tez yordami"
+      content="yebqoydi.uz — Chocobulance: Chococream shokolad tez yordami"
       data-i18n="meta.title"
     />
     <meta
       property="og:description"
-      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
+      content="Yeb qoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahrida."
       data-i18n="meta.description"
     />
     <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
@@ -46,15 +49,59 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Chocobulance — Chococream shokolad tez yordami"
+      content="yebqoydi.uz — Chocobulance: Chococream shokolad tez yordami"
       data-i18n="meta.title"
     />
     <meta
       name="twitter:description"
-      content="Yebqoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahri ichida."
+      content="Yeb qoʻydingizmi? 71&nbsp;209&nbsp;99&nbsp;00 raqamiga qoʻngʻiroq qiling — choco doktorlar uyingizga kelib, kichkintoyni ovutadi. Xizmat bepul, shokolad pastasi 99&nbsp;000 soʻm. Faqat Toshkent shahrida."
       data-i18n="meta.description"
     />
     <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
+    <!-- Structured data for search engines: the site under all the ways people type its name, and
+         the service (who, where, how to call, what it costs). A test keeps phone and price in step
+         with src/config.ts. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "%VITE_SITE_URL%/#website",
+            "url": "%VITE_SITE_URL%/",
+            "name": "yebqoydi.uz",
+            "alternateName": [
+              "Yebqoʻydi.uz",
+              "Yebqo'ydi.uz",
+              "Yeb qoʻydi",
+              "Yebqoydi",
+              "Chocobulance"
+            ],
+            "inLanguage": ["uz", "ru"],
+            "publisher": { "@id": "%VITE_SITE_URL%/#chococream" }
+          },
+          {
+            "@type": "Organization",
+            "@id": "%VITE_SITE_URL%/#chococream",
+            "name": "Chococream",
+            "logo": "%VITE_SITE_URL%/icon-192.png"
+          },
+          {
+            "@type": "Service",
+            "name": "Chocobulance — Chococream shokolad tez yordami",
+            "serviceType": "Chococream yetkazib berish",
+            "provider": { "@id": "%VITE_SITE_URL%/#chococream" },
+            "areaServed": { "@type": "City", "name": "Toshkent" },
+            "availableChannel": {
+              "@type": "ServiceChannel",
+              "servicePhone": { "@type": "ContactPoint", "telephone": "+998712099900" }
+            },
+            "offers": { "@type": "Offer", "price": "99000", "priceCurrency": "UZS" },
+            "url": "%VITE_SITE_URL%/"
+          }
+        ]
+      }
+    </script>
     <link
       rel="preload"
       as="font"

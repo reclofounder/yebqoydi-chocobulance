@@ -35,7 +35,7 @@ test('boot applies copy and state, and [data-lang] buttons switch the language',
   expect(document.documentElement.hasAttribute('data-booting')).toBe(false);
   expect(document.documentElement.lang).toBe('uz');
   expect(text('[data-cta]')).toBe('Tez orada');
-  expect(text('h2')).toBe('Yebqoʻydingizmi?');
+  expect(text('h2')).toBe('Yeb qoʻydingizmi?');
   // Teaser: the number in the copy stays readable, but is not a link yet.
   expect(text('[data-tel]')).toBe('71 209 99 00');
   expect(document.querySelector('[data-tel]')!.hasAttribute('href')).toBe(false);
