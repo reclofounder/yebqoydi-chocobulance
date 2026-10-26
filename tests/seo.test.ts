@@ -100,11 +100,14 @@ describe('robots.txt and sitemap.xml', () => {
 describe('one address for the site', () => {
   it('sends the vercel.app address to yebqoydi.uz, page for page', () => {
     const config = JSON.parse(readFileSync(resolve(process.cwd(), 'vercel.json'), 'utf8'));
+    // The root needs its own rule: Vercel's /:path* does not match it.
+    const host = [{ type: 'host', value: 'chocobulance-omega.vercel.app' }];
     expect(config.redirects).toEqual([
+      { source: '/', has: host, destination: 'https://yebqoydi.uz/', permanent: true },
       {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'chocobulance-omega.vercel.app' }],
-        destination: 'https://yebqoydi.uz/:path*',
+        source: '/:path+',
+        has: host,
+        destination: 'https://yebqoydi.uz/:path+',
         permanent: true,
       },
     ]);

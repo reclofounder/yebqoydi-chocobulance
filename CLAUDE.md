@@ -524,4 +524,6 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   Tashkent border (red) and the served part (blue, rough): service area = official border (OSM
   2216724) on the west/north, cut along real roads, the Chirchiq and canals nearest the blue line
   (Overpass data, least-cost route), 349 points; pipeline in `tools/map/`. Map refits after load and
-  keeps 48 px at the bottom for the credit line. Committed; push waits for the client's OK.
+  keeps 48 px at the bottom for the credit line. Pushed on the client's OK; live checked (robots, sitemap,
+  canonical, hreflang, og tags, JSON-LD, pre-rendered copy, www 308). `vercel.json` needed an explicit `/`
+  rule: Vercel's `/:path*` did not redirect the vercel.app root.
