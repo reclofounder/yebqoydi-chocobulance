@@ -93,6 +93,8 @@ swift tools/car/render.swift design.pdf 2 2.0833333 /tmp/right.png
 python tools/car/export.py /tmp/left.png /tmp/right.png public/car src/styles/car.css
 ```
 
+**The right-facing roof:** on page 2 of the PDF the red roof stripe sits about 20 px lower than on page 1 (a white sliver of roof shows above it). After exporting, run `python tools/car/fix-right-roof.py public/car`: it takes the roof band from the mirrored left-facing image (the two pages are the same photo mirrored) and keeps the rest, lettering included. Drop this step once the design is corrected.
+
 Render with `render.swift`, not `pdftocairo`: the artwork is CMYK, and only Quartz converts it as Illustrator and Preview show it (red `#D9242A`, not `#ED1C24`). `export.py` finds the wheels itself and writes the images and `car.css`; if a new body or rim changes its pixel size, update the `width`, `height` and `srcset` widths in `index.html` (the script prints the sizes). Then `npm test`, a scroll through at 1440x900 and 390x844, and a new `og.png` (below).
 
 ## The boys

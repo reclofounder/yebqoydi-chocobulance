@@ -671,16 +671,18 @@ h2,
   content: '';
   position: absolute;
   z-index: -1;
-  left: 3%;
-  right: 3%;
-  top: 90%;
-  height: 16%;
+  left: 7%;
+  right: 7%;
+  top: 87%;
+  height: 13%;
   background: radial-gradient(
     closest-side,
-    rgb(46 20 13 / 0.7),
-    rgb(46 20 13 / 0.3) 60%,
+    rgb(46 20 13 / 0.3),
+    rgb(46 20 13 / 0.1) 60%,
     transparent
   );
+  /* Blurred, so it fades out evenly with no edge (painted once: the car is its own layer). */
+  filter: blur(6px);
 }
 
 /* Its outline, so the red spoiler and stripes read against the red page: a warm brown shadow
@@ -690,7 +692,7 @@ h2,
 .car__body {
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 2px 3px rgb(46 20 13 / 0.6)) drop-shadow(0 14px 22px rgb(46 20 13 / 0.4));
+  filter: drop-shadow(0 1px 2px rgb(46 20 13 / 0.45)) drop-shadow(0 8px 20px rgb(46 20 13 / 0.16));
 }
 
 /* Each rim is a round copy of the photo's own rim, laid exactly over it, so the car looks the same

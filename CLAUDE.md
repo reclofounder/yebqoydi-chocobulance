@@ -527,3 +527,11 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   keeps 48 px at the bottom for the credit line. Pushed on the client's OK; live checked (robots, sitemap,
   canonical, hreflang, og tags, JSON-LD, pre-rendered copy, www 308). `vercel.json` needed an explicit `/`
   rule: Vercel's `/:path*` did not redirect the vercel.app root.
+- **2026-10-30 (right car roof, softer shadow)** — Client: on the left-to-right cars a white strip shows
+  on top and the red line is off; the right-to-left cars are fine. Cause: on page 2 of the design PDF
+  the red roof stripe sits ~20 px lower than on page 1 (white roof sliver above it, stripe over the
+  windows). The two pages are the same photo mirrored, so the roof band of `right.avif` / `right-720.avif`
+  was replaced with the mirrored left view's (`tools/car/fix-right-roof.py`; rest unchanged, mean
+  difference 0.3/255). The design PDF is no longer on the Desktop; re-exporting needs that step until the
+  design is corrected. Client also asked for a softer, lighter shadow under the car: ground shadow
+  0.7/0.3 to 0.3/0.1, narrower, blurred 6 px; body drop-shadow 0.6 + 0.4 to 0.45 + 0.16.
