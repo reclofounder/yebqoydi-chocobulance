@@ -21,7 +21,8 @@ test('no literal number or price in copy, only templates (and no trace of the ol
     for (const [k, v] of Object.entries(d)) {
       expect(v, k).not.toMatch(/(?<!\d)105(?!\d)/);
       expect(v, k).not.toMatch(/71\s?209/); // \s also matches the no-break space
-      expect(v, k).not.toMatch(/99\s000/);
+      // The price comes from {price}; neither the current one nor the old 99 000 is typed in.
+      expect(v, k).not.toMatch(/(45|99)\s000/);
     }
   }
 });
@@ -29,7 +30,7 @@ test('no literal number or price in copy, only templates (and no trace of the ol
 test('t fills templates', () => {
   expect(t('call.number', 'uz')).toBe('71\u00a0209\u00a099\u00a000');
   expect(t('header.call', 'ru')).toBe('71\u00a0209\u00a099\u00a000');
-  expect(t('price.tub', 'uz')).toBe('Shokolad pastasi\u00a0— 99\u00a0000 soʻm.');
+  expect(t('price.tub', 'uz')).toBe('Shokolad pastasi\u00a0— 45\u00a0000 soʻm.');
   expect(t('a11y.call', 'ru')).toBe('Позвонить по номеру 71\u00a0209\u00a099\u00a000');
 });
 

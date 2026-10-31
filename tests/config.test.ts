@@ -4,6 +4,6 @@ test('config defaults', () => {
   expect(PHONE_TEL).toBe('tel:+998712099900');
   // No-break spaces: neither the number nor the price ever wraps between its groups.
   expect(PHONE_DISPLAY).toBe('71\u00a0209\u00a099\u00a000');
-  expect(PRICE).toBe('99\u00a0000');
+  expect(PRICE).toBe('45\u00a0000');
   expect(['teaser', 'live', 'ended']).toContain(MODE);
 });

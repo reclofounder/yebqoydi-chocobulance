@@ -96,7 +96,7 @@ describe('index.html markup', () => {
     // The number is {phone} and the price {price} in the JSON; only tel: links carry the number.
     const text = doc.body.textContent ?? '';
     expect(text).not.toMatch(/71[\s ]?209/);
-    expect(text).not.toMatch(/99[\s ]?000/);
+    expect(text).not.toMatch(/(45|99)[\s\u00a0]?000/);
     expect(html).not.toMatch(/(?<![\d.])105(?![\d.])/);
   });
 

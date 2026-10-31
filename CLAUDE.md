@@ -114,7 +114,7 @@ Notes:
 | Phone number | **Superseded 2026-10-25:** the number is **71 209 99 00** (`PHONE = '+998712099900'`, `PHONE_DISPLAY` with no-break spaces, `src/config.ts`). **105 is dropped everywhere** (no `HOOK` any more). |
 | Site purpose | **Information only, for end users:** what Chocobulance is and how to call. No order form, no payment online. |
 | Coverage | **Tashkent city only.** Say clearly that addresses outside the city may not be served. |
-| Price | **99 000 UZS** per tub, paid by the customer **when the service is completed** (on delivery). **Call-out is free** (2026-10-25). |
+| Price | **45 000 UZS** per tub since **2026-10-31** (was 99 000), paid by the customer **when the service is completed** (on delivery). **Call-out is free** (2026-10-25). `PRICE` in `src/config.ts`; the static descriptions and JSON-LD `price` in `index.html` repeat it (tests keep them in step). |
 | Design direction | "Super cool" animated **parallax** landing page: the **Chocobulance van moves with scroll, wheels animate**. Scroll-driven storytelling. Still must respect Apple HIG rules (clarity, restraint, reduced-motion fallback). |
 | Process | User wants **design references first**, then a design discussion, then build. |
 | **New direction (2026-10-25)** | Supersedes the v1 illustrated scenes. **One long red background** (the campaign teaser's radial red), **only the user's words** on it in their chronology, **nothing else added**, and **the real Chocobulance car** (from the user's Figma) driving **right to left, then left to right** across the page as you scroll. Hero: "Yebqoʻydingizmi?" on a **gentle arc**. Footer legal: **only the © line** for now. Headline font: Baloo 2 (closest to the teaser's lettering). |
@@ -535,3 +535,7 @@ exact car). Lighthouse after: performance 99, LCP 2.2 s, CLS 0, about 197 kB.
   difference 0.3/255). The design PDF is no longer on the Desktop; re-exporting needs that step until the
   design is corrected. Client also asked for a softer, lighter shadow under the car: ground shadow
   0.7/0.3 to 0.3/0.1, narrower, blurred 6 px; body drop-shadow 0.6 + 0.4 to 0.45 + 0.16.
+- **2026-10-31 (new price)** — Client changed the price to **45 000 soʻm** per tub. `PRICE` in
+  `src/config.ts` (all copy, UZ and RU, uses `{price}`), the three static meta/OG/Twitter descriptions
+  and the JSON-LD offer (`"price": "45000"`) in `index.html`, tests (the JSON-LD test now reads `PRICE`;
+  the no-literal guards catch both 45 000 and the old 99 000). Built output checked: no 99 000 anywhere.

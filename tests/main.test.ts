@@ -6,7 +6,7 @@ vi.doMock('../src/config', () => ({
   PHONE: '+998712099900',
   PHONE_DISPLAY: '71 209 99 00',
   PHONE_TEL: 'tel:+998712099900',
-  PRICE: '99 000',
+  PRICE: '45 000',
   MODE: 'teaser',
 }));
 vi.doMock('../src/scroll/motion', () => ({

@@ -69,7 +69,7 @@ Edit `src/config.ts`: `PHONE` is what a tap dials (international form, `'+998712
 
 ## Edit copy
 
-All copy lives in `src/i18n/uz.json` and `src/i18n/ru.json`; the HTML only carries keys (`data-i18n="soothe.title"`). Both files must have the same keys (a test checks it). A key can use `{phone}` and `{price}`, filled from `src/config.ts`; never type the number or `99 000` into the copy (a test fails if you do).
+All copy lives in `src/i18n/uz.json` and `src/i18n/ru.json`; the HTML only carries keys (`data-i18n="soothe.title"`). Both files must have the same keys (a test checks it). A key can use `{phone}` and `{price}`, filled from `src/config.ts`; never type the number or the price into the copy (a test fails if you do). To change the price, edit `PRICE` in `src/config.ts`, then the three static descriptions and the JSON-LD `"price"` in `index.html` (tests check they match).
 
 Uzbek uses two different marks, never the ASCII `'`: `ʻ` (U+02BB) inside the letters oʻ and gʻ (qoʻngʻiroq), and `ʼ` (U+02BC) as the apostrophe. Copy them from the existing strings.
 

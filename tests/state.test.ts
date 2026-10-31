@@ -6,7 +6,7 @@ const { DEFAULTS, cfg } = vi.hoisted(() => {
   const DEFAULTS = {
     PHONE: '+998712099900',
     PHONE_DISPLAY: '71\u00a0209\u00a099\u00a000',
-    PRICE: '99\u00a0000',
+    PRICE: '45\u00a0000',
     MODE: 'live',
   };
   return { DEFAULTS, cfg: { ...DEFAULTS } };

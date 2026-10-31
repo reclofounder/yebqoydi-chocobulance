@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import uz from '../src/i18n/uz.json';
 import { t } from '../src/i18n';
-import { PHONE } from '../src/config';
+import { PHONE, PRICE } from '../src/config';
 import { prerenderCopy, seoFiles } from '../vite.config';
 
 const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
@@ -55,7 +55,7 @@ describe('structured data', () => {
   it('describes the service with the same phone and price as the page', () => {
     const service = node('Service');
     expect(service.availableChannel.servicePhone.telephone).toBe(PHONE);
-    expect(service.offers.price).toBe('99000');
+    expect(service.offers.price).toBe(PRICE.replace(/\D/g, ''));
     expect(service.offers.priceCurrency).toBe('UZS');
     expect(service.areaServed.name).toBe('Toshkent');
   });
